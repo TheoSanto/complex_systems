@@ -1,67 +1,78 @@
 import global_variables as glob
 
-# THIS IS OK ########################################################
-# Function that returns if a Value is already in an Array of Integers
-def is_there_equals(array, value) :
-    if array.count(value)!=0 : return True
-    else: return False
+def count_all(ambient) :
+    nred = 0
+    for i in range(glob.dimension) :
+        if ambient[i][1]==-1 :
+            nred += 1
+    return [nred, glob.npeople-nred]
 
-# THIS IS OK ########################################################
-# Function that returns a Matrix containing the Friends' Links 
-# for each Individual
-#def choose_friends() :
-#    friends_matrix = [[-3]*(glob.npeople-1)]*glob.npeople
-#    
-#    for j in range(glob.npeople) :
-#
-#        # Extraction of the n° of Friends of j-th Individual
-#        gaus_num_friends = int(glob.np.random.normal(2,2)) # da definire meglio 
-#        '''NOTA: IL NUMERO DI AMICI GENERATI GAUSSIANAMENTE SOTTOSTIMA QUELLO REALE, QUESTO PERCHè LE AMICIZIE "NON CORRISPOSTE" VALGONO 
-#        COME EFFETTIVE AMICIZIE DI ENTRAMBE LE PARTI'''
-#
-#        # Repeating the Extraction if the previous is unacceptable
-#        while gaus_num_friends<=0 or gaus_num_friends>glob.npeople :
-#            gaus_num_friends = abs(int(glob.np.random.normal(2,2)))
-#        
-#        j_friends = [-3]*(glob.npeople)
-#
-#        # Does j-th Individual have already some Friends between the previous Individuals??
-#        # If YES, add that one to the Friends' Links of j-th Individual
-#        # Just to grant the Symmetry of the Matrix of Friends' Links
-#        c = 0
-#        for a in range(j) :
-#            if is_there_equals(friends_matrix[a], j)==True :
-#                j_friends[c] = a
-#                c += 1
-#        
-#        if gaus_num_friends!=0 :  # forse inutile
-#            k = 0
-#            n = 0
-#            possible_outcomes = [-3]*(glob.npeople-(j+1)) #vabene
-#            while j_friends[gaus_num_friends-1]==-3 :
-#                friend_id = glob.np.random.randint(j,glob.npeople)
-#                if is_there_equals(possible_outcomes,friend_id)==False and n<len(possible_outcomes) :
-#                    possible_outcomes[n] = friend_id
-#                    n += 1
-#
-#                if possible_outcomes.count(-3)==0 :
-#                    break
-#                
-#                if j_friends[k]!=-3 :
-#                    if k == len(j_friends)-1: break
-#                    else: k += 1
-#                
-#                if j_friends[k]==-3 and is_there_equals(j_friends,friend_id)==False and friend_id!=j : #evita doppioni  #tolto friend_id!=j migliora un po' #j_friends[k]==-3 si ptrebbe togliere con un elif invece di if
-#                    j_friends[k] = friend_id
-#                    if k == len(j_friends)-1: break
-#                    else: k += 1
-#                 
-#        friends_matrix[j] = j_friends
-#    return friends_matrix
+def init_random() :
+    ambient = [[-3,-3]]*glob.dimension
+    j = 0
+    while j<glob.npeople :
+        rand_pos = glob.np.random.randint(0, glob.dimension-1) 
+        rand_sign = glob.np.random.randint(0,2)
+        rand_extr = 0
+        if rand_sign==0 : rand_extr = -1
+        else : rand_extr = +1
+    
+        if ambient[rand_pos]==[-3,-3] :
+            ambient[rand_pos] = [j, rand_extr]
+            j += 1
+    
+    return ambient
 
+def init_fixed() :
+    ambient = [[-3,-3]]*glob.dimension
+    j = 0
+    while j<glob.npeople :
+        rand_pos = glob.np.random.randint(0, glob.dimension-1) 
+        
+        if ambient[rand_pos]==[-3,-3] :
+            ambient[rand_pos] = [-3, 1]
+            j += 1
+
+    j = 0
+    for k in range(glob.dimension) :
+        if ambient[k]==[-3,1] and j<glob.initial_blues :
+            ambient[k] = [j,-1]
+            j += 1
+        if ambient[k]==[-3,1] and j>=glob.initial_blues :
+            ambient[k] = [j,1]
+            j += 1
+    
+    assert j == glob.npeople
+    return ambient
+
+def time_distribution(evolution) :
+    assert len(evolution) == glob.nsteps
+    time_distribution = []
+    for j in range(glob.npeople) :
+        jth_position_0 = ID_position(evolution[0],j)
+        jth_opinion_0 = evolution[0][jth_position_0][1]
+        for t in range(1, glob.nsteps) :
+            jth_position_t = ID_position(evolution[t],j)
+            jth_opinion_t = evolution[t][jth_position_t][1]
+            if jth_opinion_t!=jth_opinion_0 :
+                time_distribution.append(t)
+                break
+            if jth_opinion_t==jth_opinion_0 and t==glob.nsteps-1 :
+                time_distribution.append(t)
+                break
+    assert len(time_distribution) == glob.npeople, 'ATTENTION: Some agents have missed the Time Distribution Analysis'
+    return time_distribution
+
+def ID_position(ambient, ID) :
+    assert len(ambient) == glob.dimension
+    assert (ID!=-3) and (ID>=0) and (ID<glob.npeople), 'ATTENTION: ID_position() second argument must be integer and different from -3.'
+
+    for i in range(glob.dimension) :
+        if ambient[i][0]==ID :
+            return i
 # THIS IS OK ########################################################
 # Function that returns x & y Coordinates of a Single Individual
-# given its Index in the Ambient Array
+# given its Index in the Ambient Array.
 def xydata(ambient, which) :
 
     # Discovering of Y Position of which
@@ -81,8 +92,8 @@ def xydata(ambient, which) :
     return xwhich, ywhich
 
 # THIS IS OK ########################################################
-# Function that defines the Distance in this 2D Discrete Space
-# with Periodic Conditions
+# Function that defines the Chebyshev Distance in this 2D Discrete Space
+# taking into account the Periodic Conditions.
 def table_distance(ambient, first, second) :
 
     # Coordinates x & y of first
@@ -112,34 +123,10 @@ def table_distance(ambient, first, second) :
     return distance
 
 # THIS IS OK ########################################################
-# Function that returns a String indicating where is second
-# with respect to first
-def where(ambient, first, second) :
-    assert table_distance(ambient, first, second) == 1
-    difference = first-second
-    # possible differences:
-    d1 = -1              #right
-    d2 = +1              #left
-    d3 = +glob.side           #down
-    d4 = -glob.side           #up
-    d5 = +glob.side-1         #right
-    d6 = -glob.side+1         #left
-    d7 = +glob.dimension-glob.side #up
-    d8 = -glob.dimension+glob.side #down
-
-    if difference==d1 : return 'right'
-    if difference==d2 : return 'left'
-    if difference==d3 : return 'down'
-    if difference==d4 : return 'up'
-    if difference==d5 : return 'right'
-    if difference==d6 : return 'left'
-    if difference==d7 : return 'up'
-    if difference==d8 : return 'down'
-
-# THIS IS OK ########################################################
-# Function that returns an Array of Integers indicating the Position 
-# of Empty Spaces around (which)-th Individual in the Ambient
-# with Periodic Conditions
+# Function that returns an Array of Integers, indicating the Position 
+# of Empty Spaces in the Von Neumann Neighborhood of the Individual 
+# at (which)-th Site in the Ambient with Periodic Conditions, 
+# for both the Distance Control Model and the Partial Vision Model.
 def empty_spaces(ambient, which) :
 
     # Array filled with Indexes of Empty Spaces next to which
@@ -154,7 +141,7 @@ def empty_spaces(ambient, which) :
             if j>=glob.dimension :
                 j = j-glob.dimension
             if j>=0 and j<glob.dimension :
-                if ambient[j]==-3 :
+                if ambient[j]==[-3,-3] :
                     empty_spaces.append(j)
                     how_many += 1
     
@@ -166,7 +153,7 @@ def empty_spaces(ambient, which) :
             if j>=glob.dimension :
                 j = j-glob.dimension
             if j>=0 and j<glob.dimension :
-                if ambient[j]==-3 :
+                if ambient[j]==[-3,-3] :
                     empty_spaces.append(j)
                     how_many += 1
     
@@ -178,12 +165,18 @@ def empty_spaces(ambient, which) :
             if j>=glob.dimension :
                 j = j-glob.dimension
             if j>=0 and j<glob.dimension :
-                if ambient[j]==-3 :
+                if ambient[j]==[-3,-3] :
                     empty_spaces.append(j)
                     how_many += 1
 
     return empty_spaces
 
+# THIS IS OK ########################################################
+# Function that returns an Array of Integers, indicating the Position 
+# (0 if that particular Site is already occupied)
+# of Empty Spaces in the Von Neumann Neighborhood of the Individual 
+# at (which)-th Site in the Ambient with Periodic Conditions, 
+# for the specific case of Gravitational Flocking Model.
 def empty_spaces_grav(ambient, which) :
 
     # Array filled with Indexes of Empty Spaces next to which
@@ -199,10 +192,10 @@ def empty_spaces_grav(ambient, which) :
             if j>=glob.dimension :
                 j = j-glob.dimension
             if j>=0 and j<glob.dimension :
-                if ambient[j]!=-3 :
+                if ambient[j]!=[-3,-3] :
                     spaces.append(-3)
                     #probs.append(0)
-                if ambient[j]==-3 :
+                if ambient[j]==[-3,-3] :
                     spaces.append(j)
                     #probs.append(1)
                     how_many += 1
@@ -215,10 +208,10 @@ def empty_spaces_grav(ambient, which) :
             if j>=glob.dimension :
                 j = j-glob.dimension
             if j>=0 and j<glob.dimension :
-                if ambient[j]!=-3 :
+                if ambient[j]!=[-3,-3] :
                     spaces.append(-3)
                     #probs.append(0)
-                if ambient[j]==-3 :
+                if ambient[j]==[-3,-3] :
                     spaces.append(j)
                     #probs.append(1)
                     how_many += 1
@@ -231,100 +224,22 @@ def empty_spaces_grav(ambient, which) :
             if j>=glob.dimension :
                 j = j-glob.dimension
             if j>=0 and j<glob.dimension :
-                if ambient[j]!=-3 :
+                if ambient[j]!=[-3,-3] :
                     spaces.append(-3)
                     #probs.append(0)
-                if ambient[j]==-3 :
+                if ambient[j]==[-3,-3] :
                     spaces.append(j)
                     #probs.append(1)
                     how_many += 1
 
-    # correzione della predilezione degli individui di muoversi rispetto che a stare fermi
-    #if probs.count(0)<4 and probs[4]!=0 :
-    #    probs[4] = 0 
-    #max_ = probs.count(1)
-    #prob_ref = 1/max_
-    #grav_attraction = gravity(ambient, which)
-    #grav_x2 = grav_attraction[0]*grav_attraction[0]
-    #grav_y2 = grav_attraction[1]*grav_attraction[1]
-    #grav_modulus2 = grav_x2+grav_y2 
-
-    #print('GRAVITY: ',grav_attraction[0],';',grav_attraction[1])
-#
-    #prob_up = 0   
-    #prob_down = 0
-    #prob_left = 0
-    #prob_right = 0
-#
-    ##sotto,sinistra,destra,sopra,which
-    #if grav_attraction[0]==0 and grav_attraction[1]==0 :
-    #    prob_up    = 0.25
-    #    prob_down  = 0.25
-    #    prob_left  = 0.25
-    #    prob_right = 0.25
-    #if grav_attraction[0]>0 or (grav_attraction[0]==0 and grav_attraction[1]!=0) :
-    #    prob_left = 0.25*(1-(grav_x2/grav_modulus2))
-    #    prob_right = 0.25*(1+(grav_x2/grav_modulus2))
-    #if grav_attraction[0]<0 : 
-    #    prob_left = 0.25*(1+(grav_x2/grav_modulus2))
-    #    prob_right = 0.25*(1-(grav_x2/grav_modulus2))
-    #if grav_attraction[1]>0 or (grav_attraction[1]==0 and grav_attraction[0]!=0) :
-    #    prob_up = 0.25*(1+(grav_y2/grav_modulus2))
-    #    prob_down = 0.25*(1-(grav_y2/grav_modulus2)) 
-    #if grav_attraction[1]<0 :
-    #    prob_up = 0.25*(1-(grav_y2/grav_modulus2))   
-    #    prob_down = 0.25*(1+(grav_y2/grav_modulus2))
-    #rescaled_probs = [prob_down, prob_left, prob_right, prob_up]
-#
-    #if max_==4 :
-    #    print('il numero è ', max_)
-    #    for i in range(4) :
-    #        probs[i] = rescaled_probs[i]
-    #if max_==3 :
-    #    print('il numero è ', max_)
-    #    occupied = -1
-    #    for i in range(4) :
-    #        if spaces[i]==0 :
-    #            occupied = i
-    #            break
-    #    missed_prob = rescaled_probs[occupied]
-    #    probs[occupied] = 0
-    #    for i in range(4) :
-    #        if i!=occupied :
-    #            probs[i] = rescaled_probs[i]+(1/max_)*missed_prob
-    #if max_==2 :
-    #    print('il numero è ', max_)
-    #    occupied1 = -1
-    #    occupied2 = -1
-    #    for i in range(4) :
-    #        if spaces[i]==0 and occupied1==-1 :
-    #            occupied1 = i
-    #        if spaces[i]==0 and i>occupied1 :
-    #            occupied2 = i
-    #            break
-    #    missed_prob1 = rescaled_probs[occupied1]
-    #    missed_prob2 = rescaled_probs[occupied2]
-    #    probs[occupied1] = 0
-    #    probs[occupied2] = 0
-    #    for i in range(4) :
-    #        if i!=occupied1 and i!=occupied2 :
-    #            probs[i] = rescaled_probs[i]+((1/max_)*(missed_prob1+missed_prob2))
-    #if max_==1 :
-    #    print('il numero è ', max_)
-    #    for i in range(4) :
-    #        if probs[i]!=0 :
-    #            probs[i] = 1  # dovrebbe già esserlo per costruzione
-    #if max_==0 and how_many==1 :
-    #    print('il numero è ', max_)
-    #    probs[4] = 1
-    #if max_==0 and how_many==0 :
-    #    print('Shit, how tha fuck is this even possibleeeeeeeeeeeeeee? Explain me, Bazzani.')
-#
-    #print('PROBS: ',probs[0],probs[1],probs[2],probs[3],probs[4])
-    ##assert probs[0]+probs[1]+probs[2]+probs[3]+probs[4] == 1
-
     return spaces
 
+# THIS IS OK ########################################################
+# Function that returns an Array of Floats, indicating the Probability 
+# of Transition towards the Directions specified in 'spaces'
+# (0 if the particular Site in that Direction is already occupied)
+# of the Individual at (which)-th Site in the Ambient with Periodic 
+# Conditions, for the specific case of Gravitational Flocking Model.
 def empty_probs_grav(ambient, spaces, which) :
 
     # Array filled with Indexes of Empty Spaces next to which
@@ -332,53 +247,6 @@ def empty_probs_grav(ambient, spaces, which) :
     probs = []
     how_many = 0
 
-    ## Left Burden Management
-    #if which%(glob.side)==0 :
-    #    for j in [which-glob.side, which+glob.side-1, which+1, which+glob.side, which] : #sotto,sinistra,destra,sopra
-    #        if j<0 :
-    #            j = j+glob.dimension
-    #        if j>=glob.dimension :
-    #            j = j-glob.dimension
-    #        if j>=0 and j<glob.dimension :
-    #            if ambient[j]!=-3 :
-    #                #spaces.append(0)
-    #                probs.append(0)
-    #            if ambient[j]==-3 :
-    #                #spaces.append(j)
-    #                probs.append(1)
-    #                how_many += 1
-    #
-    ## Right Burden Management
-    #if (which+1)%(glob.side)==0 :
-    #    for j in [which-glob.side, which-1, which-glob.side+1, which+glob.side, which] : #sotto,sinistra,destra,sopra
-    #        if j<0 :
-    #            j = j+glob.dimension
-    #        if j>=glob.dimension :
-    #            j = j-glob.dimension
-    #        if j>=0 and j<glob.dimension :
-    #            if ambient[j]!=-3 :
-    #                #spaces.append(0)
-    #                probs.append(0)
-    #            if ambient[j]==-3 :
-    #                #spaces.append(j)
-    #                probs.append(1)
-    #                how_many += 1
-    #
-    ## General Case & High-Low Burden Management
-    #if which%(glob.side)!=0 and (which+1)%(glob.side)!=0 :
-    #    for j in [which-glob.side, which-1, which+1, which+glob.side, which] : #sotto,sinistra,destra,sopra
-    #        if j<0 :
-    #            j = j+glob.dimension
-    #        if j>=glob.dimension :
-    #            j = j-glob.dimension
-    #        if j>=0 and j<glob.dimension :
-    #            if ambient[j]!=-3 :
-    #                #spaces.append(0)
-    #                probs.append(0)
-    #            if ambient[j]==-3 :
-    #                #spaces.append(j)
-    #                probs.append(1)
-    #                how_many += 1
     print('SPACES: ',spaces)
     for i in range(5) :
         if spaces[i]==-3 :
@@ -473,8 +341,11 @@ def empty_probs_grav(ambient, spaces, which) :
     return probs
 
 # THIS IS OK #########################################################
-# Funcion that defines the Friends' Influence on the (which)-th Individual
-# depending on their Inclusion (or not) in his Influence Zone 
+# Function that defines the Opinion Influence acting on the Individual
+# at the (which)-th Site in the Ambient as the Mean Opinion
+# of all Individual included in his Influence Zone,
+# given by the extended Moore Neighborhood of 'distance' Radius.
+# It is valid both for Distance Variation Model and Gravitational Flocking Model.
 def influence_norm(ambient, which) :
 
     neighs = 0
@@ -482,8 +353,8 @@ def influence_norm(ambient, which) :
     for d in range(1, glob.distance+1) :
         for j in range(which-d*glob.side-glob.distance, which-d*glob.side+glob.distance+1) :
             if j!=which and j>=0 and j<glob.dimension :
-                if ambient[j]!=-3 and table_distance(ambient,which,j)==d :
-                    opinions.append(ambient[j])
+                if ambient[j]!=[-3,-3] and table_distance(ambient,which,j)==d :
+                    opinions.append(ambient[j][1])
                     neighs += 1
     #print(opinions)
 
@@ -492,26 +363,30 @@ def influence_norm(ambient, which) :
     for i in range(len(opinions)) :
         sum_opinions += opinions[i]   # Each of their Opinion with same Weight
     influence = 0
+    his_own = ambient[which][1]
     if neighs==0 :
-        influence = ambient[which]  # No Changements of Opinion in Absence of Friends
+        influence = his_own # No Changements of Opinion in Absence of Friends
     if neighs!=0 :
         influence = sum_opinions/neighs
     return influence
 
-# WORK IN PROGRESS #########################################################
-# Funcion that defines the Friends' Influence on the (which)-th Individual
-# depending on their Inclusion (or not) in his Influence Zone 
+# THIS IS OK #########################################################
+# Function that defines the Opinion Influence acting on the Individual
+# at the 'which'-th Site in the Ambient as the Mean Opinion
+# of 'vision' randomly-chosen Individuals included in his Influence Zone,
+# given by the extended Moore Neighborhood of 'distance' Radius.
+# It is valid only for the Partial Vision Model.
 def influence_vis(ambient, which) :
     viewed_people = partial_vision(ambient, which)
     opinions = []
     for j in range(len(viewed_people)) :
-        opinions.append(ambient[viewed_people[j]])
+        opinions.append(ambient[viewed_people[j]][1])
                     
     # Influence as the Mean Opinion
     sum_opinions = 0
     for i in range(len(opinions)) :
         sum_opinions += opinions[i]   # Each of their Opinion with same Weight
-    influence = ambient[which]
+    influence = ambient[which][1]
     if len(viewed_people)>0 :   
         influence = sum_opinions/len(viewed_people)
     
@@ -519,29 +394,26 @@ def influence_vis(ambient, which) :
 
 # WORK IN PROGRESS ##################################################
 # Function that features the One-Step Time Evolution of the Population
-# on the Ambient for the 1° Scenario
+# on the Ambient for the 1° Scenario.
 def evolve_norm(initial) :
 
-    final = [-3]*glob.dimension
+    final = [[-3,-3]]*glob.dimension
     eff_changes = 0
     people = 0
     for i in range(glob.dimension) :
         
-        if initial[i]!=-3 :
+        if initial[i]!=[-3,-3] :
             people += 1
             # if people==glob.npeople : print('beneeeeeee')
             mean = influence_norm(initial, i)
             
             prob_change = glob.np.random.uniform(0,1)
-            #A = 0.5*np.floor(3*glob.np.tanh(initial[i])+0.5)
-            #B = 0.5*np.floor(glob.np.exp(-0.25*(initial[i]*initial[i]))+1.5)
-            #B_2 = 0.5*np.floor(5*glob.np.exp(-3*(initial[i]*initial[i]))+1.5)
-            #changed_opinion = np.floor(A+B*glob.np.tanh(B_2*mean+0.5*np.sign(initial[i]))+0.5)
-            A = 0.5*glob.np.floor(3*glob.np.tanh(initial[i])+0.5)
-            B = 0.5*glob.np.floor(-0.1*(initial[i]*initial[i])+1.5)
-            B_2 = 0.5*glob.np.floor(5*glob.np.exp(-3*(initial[i]*initial[i]))+1.5)
-            changed_opinion = glob.np.floor(A+B*glob.np.tanh(mean)+0.5)
-            
+
+            # First Attempt
+            changed_opinion = glob.np.sign(mean)#*float(initial[i][1]))
+            if changed_opinion==0 :
+                changed_opinion = initial[i][1]
+
             #print('x =',mean,', y =',changed_opinion,', s =',initial[i])
             empty_spacez = empty_spaces(final, i)
             how_many = len(empty_spacez)
@@ -553,40 +425,41 @@ def evolve_norm(initial) :
             # Event of Opinion Change
             #if initial[i]==0 :
             #    print(glob.neutral_prob-(glob.neutral_prob-0.5)*abs(initial[i]))
-            if prob_change<=glob.neutral_prob-(glob.neutral_prob-0.5)*abs(initial[i]) : #da cambiare (per ora)
-                if changed_opinion!=initial[i] :
+            if prob_change<=glob.np.tanh(glob.T) : # semplificazione
+                if changed_opinion!=initial[i][1] :
+                    print(initial[i][1],'-->',mean,'-->',changed_opinion)
                     eff_changes += 1
-                    print('There have been ', eff_changes, ' changements of opinion.')
+                    #print('There have been ', eff_changes, ' changements of opinion.')
                 match how_many:
                     case 1:
-                        final[empty_spacez[0]] = changed_opinion 
+                        final[empty_spacez[0]] = [initial[i][0], changed_opinion] 
                 
                     case 2:
                         if empty_spacez[1]!=i :
-                            final[empty_spacez[step_2dir]] = changed_opinion
+                            final[empty_spacez[step_2dir]] = [initial[i][0], changed_opinion]
      
                         if empty_spacez[1]==i :
-                            final[empty_spacez[0]] = changed_opinion
+                            final[empty_spacez[0]] = [initial[i][0], changed_opinion]
          
                     case 3:
                         if empty_spacez[2]!=i :
-                            final[empty_spacez[step_3dir]] = changed_opinion
+                            final[empty_spacez[step_3dir]] = [initial[i][0], changed_opinion]
   
                         if empty_spacez[2]==i :
-                            final[empty_spacez[step_2dir]] = changed_opinion
+                            final[empty_spacez[step_2dir]] = [initial[i][0], changed_opinion]
 
                     case 4:
                         if empty_spacez[3]!=i :
-                            final[empty_spacez[step_4dir]] = changed_opinion
+                            final[empty_spacez[step_4dir]] = [initial[i][0], changed_opinion]
 
                         if empty_spacez[3]==i :
-                            final[empty_spacez[step_3dir]] = changed_opinion
+                            final[empty_spacez[step_3dir]] = [initial[i][0], changed_opinion]
 
                     case 5:
-                        final[empty_spacez[step_4dir]] = changed_opinion
+                        final[empty_spacez[step_4dir]] = [initial[i][0], changed_opinion]
             
             # Event of Same Opinion as Before
-            if prob_change>glob.neutral_prob-(glob.neutral_prob-0.5)*abs(initial[i]) :  #di nuovo per ora
+            if prob_change>glob.np.tanh(glob.T) :  #di nuovo per ora
        
                 match how_many:
                     case 1:
@@ -623,25 +496,20 @@ def evolve_norm(initial) :
 # on the Ambient for the 2° Scenario
 def evolve_grav(initial) :
 
-    final = [-3]*glob.dimension
+    final = [-3,-3]*glob.dimension
     eff_changes = 0
     people = 0
     for i in range(glob.dimension) :
         
-        if initial[i]!=-3 :
+        if initial[i]!=[-3,-3] :
             people += 1
             # if people==glob.npeople : print('beneeeeeee')
             mean = influence_norm(initial, i)
             
-            
-            #A = 0.5*np.floor(3*glob.np.tanh(initial[i])+0.5)
-            #B = 0.5*np.floor(glob.np.exp(-0.25*(initial[i]*initial[i]))+1.5)
-            #B_2 = 0.5*np.floor(5*glob.np.exp(-3*(initial[i]*initial[i]))+1.5)
-            #changed_opinion = np.floor(A+B*glob.np.tanh(B_2*mean+0.5*np.sign(initial[i]))+0.5)
-            A = 0.5*glob.np.floor(3*glob.np.tanh(initial[i])+0.5)
-            B = 0.5*glob.np.floor(-0.1*(initial[i]*initial[i])+1.5)
-            B_2 = 0.5*glob.np.floor(5*glob.np.exp(-3*(initial[i]*initial[i]))+1.5)
-            changed_opinion = glob.np.floor(A+B*glob.np.tanh(mean)+0.5)
+            # First Attempt
+            changed_opinion = glob.np.sign(mean*initial[i][1])
+            if changed_opinion==0 :
+                changed_opinion = initial[i][1]
             
             #print('x =',mean,', y =',changed_opinion,', s =',initial[i])
             spaces = empty_spaces_grav(final, i)
@@ -654,13 +522,13 @@ def evolve_grav(initial) :
 
             # Event of Opinion Change
             prob_change = glob.np.random.uniform(0,1)
-            if prob_change<=glob.neutral_prob-(glob.neutral_prob-0.5)*abs(initial[i]) : #da cambiare (per ora)
-                if changed_opinion!=initial[i] :
+            if prob_change<=glob.np.sign(initial[i][1])*glob.np.tanh(initial[i][1]*glob.T) : #da cambiare (per ora)
+                if changed_opinion!=initial[i][1] :
                     eff_changes += 1
                     print('There have been ', eff_changes, ' changements of opinion.')
                 #match how_many:
                 #    case 1:
-                final[glob.np.random.choice(spaces, p=probs)] = changed_opinion 
+                final[glob.np.random.choice(spaces, p=probs)] = [initial[i][0], changed_opinion] 
                 
                 #    case 2:
                 #        if empty_spacez[1]!=i :
@@ -687,7 +555,7 @@ def evolve_grav(initial) :
                 #        final[empty_spacez[step_4dir]] = changed_opinion
             
             # Event of Same Opinion as Before
-            if prob_change>glob.neutral_prob-(glob.neutral_prob-0.5)*abs(initial[i]) :  #di nuovo per ora
+            if prob_change>glob.np.sign(initial[i][1])*glob.np.tanh(initial[i][1]*glob.T) :  #di nuovo per ora
        
                 #match how_many:
                 #    case 1:
@@ -724,26 +592,23 @@ def evolve_grav(initial) :
 # on the Ambient of the 3° Scenario
 def evolve_vis(initial) :
 
-    final = [-3]*glob.dimension
+    final = [-3,-3]*glob.dimension
     eff_changes = 0
     people = 0
     for i in range(glob.dimension) :
         
-        if initial[i]!=-3 :
+        if initial[i]!=[-3,-3] :
             people += 1
             # if people==glob.npeople : print('beneeeeeee')
             mean = influence_vis(initial, i)
             
             prob_change = glob.np.random.uniform(0,1)
-            #A = 0.5*np.floor(3*glob.np.tanh(initial[i])+0.5)
-            #B = 0.5*np.floor(glob.np.exp(-0.25*(initial[i]*initial[i]))+1.5)
-            #B_2 = 0.5*np.floor(5*glob.np.exp(-3*(initial[i]*initial[i]))+1.5)
-            #changed_opinion = np.floor(A+B*glob.np.tanh(B_2*mean+0.5*np.sign(initial[i]))+0.5)
-            A = 0.5*glob.np.floor(3*glob.np.tanh(initial[i])+0.5)
-            B = 0.5*glob.np.floor(-0.1*(initial[i]*initial[i])+1.5)
-            B_2 = 0.5*glob.np.floor(5*glob.np.exp(-3*(initial[i]*initial[i]))+1.5)
-            changed_opinion = glob.np.floor(A+B*glob.np.tanh(mean)+0.5)
-            
+
+            # First Attempt
+            changed_opinion = glob.np.sign(mean*initial[i][1])
+            if changed_opinion==0 :
+                changed_opinion = initial[i][1]
+
             #print('x =',mean,', y =',changed_opinion,', s =',initial[i])
             step_4dir = glob.np.random.randint(0,4)
             step_3dir = glob.np.random.randint(0,3)
@@ -754,40 +619,40 @@ def evolve_vis(initial) :
             # Event of Opinion Change
             #if initial[i]==0 :
             #    print(glob.neutral_prob-(glob.neutral_prob-0.5)*abs(initial[i]))
-            if prob_change<=glob.neutral_prob-(glob.neutral_prob-0.5)*abs(initial[i]) : #da cambiare (per ora)
-                if changed_opinion!=initial[i] :
+            if prob_change<=glob.np.sign(initial[i][1])*glob.np.tanh(initial[i][1]*glob.T) : #da cambiare (per ora)
+                if changed_opinion!=initial[i][1] :
                     eff_changes += 1
                     print('There have been ', eff_changes, ' changements of opinion.')
                 match how_many:
                     case 1:
-                        final[empty_spacez[0]] = changed_opinion 
+                        final[empty_spacez[0]] = [initial[i][0], changed_opinion] 
                 
                     case 2:
                         if empty_spacez[1]!=i :
-                            final[empty_spacez[step_2dir]] = changed_opinion
+                            final[empty_spacez[step_2dir]] = [initial[i][0], changed_opinion]
      
                         if empty_spacez[1]==i :
-                            final[empty_spacez[0]] = changed_opinion
+                            final[empty_spacez[0]] = [initial[i][0], changed_opinion]
          
                     case 3:
                         if empty_spacez[2]!=i :
-                            final[empty_spacez[step_3dir]] = changed_opinion
+                            final[empty_spacez[step_3dir]] = [initial[i][0], changed_opinion]
   
                         if empty_spacez[2]==i :
-                            final[empty_spacez[step_2dir]] = changed_opinion
+                            final[empty_spacez[step_2dir]] = [initial[i][0], changed_opinion]
 
                     case 4:
                         if empty_spacez[3]!=i :
-                            final[empty_spacez[step_4dir]] = changed_opinion
+                            final[empty_spacez[step_4dir]] = [initial[i][0], changed_opinion]
 
                         if empty_spacez[3]==i :
-                            final[empty_spacez[step_3dir]] = changed_opinion
+                            final[empty_spacez[step_3dir]] = [initial[i][0], changed_opinion]
 
                     case 5:
-                        final[empty_spacez[step_4dir]] = changed_opinion
+                        final[empty_spacez[step_4dir]] = [initial[i][0], changed_opinion]
             
             # Event of Same Opinion as Before
-            if prob_change>glob.neutral_prob-(glob.neutral_prob-0.5)*abs(initial[i]) :  #di nuovo per ora
+            if prob_change>glob.np.sign(initial[i][1])*glob.np.tanh(initial[i][1]*glob.T) :  #di nuovo per ora
        
                 match how_many:
                     case 1:
@@ -827,15 +692,9 @@ def xydata_scatter(ambient, color) :
     if color=='empty' :
         which_color = -3
     if color=='red' :
-        which_color = -2
-    if color=='orange' :
         which_color = -1
-    if color=='white' :
-        which_color = 0
-    if color=='cyan' :
-        which_color = +1
     if color=='blue' :
-        which_color = +2
+        which_color = +1
     
     # Fullfilling of the Position Arrays for each Color
     xdata_color = []
@@ -845,70 +704,52 @@ def xydata_scatter(ambient, color) :
         j += 1
         ydata = abs(int((i/glob.side)+1))
         xdata = abs(int(i+1-(ydata-1)*glob.side))
-        if ambient[i]==which_color : 
+        if ambient[i][1]==which_color : 
             xdata_color.append(xdata)
             ydata_color.append(ydata)
 
+    print('ci sono',len(xdata_color),color)
     return xdata_color, ydata_color 
 
 # THIS IS OK ########################################################
 # Function that saves on CSV File the Info about the i-th Individual
 def data_extr(array, i, fout, t):
     empty = 0
-    orange = 0
     red = 0
-    white = 0
-    cyan = 0
     blue = 0
-    opinion_class = ['empty','red','orange','white','cyan','blue']
-    if array[i]==-3 :
+    opinion_class = ['empty','red','blue']
+    if array[i]==[-3,-3] :
         empty = i
-        fout.write(f'{opinion_class[0]}, {array[i]}, {empty}, {t}\n')
-    if array[i]==-2 : 
+        fout.write(f'{opinion_class[0]}, {-3}, {array[i][1]}, {empty}, {t}\n')
+    if array[i][1]==-1 : 
         red = i
-        fout.write(f'{opinion_class[1]}, {array[i]}, {red}, {t}\n')
-    if array[i]==-1 :
-        orange = i
-        fout.write(f'{opinion_class[2]}, {array[i]}, {orange}, {t}\n')
-    if array[i]==0 :
-        white = i
-        fout.write(f'{opinion_class[1]}, {array[i]}, {white}, {t}\n')
-    if array[i]==1 :
-        cyan = i
-        fout.write(f'{opinion_class[3]}, {array[i]}, {cyan}, {t}\n')
-    if array[i]==2 :
+        fout.write(f'{opinion_class[1]}, {array[i][0]}, {array[i][1]}, {red}, {t}\n')
+    if array[i][1]==+1 :
         blue = i
-        fout.write(f'{opinion_class[4]}, {array[i]}, {blue}, {t}\n')
+        fout.write(f'{opinion_class[4]}, {array[i][0]}, {array[i][1]}, {blue}, {t}\n')
 
 # THIS IS OK ########################################################
 # Function that makes possible to view the Animation
-def update_scatter(time) : 
-    glob.ax.clear()
-    glob.plt.title('Agent-Based Cellular Automata Simulation')
+def update_scatter(time) :
+    glob.ax_histo.clear()  
+    glob.ax.clear()  
+    #glob.plt.title('Agent-Based Cellular Automata Simulation', loc='upper center') 
     glob.ax.grid(False) #False to not show 
+
     xempties, yempties = xydata_scatter(glob.ambient_evolution[time], 'empty')
     xred, yred = xydata_scatter(glob.ambient_evolution[time], 'red')
-    xorange, yorange = xydata_scatter(glob.ambient_evolution[time], 'orange')
-    xwhite, ywhite = xydata_scatter(glob.ambient_evolution[time], 'white')
-    xcyan, ycyan = xydata_scatter(glob.ambient_evolution[time], 'cyan')
     xblue, yblue = xydata_scatter(glob.ambient_evolution[time], 'blue')
-    glob.ax.scatter(xempties, yempties, s=200-0.15*glob.dimension, c='w', label= 'Time Step '+ str(time), alpha=0, edgecolors='k')
-    glob.ax.scatter(xred, yred, s=200-0.15*glob.dimension, c='tab:red', label='Estremisti -', edgecolors='k')
-    glob.ax.scatter(xorange, yorange, s=200-0.15*glob.dimension, c='tab:orange', label='Moderati -', alpha=0.6, edgecolors='k')
-    glob.ax.scatter(xwhite, ywhite, s=200-0.15*glob.dimension, c='black', label='Ignavi', alpha=0.4, edgecolors='k')
-    glob.ax.scatter(xcyan, ycyan, s=200-0.15*glob.dimension, c='tab:cyan', label='Moderati +', alpha=0.6, edgecolors='k')
-    glob.ax.scatter(xblue, yblue, s=200-0.15*glob.dimension, c='tab:blue', label='Estremisti +', edgecolors='k')
+
+    glob.ax.scatter(xempties, yempties, s=200-0.15*glob.dimension, c='w', label= 'Step Temporale '+ str(time), alpha=0, edgecolors='k')
+    glob.ax.scatter(xred, yred, s=200-0.15*glob.dimension, c='tab:red', label='Agente A', edgecolors='k')
+    glob.ax.scatter(xblue, yblue, s=200-0.15*glob.dimension, c='tab:blue', label='Agente B', edgecolors='k')
+
     glob.ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
 
-# THIS IS OK ########################################################
-# Function that saves on CSV File the Info about the Friends of the i-th Individual
-# Delimiter is ; not , otherwise it can be confused with commas of Arrays' Elements
-#def friend_extr(fmatrix, i, fout) :
-#
-#    list_nthfriend=[]
-#    for j in range (0, glob.npeople-1) :
-#        list_nthfriend.append(fmatrix[i][j])
-#    fout.write(f'{i}; {list_nthfriend}\n')
+    bar_heights = [len(xred),len(xblue)]
+    glob.ax_histo.bar([-0.5,0.5], height=bar_heights, color=['tab:red','tab:blue'])
+
+    glob.plt.tight_layout()
 
 # THIS IS OK ########################################################
 # Function that return how many people with a certain opinion can be seen by a person with that opinion in his range of influence
@@ -922,7 +763,7 @@ def local_density(opinion, ambient, distance) : #provo a scrivere una funzione c
         known_box = []
         density_index = []
         
-        if ambient[i]==opinion :   #oppure solo ambient[i] se togliamo gli amici
+        if ambient[i][1]==opinion :   #oppure solo ambient[i] se togliamo gli amici
             for j in range(0, 2*distance+1) : #sale di uno ogni volta [0,2distace]
 
                 #print("JEY",j)
@@ -944,7 +785,7 @@ def local_density(opinion, ambient, distance) : #provo a scrivere una funzione c
                             if known_box.count(d)==0 and d!=i and d>=0 and d<glob.dimension :
                                 if int(d/glob.side)*glob.side>=(glob.side-down_increment)*glob.side :
                                     known_box.append(d)
-                                    if ambient[d]==opinion :
+                                    if ambient[d][1]==opinion :
                                         density = density+1
                                         if d!=i and density_index.count(d)<1 :
                                             density_index.append(d)
@@ -962,7 +803,7 @@ def local_density(opinion, ambient, distance) : #provo a scrivere una funzione c
                                 if int(u/glob.side)*glob.side<(up_increment)*glob.side  :
                                     known_box.append(u)
                                     #ambient[u] = [ambient[u][0], +2]
-                                    if ambient[u]==opinion :
+                                    if ambient[u][1]==opinion :
                                         density = density+1
                                         if u!=i and density_index.count(u)<1 :
                                             density_index.append(u)
@@ -979,7 +820,7 @@ def local_density(opinion, ambient, distance) : #provo a scrivere una funzione c
                             b = glob.dimension+r
                             if known_box.count(b)==0 :
                                 known_box.append(b)
-                                if ambient[b]==opinion :
+                                if ambient[b][1]==opinion :
                                     density = density+1
                                     if b!=i and density_index.count(b)<1 :
                                         density_index.append(b)
@@ -987,7 +828,7 @@ def local_density(opinion, ambient, distance) : #provo a scrivere una funzione c
                         if known_box.count(r)==0 and r!=i and r>=0 :
                             if r<glob.dimension :
                                 known_box.append(r)
-                                if ambient[r]==opinion :
+                                if ambient[r][1]==opinion :
                                         density = density+1
                                         if r!=i and density_index.count(r)<1 :
                                             density_index.append(r)
@@ -996,7 +837,7 @@ def local_density(opinion, ambient, distance) : #provo a scrivere una funzione c
                                 r = r-glob.dimension
                                 if known_box.count(r)==0 :
                                     known_box.append(r)
-                                    if ambient[r]==opinion :
+                                    if ambient[r][1]==opinion :
                                         density = density+1
                                         if r!=i and density_index.count(r)<1 :
                                             density_index.append(r)
@@ -1012,7 +853,7 @@ def local_density(opinion, ambient, distance) : #provo a scrivere una funzione c
                             a = glob.dimension+l
                             if known_box.count(a)==0 :
                                 known_box.append(a)
-                                if ambient[a]==opinion :
+                                if ambient[a][1]==opinion :
                                     density = density+1
                                     if a!=i and density_index.count(a)<1 :
                                         density_index.append(a)
@@ -1022,7 +863,7 @@ def local_density(opinion, ambient, distance) : #provo a scrivere una funzione c
                                 counter_left = counter_left+1
                                 if known_box.count(l)==0 :
                                     known_box.append(l)
-                                    if ambient[l]==opinion :
+                                    if ambient[l][1]==opinion :
                                         density = density+1
                                         if l!=i and density_index.count(l)<1 :
                                             density_index.append(l)
@@ -1031,7 +872,7 @@ def local_density(opinion, ambient, distance) : #provo a scrivere una funzione c
                                 l = l-glob.dimension
                                 if known_box.count(l)==0 :
                                     known_box.append(l)
-                                    if ambient[l]==opinion :
+                                    if ambient[l][1]==opinion :
                                         density = density+1
                                         if l!=i and density_index.count(l)<1 :
                                             density_index.append(l)
@@ -1044,7 +885,7 @@ def local_density(opinion, ambient, distance) : #provo a scrivere una funzione c
                         if k!=i and known_box.count(k)==0 :
                             if k<0 : print("bro wtf")
                             known_box.append(k)
-                            if ambient[k]==opinion :
+                            if ambient[k][1]==opinion :
                                         density = density+1
                                         if k!=i and density_index.count(k)<1 :
                                             density_index.append(k)
@@ -1107,7 +948,7 @@ def xy_distance(ambient, first, second) :
 #OK? depends on xy_distance
 def gravity(ambient, which) :
 
-    opinion = ambient[which]
+    opinion = ambient[which][1]
     grav_int = local_density(opinion, ambient, int((glob.side-1)/2)) #passo il range massimo per renderla non locale (campo medio)
     nth = 0
     gravitation_x = 0
@@ -1118,7 +959,7 @@ def gravity(ambient, which) :
     #if opinion==-3 : return False
     assert opinion != -3
     for k in range(0, glob.dimension) :
-        if ambient[k]==opinion :
+        if ambient[k][1]==opinion :
             nth += 1
             if k==which : break
 
@@ -1199,7 +1040,7 @@ def gravity(ambient, which) :
 
 def partial_vision(ambient, which) : #ritorna un array delle posizioni che vede un certo individuo
     
-    opinion = ambient[which]
+    opinion = ambient[which][1]
     grav_int = local_density(opinion, ambient, glob.distance)
     nth = 0 # mi darà la posizione ordinale della persona i all'interno dell'array grav_int
     choosen = []
@@ -1207,7 +1048,7 @@ def partial_vision(ambient, which) : #ritorna un array delle posizioni che vede 
     old_choice = -1
     if opinion==-3 : return False
     for k in range(0, glob.dimension) :
-        if ambient[k]==opinion :
+        if ambient[k][1]==opinion :
             nth = nth+1
             if k==which : break
     #numero di persone che vengono viste nel proprio range
