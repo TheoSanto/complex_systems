@@ -12,47 +12,72 @@ import networkx as nx
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# Inizialization of the Ambient
-global dimension 
-global npeople
-global nwhite
-global nred 
-global norange
-global ncyan 
-global nblue 
-global ambient_evolution
+# Instance of Global Variables, Constants and Controls
 global nsteps
-global ax
+global interval
+global dimension
+global side
+global ambient
+global ambient_evolution
+global nempties
+global nred
+global nblue 
+global setup
+global npeople
 global distance
+global G
+global T 
+global vision
+global ax
+global ax_histo
 
 # Animation Settings
 nsteps = 100
-interval = 200 #ms
+interval = 60 #ms
 
 # Ambient Variables
-dimension = 961 ### side è 11
+dimension = 961 
 side = int(np.sqrt(dimension)) # 31
-ambient = [-3]*dimension
+ambient = [[-3,-3]]*dimension
 ambient_evolution = [ambient]*(nsteps)
 
-# Initial Conditions
-nwhite = 0
-nred = 0
-norange = 0
-ncyan = 0
-nblue = 0
-
 # Scenario Choice
-setup = 1
+setup = 0
 # 0 per Scenario di Distanza, 
 # 1 per Scenario di Flocking Gravitazionale,
-# 2 per Scenario di Visione Parziale.  
+# 2 per Scenario di Visione Parziale. 
+
+# ONLY FOR setup==0
+fixed_or_random = 0
+# 0 if Inizialization of the Ambient is Random
+# 1 if Inizialization of the Ambient is Pre-fixed
+
+# forse può essere interessante estendere questo tipo di analisi per i vari scenari
+time_analysis = 1
+# 0 if Representation of Time Distribution is not wanted
+# 1 if Representation of Time Distribution is wanted
 
 # Control Parameters
-npeople = 100  ### fundamental
-distance = 4  # MAX = int((side-1)/2)
-G = 10 
-neutral_prob = 0.55
+npeople = 50
+distance = 3  # MAX = int((side-1)/2)
+G = 10
+T = 1
+vision = 2
+initial_blues = 30
+
+# Tests of Initialization's Consistence
+assert nsteps >= 0, 'ATTENTION: Negative n° of Time Steps.'
+assert interval > 0, 'ATTENTION: Negative Time Interval for Animation.'
+assert (side-np.sqrt(dimension)) == 0, 'ATTENTION: The Root of dimension is not Integer, as it should be.'
+assert (setup==0) or (setup==1) or (setup==2), 'ATTENTION: setup Value is not acceptable.'
+assert (fixed_or_random==0) or (fixed_or_random==1), 'ATTENTION: fixed_or_random Value is not acceptable.' 
+if setup!=0 :
+   assert fixed_or_random == 0, 'ATTENTION: Wrong Scenario for non-vanishing fixed_or_random.'
+assert (npeople>0) and (npeople<dimension), 'ATTENTION: Negative or too elevated npeople Value.' 
+assert (distance>0) and (distance<=int((side-1)/2)), 'ATTENTION: Negative or too elevated distance Value.'
+assert G > 0, 'ATTENTION: Negative Universal Gravitational Constant G.'
+assert T > 0, 'ATTENTION: Negative Temperature T.'
+assert (vision>0) and (vision<npeople), 'ATTENTION: Negative or too elevated vision Value.'
 
 '''
 MODELLO DI ISING: here 'https://it.abcdef.wiki/wiki/Ising_model'
