@@ -45,7 +45,7 @@ def init_fixed() :
     assert j == glob.npeople
     return ambient
 
-def time_distribution(evolution) :
+def decision_time_data(evolution) :
     assert len(evolution) == glob.nsteps
     time_distribution = []
     for j in range(glob.npeople) :
@@ -75,6 +75,7 @@ def ID_position(ambient, ID) :
     for i in range(glob.dimension) :
         if ambient[i][0]==ID :
             return i
+
 # THIS IS OK ########################################################
 # Function that returns x & y Coordinates of a Single Individual
 # given its Index in the Ambient Array.
@@ -668,6 +669,7 @@ def xydata_scatter(ambient, color) :
     #print('ci sono',len(xdata_color),color)
     return xdata_color, ydata_color 
 
+# MAYBE, THIS IS USELESS ############################################
 # THIS IS OK ########################################################
 # Function that saves on CSV File the Info about the i-th Individual
 def data_extr(array, i, fout, t):
@@ -684,6 +686,18 @@ def data_extr(array, i, fout, t):
     if array[i][1]==+1 :
         blue = i
         fout.write(f'{opinion_class[4]}, {array[i][0]}, {array[i][1]}, {blue}, {t}\n')
+
+def magnetization_data_storage(data, fout):
+    assert len(data) == glob.nsteps, 'ATTENTION: magnetization_data_storage() needs a (nsteps)-dim. array of floats as first argument.'
+    fout.write('Magnetization_Value, Time_Step\n')
+    for t in range(glob.nsteps) :
+        fout.write(f'{data[t]}, {t}\n')
+
+def decision_time_data_storage(data, fout):
+    assert len(data) == glob.nsteps-1, 'ATTENTION: time_data_storage() needs a (nsteps)-dim. array of floats as first argument.'
+    fout.write('Occurrences, Corresponding_Decision_Time\n')
+    for t in range(glob.nsteps) :
+        fout.write(f'{data[t]}, {t+1}\n')
 
 # THIS IS OK ########################################################
 # Function that makes possible to view the Animation
