@@ -9,6 +9,10 @@ if glob.fixed_or_random==0 :
 if glob.fixed_or_random==1 :
     glob.ambient_evolution[0] = f.init_fixed()
 
+# CSV Files for Magnetization & Decision Time Data Storage
+magnetization_data_file = 'magnetization_data_file.csv'
+decision_time_data_file = 'decision_time_data_file.csv'
+
 # Implementation and Storage of Time Evolution of 1° Scenario
 if glob.setup==0 :
     # lista di array 2D per lo storage degli effetti prodotti da condizioni iniziali diverse
@@ -21,34 +25,51 @@ if glob.setup==0 :
             glob.ambient_evolution[0] = f.init_random()
         if glob.fixed_or_random==1 :
             glob.ambient_evolution[0] = f.init_fixed()
-        # utile per Magnetization Analysis
-        #magnetization_data = []
-        #spin_data_0 = f.count_all(glob.ambient_evolution[0])
-        #magnetization_data.append((1/glob.npeople)*(spin_data_0[1]-spin_data_0[0]))
 
-        for t in range(0, glob.nsteps) : 
-                    #print("Step", t, ', Mode',glob.setup)
-                    if t>0 :
-                        glob.ambient_evolution[t] = f.evolve_norm(glob.ambient_evolution[t-1])
+        for t in range(glob.nsteps) : 
+            #print("Step", t, ', Mode',glob.setup)
+            if t>0 :
+                glob.ambient_evolution[t] = f.evolve_norm(glob.ambient_evolution[t-1])
 
-                        #spin_data_t = f.count_all(glob.ambient_evolution[t])
-                        #magnetization_data.append((1/glob.npeople)*(spin_data_t[1]-spin_data_t[0]))
+        if n==0 : # this ensures that even if nsimulation>1, Magnetization & Decision Time Analysis are done just one time
 
-        #times = glob.np.linspace(0,glob.nsteps,glob.nsteps)
-        #glob.plt.plot(times,magnetization_data)
-        #glob.plt.show()
+            # Magnetization Analysis
 
-        # utile per Time Distribution Analysis
-        time_data = f.time_distribution(glob.ambient_evolution)
-        fig1 = glob.plt.figure()
-        ax1 = fig1.add_axes([0.1, 0.1, 0.5, 0.75])
-        ax1.hist(time_data,bins=int(glob.nsteps))
-        glob.plt.yscale('log')
-        glob.plt.xscale('log')
-        glob.plt.show()
-        print('\n\n')
+            if glob.magnetization_analysis==1 :
+                magnetization_data = []
+                for t in range(glob.nsteps) :
+                    spin_data_t = f.count_all(glob.ambient_evolution[t])
+                    magnetization_data.append((1/glob.npeople)*(spin_data_t[1]-spin_data_t[0]))
+                times = glob.np.linspace(0,glob.nsteps,glob.nsteps)
+                glob.plt.title('Magnetization\'s Time Evolution')
+                glob.plt.plot(times, magnetization_data, marker='.',linestyle='--')
+                glob.plt.ylabel('Magnetization')
+                glob.plt.xlabel('Time Step')
+                glob.plt.show()
 
-        # utile per Initial Conditions Analysis
+                with open(magnetization_data_file, 'w') as magn_fout :
+                    f.magnetization_data_storage(magnetization_data, magn_fout)
+
+            # Decision Time Distribution Analysis
+
+            if glob.time_analysis==1 :
+                decision_time_data = f.decision_time_data(glob.ambient_evolution)
+                fig1 = glob.plt.figure()
+                ax1 = fig1.add_axes([0.1, 0.1, 0.8, 0.8])
+                times_counts, bins = glob.np.histogram(decision_time_data,bins=glob.np.linspace(0,glob.nsteps,glob.nsteps))
+                glob.plt.title('Decision Time Occurrences')
+                glob.plt.plot(glob.np.linspace(1,glob.nsteps,glob.nsteps-1),times_counts,marker='.',linewidth=0)
+                glob.plt.ylabel('Occurrences')
+                glob.plt.xlabel('Time Steps')
+                glob.plt.yscale('log')
+                glob.plt.xscale('log')
+                glob.plt.show()
+
+                with open(decision_time_data_file, 'w') as time_fout :
+                    f.decision_time_data_storage(times_counts, time_fout)
+
+        # Initial Conditions Influence Analysis
+
         #nth_opinion_data_in = f.count_all(glob.ambient_evolution[0])
         #nth_opinion_data_fin = f.count_all(glob.ambient_evolution[glob.nsteps-1])
         #initial_conditions.append(nth_opinion_data_in)
