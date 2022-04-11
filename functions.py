@@ -49,18 +49,23 @@ def time_distribution(evolution) :
     assert len(evolution) == glob.nsteps
     time_distribution = []
     for j in range(glob.npeople) :
-        jth_position_0 = ID_position(evolution[0],j)
-        jth_opinion_0 = evolution[0][jth_position_0][1]
+        #jth_position_0 = ID_position(evolution[0],j)
+        #jth_opinion_0 = evolution[0][jth_position_0][1]
+        jth_times = 0
         for t in range(1, glob.nsteps) :
             jth_position_t = ID_position(evolution[t],j)
             jth_opinion_t = evolution[t][jth_position_t][1]
-            if jth_opinion_t!=jth_opinion_0 :
+            if jth_opinion_t!=evolution[t-1][ID_position(evolution[t-1],j)][1] :
+                if jth_times==0 :
+                    time_distribution.append(t)
+                if jth_times>0 :
+                    time_distribution.append(t-time_distribution[-1])
+                jth_times += 1
+                break
+            if jth_opinion_t==evolution[0][ID_position(evolution[0],j)][1] and t==glob.nsteps-1 :
                 time_distribution.append(t)
                 break
-            if jth_opinion_t==jth_opinion_0 and t==glob.nsteps-1 :
-                time_distribution.append(t)
-                break
-    assert len(time_distribution) == glob.npeople, 'ATTENTION: Some agents have missed the Time Distribution Analysis'
+    #assert len(time_distribution) == glob.npeople, 'ATTENTION: Some agents have missed the Time Distribution Analysis'
     return time_distribution
 
 def ID_position(ambient, ID) :
@@ -426,8 +431,153 @@ def evolve_norm(initial) :
             #if initial[i]==0 :
             #    print(glob.neutral_prob-(glob.neutral_prob-0.5)*abs(initial[i]))
             if prob_change<=glob.np.tanh(glob.T) : # semplificazione
+                #if changed_opinion!=initial[i][1] :
+                    #print(initial[i][1],'-->',mean,'-->',changed_opinion)
+                    #eff_changes += 1
+                    #print('There have been ', eff_changes, ' changements of opinion.')
+                match how_many:
+                    case 1:
+                        final[empty_spacez[0]] = [initial[i][0], changed_opinion] 
+                
+                    case 2:
+                        if empty_spacez[1]!=i :
+                            final[empty_spacez[step_2dir]] = [initial[i][0], changed_opinion]
+     
+                        if empty_spacez[1]==i :
+                            final[empty_spacez[0]] = [initial[i][0], changed_opinion]
+         
+                    case 3:
+                        if empty_spacez[2]!=i :
+                            final[empty_spacez[step_3dir]] = [initial[i][0], changed_opinion]
+  
+                        if empty_spacez[2]==i :
+                            final[empty_spacez[step_2dir]] = [initial[i][0], changed_opinion]
+
+                    case 4:
+                        if empty_spacez[3]!=i :
+                            final[empty_spacez[step_4dir]] = [initial[i][0], changed_opinion]
+
+                        if empty_spacez[3]==i :
+                            final[empty_spacez[step_3dir]] = [initial[i][0], changed_opinion]
+
+                    case 5:
+                        final[empty_spacez[step_4dir]] = [initial[i][0], changed_opinion]
+            
+            # Event of Same Opinion as Before
+            if prob_change>glob.np.tanh(glob.T) :  #di nuovo per ora
+       
+                match how_many:
+                    case 1:
+                        final[empty_spacez[0]] = initial[i]
+
+                    case 2:
+                        if empty_spacez[1]!=i :
+                            final[empty_spacez[step_2dir]] = initial[i]
+
+                        if empty_spacez[1]==i :
+                            final[empty_spacez[0]] = initial[i]
+ 
+                    case 3:
+                        if empty_spacez[2]!=i :
+                            final[empty_spacez[step_3dir]] = initial[i]
+
+                        if empty_spacez[2]==i :
+                            final[empty_spacez[step_2dir]] = initial[i]
+
+                    case 4:
+                        if empty_spacez[3]!=i :
+                            final[empty_spacez[step_4dir]] = initial[i]
+
+                        if empty_spacez[3]==i :
+                            final[empty_spacez[step_3dir]] = initial[i]
+
+                    case 5:
+                        final[empty_spacez[step_4dir]] = initial[i] 
+    #print('\n\n')             
+    return final
+
+# WORK IN PROGRESS ##################################################
+# Function that features the One-Step Time Evolution of the Population 
+# on the Ambient for the 2° Scenario
+def evolve_grav(initial) :
+
+    final = [-3,-3]*glob.dimension
+    eff_changes = 0
+    people = 0
+    for i in range(glob.dimension) :
+        
+        if initial[i]!=[-3,-3] :
+            people += 1
+            # if people==glob.npeople : print('beneeeeeee')
+            mean = influence_norm(initial, i)
+            
+            # First Attempt
+            changed_opinion = glob.np.sign(mean*initial[i][1])
+            if changed_opinion==0 :
+                changed_opinion = initial[i][1]
+            
+            #print('x =',mean,', y =',changed_opinion,', s =',initial[i])
+            spaces = empty_spaces_grav(final, i)
+            print('WHO: ', i)
+            print('SPACES: ',spaces)
+            probs = empty_probs_grav(initial, spaces, i)
+            step_4dir = glob.np.random.randint(0,4)
+            step_3dir = glob.np.random.randint(0,3)
+            step_2dir = glob.np.random.randint(0,2)
+
+            # Event of Opinion Change
+            prob_change = glob.np.random.uniform(0,1)
+            if prob_change<=glob.np.sign(initial[i][1])*glob.np.tanh(initial[i][1]*glob.T) : #da cambiare (per ora)
                 if changed_opinion!=initial[i][1] :
-                    print(initial[i][1],'-->',mean,'-->',changed_opinion)
+                    eff_changes += 1
+                    print('There have been ', eff_changes, ' changements of opinion.')
+                
+                final[glob.np.random.choice(spaces, p=probs)] = [initial[i][0], changed_opinion] 
+                
+                
+            # Event of Same Opinion as Before
+            if prob_change>glob.np.sign(initial[i][1])*glob.np.tanh(initial[i][1]*glob.T) :  #di nuovo per ora
+       
+                final[glob.np.random.choice(spaces, p=probs)] = initial[i]
+
+                 
+    #print('\n\n')             
+    return final
+
+# WORK IN PROGRESS ##################################################
+# Function that features the One-Step Time Evolution of the Population 
+# on the Ambient of the 3° Scenario
+def evolve_vis(initial) :
+
+    final = [-3,-3]*glob.dimension
+    eff_changes = 0
+    people = 0
+    for i in range(glob.dimension) :
+        
+        if initial[i]!=[-3,-3] :
+            people += 1
+            # if people==glob.npeople : print('beneeeeeee')
+            mean = influence_vis(initial, i)
+            
+            prob_change = glob.np.random.uniform(0,1)
+
+            # First Attempt
+            changed_opinion = glob.np.sign(mean)
+            if changed_opinion==0 :
+                changed_opinion = initial[i][1]
+
+            #print('x =',mean,', y =',changed_opinion,', s =',initial[i])
+            step_4dir = glob.np.random.randint(0,4)
+            step_3dir = glob.np.random.randint(0,3)
+            step_2dir = glob.np.random.randint(0,2)
+            empty_spacez = empty_spaces(final, i)
+            how_many = len(empty_spacez)
+
+            # Event of Opinion Change
+            #if initial[i]==0 :
+            #    print(glob.neutral_prob-(glob.neutral_prob-0.5)*abs(initial[i]))
+            if prob_change<=glob.np.tanh(glob.T) : #da cambiare (per ora)
+                if changed_opinion!=initial[i][1] :
                     eff_changes += 1
                     #print('There have been ', eff_changes, ' changements of opinion.')
                 match how_many:
@@ -488,200 +638,7 @@ def evolve_norm(initial) :
 
                     case 5:
                         final[empty_spacez[step_4dir]] = initial[i] 
-    print('\n\n')             
-    return final
-
-# WORK IN PROGRESS ##################################################
-# Function that features the One-Step Time Evolution of the Population 
-# on the Ambient for the 2° Scenario
-def evolve_grav(initial) :
-
-    final = [-3,-3]*glob.dimension
-    eff_changes = 0
-    people = 0
-    for i in range(glob.dimension) :
-        
-        if initial[i]!=[-3,-3] :
-            people += 1
-            # if people==glob.npeople : print('beneeeeeee')
-            mean = influence_norm(initial, i)
-            
-            # First Attempt
-            changed_opinion = glob.np.sign(mean*initial[i][1])
-            if changed_opinion==0 :
-                changed_opinion = initial[i][1]
-            
-            #print('x =',mean,', y =',changed_opinion,', s =',initial[i])
-            spaces = empty_spaces_grav(final, i)
-            print('WHO: ', i)
-            print('SPACES: ',spaces)
-            probs = empty_probs_grav(initial, spaces, i)
-            step_4dir = glob.np.random.randint(0,4)
-            step_3dir = glob.np.random.randint(0,3)
-            step_2dir = glob.np.random.randint(0,2)
-
-            # Event of Opinion Change
-            prob_change = glob.np.random.uniform(0,1)
-            if prob_change<=glob.np.sign(initial[i][1])*glob.np.tanh(initial[i][1]*glob.T) : #da cambiare (per ora)
-                if changed_opinion!=initial[i][1] :
-                    eff_changes += 1
-                    print('There have been ', eff_changes, ' changements of opinion.')
-                #match how_many:
-                #    case 1:
-                final[glob.np.random.choice(spaces, p=probs)] = [initial[i][0], changed_opinion] 
-                
-                #    case 2:
-                #        if empty_spacez[1]!=i :
-                #            final[empty_spacez[step_2dir]] = changed_opinion
-     #
-                #        if empty_spacez[1]==i :
-                #            final[empty_spacez[0]] = changed_opinion
-         #
-                #    case 3:
-                #        if empty_spacez[2]!=i :
-                #            final[empty_spacez[step_3dir]] = changed_opinion
-  #
-                #        if empty_spacez[2]==i :
-                #            final[empty_spacez[step_2dir]] = changed_opinion
-#
-                #    case 4:
-                #        if empty_spacez[3]!=i :
-                #            final[empty_spacez[step_4dir]] = changed_opinion
-#
-                #        if empty_spacez[3]==i :
-                #            final[empty_spacez[step_3dir]] = changed_opinion
-#
-                #    case 5:
-                #        final[empty_spacez[step_4dir]] = changed_opinion
-            
-            # Event of Same Opinion as Before
-            if prob_change>glob.np.sign(initial[i][1])*glob.np.tanh(initial[i][1]*glob.T) :  #di nuovo per ora
-       
-                #match how_many:
-                #    case 1:
-                final[glob.np.random.choice(spaces, p=probs)] = initial[i]
-
-                    #case 2:
-                    #    if empty_spacez[1]!=i :
-                    #        final[empty_spacez[step_2dir]] = initial[i]
-#
-                    #    if empty_spacez[1]==i :
-                    #        final[empty_spacez[0]] = initial[i]
- #
-                    #case 3:
-                    #    if empty_spacez[2]!=i :
-                    #        final[empty_spacez[step_3dir]] = initial[i]
-#
-                    #    if empty_spacez[2]==i :
-                    #        final[empty_spacez[step_2dir]] = initial[i]
-#
-                    #case 4:
-                    #    if empty_spacez[3]!=i :
-                    #        final[empty_spacez[step_4dir]] = initial[i]
-#
-                    #    if empty_spacez[3]==i :
-                    #        final[empty_spacez[step_3dir]] = initial[i]
-#
-                    #case 5:
-                    #    final[empty_spacez[step_4dir]] = initial[i] 
-    print('\n\n')             
-    return final
-
-# WORK IN PROGRESS ##################################################
-# Function that features the One-Step Time Evolution of the Population 
-# on the Ambient of the 3° Scenario
-def evolve_vis(initial) :
-
-    final = [-3,-3]*glob.dimension
-    eff_changes = 0
-    people = 0
-    for i in range(glob.dimension) :
-        
-        if initial[i]!=[-3,-3] :
-            people += 1
-            # if people==glob.npeople : print('beneeeeeee')
-            mean = influence_vis(initial, i)
-            
-            prob_change = glob.np.random.uniform(0,1)
-
-            # First Attempt
-            changed_opinion = glob.np.sign(mean*initial[i][1])
-            if changed_opinion==0 :
-                changed_opinion = initial[i][1]
-
-            #print('x =',mean,', y =',changed_opinion,', s =',initial[i])
-            step_4dir = glob.np.random.randint(0,4)
-            step_3dir = glob.np.random.randint(0,3)
-            step_2dir = glob.np.random.randint(0,2)
-            empty_spacez = empty_spaces(final, i)
-            how_many = len(empty_spacez)
-
-            # Event of Opinion Change
-            #if initial[i]==0 :
-            #    print(glob.neutral_prob-(glob.neutral_prob-0.5)*abs(initial[i]))
-            if prob_change<=glob.np.sign(initial[i][1])*glob.np.tanh(initial[i][1]*glob.T) : #da cambiare (per ora)
-                if changed_opinion!=initial[i][1] :
-                    eff_changes += 1
-                    print('There have been ', eff_changes, ' changements of opinion.')
-                match how_many:
-                    case 1:
-                        final[empty_spacez[0]] = [initial[i][0], changed_opinion] 
-                
-                    case 2:
-                        if empty_spacez[1]!=i :
-                            final[empty_spacez[step_2dir]] = [initial[i][0], changed_opinion]
-     
-                        if empty_spacez[1]==i :
-                            final[empty_spacez[0]] = [initial[i][0], changed_opinion]
-         
-                    case 3:
-                        if empty_spacez[2]!=i :
-                            final[empty_spacez[step_3dir]] = [initial[i][0], changed_opinion]
-  
-                        if empty_spacez[2]==i :
-                            final[empty_spacez[step_2dir]] = [initial[i][0], changed_opinion]
-
-                    case 4:
-                        if empty_spacez[3]!=i :
-                            final[empty_spacez[step_4dir]] = [initial[i][0], changed_opinion]
-
-                        if empty_spacez[3]==i :
-                            final[empty_spacez[step_3dir]] = [initial[i][0], changed_opinion]
-
-                    case 5:
-                        final[empty_spacez[step_4dir]] = [initial[i][0], changed_opinion]
-            
-            # Event of Same Opinion as Before
-            if prob_change>glob.np.sign(initial[i][1])*glob.np.tanh(initial[i][1]*glob.T) :  #di nuovo per ora
-       
-                match how_many:
-                    case 1:
-                        final[empty_spacez[0]] = initial[i]
-
-                    case 2:
-                        if empty_spacez[1]!=i :
-                            final[empty_spacez[step_2dir]] = initial[i]
-
-                        if empty_spacez[1]==i :
-                            final[empty_spacez[0]] = initial[i]
- 
-                    case 3:
-                        if empty_spacez[2]!=i :
-                            final[empty_spacez[step_3dir]] = initial[i]
-
-                        if empty_spacez[2]==i :
-                            final[empty_spacez[step_2dir]] = initial[i]
-
-                    case 4:
-                        if empty_spacez[3]!=i :
-                            final[empty_spacez[step_4dir]] = initial[i]
-
-                        if empty_spacez[3]==i :
-                            final[empty_spacez[step_3dir]] = initial[i]
-
-                    case 5:
-                        final[empty_spacez[step_4dir]] = initial[i] 
-    print('\n\n')             
+    #print('\n\n')             
     return final
 
 # THIS IS OK ########################################################
@@ -708,7 +665,7 @@ def xydata_scatter(ambient, color) :
             xdata_color.append(xdata)
             ydata_color.append(ydata)
 
-    print('ci sono',len(xdata_color),color)
+    #print('ci sono',len(xdata_color),color)
     return xdata_color, ydata_color 
 
 # THIS IS OK ########################################################
@@ -733,7 +690,9 @@ def data_extr(array, i, fout, t):
 def update_scatter(time) :
     glob.ax_histo.clear()  
     glob.ax.clear()  
-    #glob.plt.title('Agent-Based Cellular Automata Simulation', loc='upper center') 
+    glob.ax.set_title('Agent-Based Cellular Automata Simulation') 
+    glob.ax.set_xlabel('x')
+    glob.ax.set_ylabel('y')
     glob.ax.grid(False) #False to not show 
 
     xempties, yempties = xydata_scatter(glob.ambient_evolution[time], 'empty')
@@ -748,6 +707,9 @@ def update_scatter(time) :
 
     bar_heights = [len(xred),len(xblue)]
     glob.ax_histo.bar([-0.5,0.5], height=bar_heights, color=['tab:red','tab:blue'])
+    glob.ax_histo.set_title('Occorrenze delle Opinioni')
+    glob.ax_histo.set_xlabel('Opinioni')
+    glob.ax_histo.set_ylabel('Occorrenze')
 
     glob.plt.tight_layout()
 
