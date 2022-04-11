@@ -13,6 +13,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # Instance of Global Variables, Constants and Controls
+global nsimulations
 global nsteps
 global interval
 global dimension
@@ -23,6 +24,9 @@ global nempties
 global nred
 global nblue 
 global setup
+global fixed_or_random
+global time_analysis
+global magnetization_analysis
 global npeople
 global distance
 global G
@@ -32,6 +36,7 @@ global ax
 global ax_histo
 
 # Animation Settings
+nsimulations = 1
 nsteps = 100
 interval = 60 #ms
 
@@ -47,18 +52,22 @@ setup = 0
 # 1 per Scenario di Flocking Gravitazionale,
 # 2 per Scenario di Visione Parziale. 
 
-# ONLY FOR setup==0
+# Global Analysis Selectors
 fixed_or_random = 0
 # 0 if Inizialization of the Ambient is Random
 # 1 if Inizialization of the Ambient is Pre-fixed
 
-# forse può essere interessante estendere questo tipo di analisi per i vari scenari
 time_analysis = 1
 # 0 if Representation of Time Distribution is not wanted
 # 1 if Representation of Time Distribution is wanted
 
+magnetization_analysis = 1
+# 0 if Representation of Time Distribution is not wanted
+# 1 if Representation of Time Distribution is wanted
+
+
 # Control Parameters
-npeople = 50
+npeople = 100
 distance = 3  # MAX = int((side-1)/2)
 G = 10
 T = 1
@@ -66,6 +75,7 @@ vision = 2
 initial_blues = 30
 
 # Tests of Initialization's Consistence
+assert nsimulations >= 0, 'ATTENTION: Negative n° of Executing Simulations.'
 assert nsteps >= 0, 'ATTENTION: Negative n° of Time Steps.'
 assert interval > 0, 'ATTENTION: Negative Time Interval for Animation.'
 assert (side-np.sqrt(dimension)) == 0, 'ATTENTION: The Root of dimension is not Integer, as it should be.'
@@ -73,6 +83,7 @@ assert (setup==0) or (setup==1) or (setup==2), 'ATTENTION: setup Value is not ac
 assert (fixed_or_random==0) or (fixed_or_random==1), 'ATTENTION: fixed_or_random Value is not acceptable.' 
 if setup!=0 :
    assert fixed_or_random == 0, 'ATTENTION: Wrong Scenario for non-vanishing fixed_or_random.'
+assert (time_analysis==0) or (time_analysis==1), 'ATTENTION: time_analysis Value is not acceptable.'   
 assert (npeople>0) and (npeople<dimension), 'ATTENTION: Negative or too elevated npeople Value.' 
 assert (distance>0) and (distance<=int((side-1)/2)), 'ATTENTION: Negative or too elevated distance Value.'
 assert G > 0, 'ATTENTION: Negative Universal Gravitational Constant G.'
