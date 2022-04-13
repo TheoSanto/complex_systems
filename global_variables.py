@@ -34,10 +34,11 @@ global T
 global vision
 global ax
 global ax_histo
+global initial_reds
 
 # Animation Settings
-nsimulations = 1
-nsteps = 100
+nsimulations = 500
+nsteps = 500
 interval = 60 #ms
 
 # Ambient Variables
@@ -57,22 +58,22 @@ fixed_or_random = 0
 # 0 if Inizialization of the Ambient is Random
 # 1 if Inizialization of the Ambient is Pre-fixed
 
-time_analysis = 1
+time_analysis = 0
 # 0 if Representation of Time Distribution is not wanted
 # 1 if Representation of Time Distribution is wanted
 
-magnetization_analysis = 1
+magnetization_analysis = 0
 # 0 if Representation of Time Distribution is not wanted
 # 1 if Representation of Time Distribution is wanted
 
 
 # Control Parameters
 npeople = 100
-distance = 3  # MAX = int((side-1)/2)
+distance = 4
 G = 10
 T = 1
 vision = 2
-initial_blues = 30
+initial_reds = 40
 
 # Tests of Initialization's Consistence
 assert nsimulations >= 0, 'ATTENTION: Negative n° of Executing Simulations.'
