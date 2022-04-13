@@ -10,8 +10,8 @@ if glob.fixed_or_random==1 :
     glob.ambient_evolution[0] = f.init_fixed()
 
 # CSV Files for Magnetization & Decision Time Data Storage
-magnetization_data_file = 'magnetization_data_file.csv'
-decision_time_data_file = 'decision_time_data_file.csv'
+#magnetization_data_file = 'magn_data_n100_t300_d15.csv'
+#decision_time_data_file = 'time_data_n100_t300_d15.csv'
 
 # Implementation and Storage of Time Evolution of 1° Scenario
 if glob.setup==0 :
@@ -47,8 +47,9 @@ if glob.setup==0 :
                 glob.plt.xlabel('Time Step')
                 glob.plt.show()
 
-                with open(magnetization_data_file, 'w') as magn_fout :
-                    f.magnetization_data_storage(magnetization_data, magn_fout)
+                # da commentare per stima delle probabilità
+                #with open(magnetization_data_file, 'w') as magn_fout :
+                #    f.magnetization_data_storage(magnetization_data, magn_fout)
 
             # Decision Time Distribution Analysis
 
@@ -65,20 +66,21 @@ if glob.setup==0 :
                 glob.plt.xscale('log')
                 glob.plt.show()
 
-                with open(decision_time_data_file, 'w') as time_fout :
-                    f.decision_time_data_storage(times_counts, time_fout)
+                # da commentare per stima delle probabilità
+                #with open(decision_time_data_file, 'w') as time_fout :
+                #    f.decision_time_data_storage(times_counts, time_fout)
 
         # Initial Conditions Influence Analysis
 
-        #nth_opinion_data_in = f.count_all(glob.ambient_evolution[0])
-        #nth_opinion_data_fin = f.count_all(glob.ambient_evolution[glob.nsteps-1])
-        #initial_conditions.append(nth_opinion_data_in)
-        #final_conditions.append(nth_opinion_data_fin)
-    #prob_blue = (final_conditions.count([0, glob.npeople]))/(glob.nsimulations)
-    #prob_red = (final_conditions.count([glob.npeople, 0]))/(glob.nsimulations)
-    #assert (len(initial_conditions)==glob.nsimulations) and (len(final_conditions)==glob.nsimulations), 'ATTENTION: Something wrong about the Storage of Simulations\' initial and final conditions.'
-    #print(initial_conditions,'\n\n',final_conditions)
-    #print(prob_blue, 'of Blue &', prob_red, 'of Red.')
+        nth_opinion_data_in = f.count_all(glob.ambient_evolution[0])
+        nth_opinion_data_fin = f.count_all(glob.ambient_evolution[glob.nsteps-1])
+        initial_conditions.append(nth_opinion_data_in)
+        final_conditions.append(nth_opinion_data_fin)
+    prob_blue = (final_conditions.count([0, glob.npeople]))/(glob.nsimulations)
+    prob_red = (final_conditions.count([glob.npeople, 0]))/(glob.nsimulations)
+    assert (len(initial_conditions)==glob.nsimulations) and (len(final_conditions)==glob.nsimulations), 'ATTENTION: Something wrong about the Storage of Simulations\' initial and final conditions.'
+    print(final_conditions)
+    print(prob_blue, 'of Blue &', prob_red, 'of Red.')
 
 # Implementation and Storage of Time Evolution of 2° Scenario
 if glob.setup==1 :
@@ -109,9 +111,9 @@ if glob.setup==2 :
 #        f.data_extr(glob.ambient_evolution[glob.nsteps-1], i, fout2, glob.nsteps-1)
 
 # Implementaion of Cellular Automata Visualization and Animation
-fig = glob.plt.figure()
-glob.ax = fig.add_axes([0.1, 0.1, 0.5, 0.75])
-glob.ax_histo = fig.add_axes([0.7, 0.1, 0.23, 0.4])
-anim = glob.animation.FuncAnimation(fig, f.update_scatter, frames=glob.nsteps, interval=glob.interval)
-anim.save('simulation_try.gif')
+#fig = glob.plt.figure()
+#glob.ax = fig.add_axes([0.1, 0.1, 0.5, 0.75])
+#glob.ax_histo = fig.add_axes([0.7, 0.1, 0.23, 0.4])
+#anim = glob.animation.FuncAnimation(fig, f.update_scatter, frames=glob.nsteps, interval=glob.interval)
+#anim.save('simulation_try.gif')
 #glob.plt.show() 
