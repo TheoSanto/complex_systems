@@ -10,15 +10,20 @@ def count_all(ambient) :
 def init_random() :
     ambient = [[-3,-3]]*glob.dimension
     j = 0
+    nred = 0
     while j<glob.npeople :
         rand_pos = glob.np.random.randint(0, glob.dimension-1) 
         rand_sign = glob.np.random.randint(0,2)
         rand_extr = 0
         if rand_sign==0 : rand_extr = -1
         else : rand_extr = +1
+        if nred==glob.initial_reds :
+            rand_extr = 1
     
         if ambient[rand_pos]==[-3,-3] :
             ambient[rand_pos] = [j, rand_extr]
+            if rand_extr==-1 :
+                nred += 1
             j += 1
     
     return ambient
@@ -35,10 +40,10 @@ def init_fixed() :
 
     j = 0
     for k in range(glob.dimension) :
-        if ambient[k]==[-3,1] and j<glob.initial_blues :
+        if ambient[k]==[-3,1] and j<glob.initial_reds :
             ambient[k] = [j,-1]
             j += 1
-        if ambient[k]==[-3,1] and j>=glob.initial_blues :
+        if ambient[k]==[-3,1] and j>=glob.initial_reds :
             ambient[k] = [j,1]
             j += 1
     
@@ -61,7 +66,7 @@ def decision_time_data(evolution) :
                 if jth_times>0 :
                     time_distribution.append(t-time_distribution[-1])
                 jth_times += 1
-                break
+                #break
             if jth_opinion_t==evolution[0][ID_position(evolution[0],j)][1] and t==glob.nsteps-1 :
                 time_distribution.append(t)
                 break
@@ -689,15 +694,15 @@ def data_extr(array, i, fout, t):
 
 def magnetization_data_storage(data, fout):
     assert len(data) == glob.nsteps, 'ATTENTION: magnetization_data_storage() needs a (nsteps)-dim. array of floats as first argument.'
-    fout.write('Magnetization_Value, Time_Step\n')
+    fout.write('Time_Step, Magnetization_Value\n')
     for t in range(glob.nsteps) :
-        fout.write(f'{data[t]}, {t}\n')
+        fout.write(f'{t} {data[t]}\n')
 
 def decision_time_data_storage(data, fout):
     assert len(data) == glob.nsteps-1, 'ATTENTION: time_data_storage() needs a (nsteps)-dim. array of floats as first argument.'
     fout.write('Occurrences, Corresponding_Decision_Time\n')
     for t in range(glob.nsteps) :
-        fout.write(f'{data[t]}, {t+1}\n')
+        fout.write(f'{t+1} {data[t]}\n')
 
 # THIS IS OK ########################################################
 # Function that makes possible to view the Animation
