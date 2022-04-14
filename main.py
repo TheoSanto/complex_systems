@@ -84,6 +84,9 @@ if glob.setup==0 :
 
 # Implementation and Storage of Time Evolution of 2° Scenario
 if glob.setup==1 :
+    flocking = 'flocking.csv'
+    with open(flocking, 'w') as flock_fout :
+        flock_fout.write('camadonna\n')
     for t in range(0, glob.nsteps) : 
                 print("Step", t, ', Mode',glob.setup)
                 if t>0 :
@@ -91,10 +94,27 @@ if glob.setup==1 :
 
 # Implementation and Storage of Time Evolution of 3° Scenario
 if glob.setup==2 :
+    partial_v= 'partial_vision_magnetization.csv'
+    magnetization_data = [] 
+    with open(partial_v, 'w') as partial_fout :
+        partial_fout.write('camadonna\n')
     for t in range(0, glob.nsteps) : 
                 print("Step", t, ', Mode',glob.setup)
                 if t>0 :
                     glob.ambient_evolution[t] = f.evolve_vis(glob.ambient_evolution[t-1])
+    
+    for t in range(glob.nsteps) :
+        spin_data_t = f.count_all(glob.ambient_evolution[t]) #proportion of opinions
+        m = (1/glob.npeople)*(spin_data_t[1]-spin_data_t[0]) #magnetizzazione al tempo t generico
+        magnetization_data.append(m)
+
+    times = glob.np.linspace(0,glob.nsteps,glob.nsteps)
+    glob.plt.title('Partial magnetization\'s Time Evolution')
+    glob.plt.plot(times, magnetization_data, marker='.',linestyle='--')
+    glob.plt.ylabel('Magnetization')
+    glob.plt.xlabel('Time Step')
+    glob.plt.show()
+
 
 ## Fulfilling of the CSV File for Initial State of the System 
 #data_in = 'data_in.csv'
@@ -111,9 +131,9 @@ if glob.setup==2 :
 #        f.data_extr(glob.ambient_evolution[glob.nsteps-1], i, fout2, glob.nsteps-1)
 
 # Implementaion of Cellular Automata Visualization and Animation
-#fig = glob.plt.figure()
-#glob.ax = fig.add_axes([0.1, 0.1, 0.5, 0.75])
-#glob.ax_histo = fig.add_axes([0.7, 0.1, 0.23, 0.4])
-#anim = glob.animation.FuncAnimation(fig, f.update_scatter, frames=glob.nsteps, interval=glob.interval)
-#anim.save('simulation_try.gif')
-#glob.plt.show() 
+fig = glob.plt.figure()
+glob.ax = fig.add_axes([0.1, 0.1, 0.5, 0.75])
+glob.ax_histo = fig.add_axes([0.7, 0.1, 0.23, 0.4])
+anim = glob.animation.FuncAnimation(fig, f.update_scatter, frames=glob.nsteps, interval=glob.interval)
+anim.save('simulation_try.gif')
+glob.plt.show() 
