@@ -37,8 +37,8 @@ global ax_histo
 global initial_reds
 
 # Animation Settings
-nsimulations = 500
-nsteps = 500
+nsimulations = 1
+nsteps = 5
 interval = 60 #ms
 
 # Ambient Variables
@@ -72,7 +72,7 @@ npeople = 100
 distance = 4
 G = 10
 T = 1
-vision = 2
+vision = 99
 initial_reds = 40
 
 # Tests of Initialization's Consistence
