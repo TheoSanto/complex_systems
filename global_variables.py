@@ -11,44 +11,26 @@ from matplotlib.pyplot import figure
 import networkx as nx
 import pandas as pd
 import matplotlib.pyplot as plt
+import time
+import unittest
 
 # Instance of Global Variables, Constants and Controls
-global nsimulations
-global nsteps
-global interval
-global dimension
-global side
-global ambient
-global ambient_evolution
-global nempties
-global nred
-global nblue 
-global setup
-global fixed_or_random
-global time_analysis
-global magnetization_analysis
-global npeople
-global distance
-global G
-global T 
-global vision
 global ax
 global ax_histo
-global initial_reds
 
 # Animation Settings
 nsimulations = 1
-nsteps = 1
+nsteps = 100
 interval = 60 #ms
 
 # Ambient Variables
-dimension = 100 #961 
+dimension = 961 
 side = int(np.sqrt(dimension)) # 31
 ambient = [[-3,-3]]*dimension
 ambient_evolution = [ambient]*(nsteps)
 
 # Scenario Choice
-setup = 0
+setup = 2
 # 0 per Scenario di Distanza, 
 # 1 per Scenario di Flocking Gravitazionale,
 # 2 per Scenario di Visione Parziale. 
@@ -68,12 +50,16 @@ magnetization_analysis = 0
 
 
 # Control Parameters
-npeople = 10
+npeople = 100
 distance = 4
 G = 10
 T = 1
-vision = 9
-initial_reds = 5
+vision = 2
+initial_reds = 50
+
+# Benchmark Variables
+time_influence_norm = 0
+time_empty_spaces = 0
 
 # Tests of Initialization's Consistence
 assert nsimulations >= 0, 'ATTENTION: Negative n° of Executing Simulations.'
