@@ -13,17 +13,12 @@ def init_random() :
     nred = 0
     while j<glob.npeople :
         rand_pos = glob.np.random.randint(0, glob.dimension-1) 
-        rand_sign = glob.np.random.randint(0,2)
         rand_extr = 0
-        if rand_sign==0 : rand_extr = -1
-        else : rand_extr = +1
-        if nred==glob.initial_reds :
-            rand_extr = 1
+        if j<glob.initial_reds : rand_extr = -1
+        else : rand_extr = 1
     
         if ambient[rand_pos]==[-3,-3] :
             ambient[rand_pos] = [j, rand_extr]
-            if rand_extr==-1 :
-                nred += 1
             j += 1
     
     return ambient
@@ -507,7 +502,7 @@ def evolve_norm(initial) :
 # on the Ambient for the 2° Scenario
 def evolve_grav(initial) :
 
-    final = [-3,-3]*glob.dimension
+    final = [[-3,-3]]*glob.dimension
     eff_changes = 0
     people = 0
     for i in range(glob.dimension) :
@@ -555,7 +550,7 @@ def evolve_grav(initial) :
 # on the Ambient of the 3° Scenario
 def evolve_vis(initial) :
 
-    final = [-3,-3]*glob.dimension
+    final = [[-3,-3]]*glob.dimension
     eff_changes = 0
     people = 0
     for i in range(glob.dimension) :
@@ -730,7 +725,7 @@ def update_scatter(time) :
     glob.ax_histo.set_xlabel('Opinioni')
     glob.ax_histo.set_ylabel('Occorrenze')
 
-    glob.plt.tight_layout()
+    # glob.plt.tight_layout() ERRORE DI COMPATIBIITà CON GLI ASSI
 
 # THIS IS OK ########################################################
 # Function that return how many people with a certain opinion can be seen by a person with that opinion in his range of influence
@@ -1025,30 +1020,27 @@ def partial_vision(ambient, which) : #ritorna un array delle posizioni che vede 
     grav_int = local_density(opinion, ambient, glob.distance)
     nth = 0 # mi darà la posizione ordinale della persona i all'interno dell'array grav_int
     choosen = []
-    choice = -1 #inizializzato con un valore a caso
-    old_choice = -1
     if opinion==-3 : return False
     for k in range(0, glob.dimension) :
         if ambient[k][1]==opinion :
             nth = nth+1
             if k==which : break
-    #numero di persone che vengono viste nel proprio range
-    vision = glob.np.random.randint(0, (2*glob.distance+1)*(2*glob.distance+1)-1)
-    #(2*glob.distance+1)*(2*glob.distance+1)-1 è il massimo valore plossibile di amici, è un parametro ovviamente grande su cui andare a giocare
-    if vision>=len(grav_int[nth-1][2]) : 
+     
+    if glob.vision>=len(grav_int[nth-1][2]) : 
         return grav_int[nth-1][2] # lo lascia inalterato
 
-    if vision<len(grav_int[nth-1][2]) :
-        for j in range(0, vision) :
+    if glob.vision<len(grav_int[nth-1][2]) :
+        for j in range(0, glob.vision) :
             choice = glob.np.random.choice(grav_int[nth-1][2])
             choosen.append(choice)
-            while choosen.count(choice)>1 : #genero una scelta non doppione
-                old_choice = choice
-                choice = glob.np.random.choice(grav_int[nth-1][2])
+            #controllo di non avere più volte la stessa estrazione
+            for i in range(0, len(choosen)) :
+                while choosen.count(choosen[i]) > 1 : #genero una scelta non doppione
+                    choosen[i] = glob.np.random.choice(grav_int[nth-1][2])
 
-            if old_choice!=-1 : choosen.append(choice) #aggiungo la nuova sccelta non doppione
-            if old_choice!=-1 : choosen.remove(old_choice) #rimuovo la vecchia scelta che avevo già
-            if old_choice!=-1 : assert choosen.count(old_choice) == 1 #mi assicuro che la vecchia scelta fosse un doppione
-
-        return choosen
+        assert len(choosen) == glob.vision
+        #choosen.sort() 
+        #print(choosen)
+    
+        return choosen #funziona
                 
