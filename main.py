@@ -1,7 +1,7 @@
 import functions as f
 import global_variables as glob
 
-glob.np.random.seed(196808822)
+glob.np.random.seed(196808855)
 
 # Random Positioning & Opinion Defining of the Individuals
 if glob.fixed_or_random==0 :
@@ -19,12 +19,31 @@ if glob.setup==0 :
     initial_conditions = []
     final_conditions = []
     for n in range(glob.nsimulations) :
-        print("Simulation n°", n)
+        if n==0 or n==100 or n==200 or n==300 or n==400 or n==450 or n==490 :
+            print("Simulation n°", n)
 
         if glob.fixed_or_random==0 :
             glob.ambient_evolution[0] = f.init_random()
         if glob.fixed_or_random==1 :
             glob.ambient_evolution[0] = f.init_fixed()
+
+        # Local Density 2 & Gravity 2 Testing ####################################################
+        density_array = f.local_density(-1,glob.ambient_evolution[0],glob.distance)
+        for i in range (glob.dimension) :
+            ith_density_truth = []
+            for j in range(glob.initial_reds) :
+                if density_array[j][1]==i :
+                    ith_density_truth = density_array[j]
+            if glob.ambient_evolution[0][i][1]==-1 :
+                ith_density_try = f.local_density2(glob.ambient_evolution[0], i, glob.distance)
+                print(ith_density_try,'&&&',ith_density_truth)
+                assert ith_density_try == ith_density_truth, 'ATTENTION: The 2 Local Density Functions give different results.'
+
+                ith_gravity_truth = f.gravity(glob.ambient_evolution[0], i)
+                ith_gravity_try = f.gravity2(glob.ambient_evolution[0], i)
+                print(ith_gravity_try,'&&&',ith_gravity_truth,'\n')
+                assert ith_gravity_try == ith_gravity_truth, 'ATTENTION: The 2 Gravity Functions give different results.'
+
 
         for t in range(glob.nsteps) : 
             #print("Step", t, ', Mode',glob.setup)
@@ -135,5 +154,5 @@ fig = glob.plt.figure()
 glob.ax = fig.add_axes([0.1, 0.1, 0.5, 0.75])
 glob.ax_histo = fig.add_axes([0.7, 0.1, 0.23, 0.4])
 anim = glob.animation.FuncAnimation(fig, f.update_scatter, frames=glob.nsteps, interval=glob.interval)
-anim.save('simulation_try.gif')
+#anim.save('simulation_try.gif')
 glob.plt.show() 
