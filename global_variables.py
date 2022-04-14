@@ -38,11 +38,11 @@ global initial_reds
 
 # Animation Settings
 nsimulations = 1
-nsteps = 5
+nsteps = 1
 interval = 60 #ms
 
 # Ambient Variables
-dimension = 961 
+dimension = 100 #961 
 side = int(np.sqrt(dimension)) # 31
 ambient = [[-3,-3]]*dimension
 ambient_evolution = [ambient]*(nsteps)
@@ -68,12 +68,12 @@ magnetization_analysis = 0
 
 
 # Control Parameters
-npeople = 100
+npeople = 10
 distance = 4
 G = 10
 T = 1
-vision = 99
-initial_reds = 40
+vision = 9
+initial_reds = 5
 
 # Tests of Initialization's Consistence
 assert nsimulations >= 0, 'ATTENTION: Negative n° of Executing Simulations.'
