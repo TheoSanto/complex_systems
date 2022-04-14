@@ -10,7 +10,6 @@ def count_all(ambient) :
 def init_random() :
     ambient = [[-3,-3]]*glob.dimension
     j = 0
-    nred = 0
     while j<glob.npeople :
         rand_pos = glob.np.random.randint(0, glob.dimension-1) 
         rand_extr = 0
@@ -21,6 +20,7 @@ def init_random() :
             ambient[rand_pos] = [j, rand_extr]
             j += 1
     
+    assert j == glob.npeople, 'ATTENTION: The Inizialization of the Ambient has not been finished.'
     return ambient
 
 def init_fixed() :
@@ -28,7 +28,6 @@ def init_fixed() :
     j = 0
     while j<glob.npeople :
         rand_pos = glob.np.random.randint(0, glob.dimension-1) 
-        
         if ambient[rand_pos]==[-3,-3] :
             ambient[rand_pos] = [-3, 1]
             j += 1
@@ -42,15 +41,15 @@ def init_fixed() :
             ambient[k] = [j,1]
             j += 1
     
-    assert j == glob.npeople
+    assert j == glob.npeople, 'ATTENTION: The Inizialization of the Ambient has not been finished.'
     return ambient
 
 def decision_time_data(evolution) :
-    assert len(evolution) == glob.nsteps
+    assert len(evolution) == glob.nsteps, 'ATTENTION: decision_time_data() needs a (nsteps)-dim. array as argument.'
+
     time_distribution = []
     for j in range(glob.npeople) :
-        #jth_position_0 = ID_position(evolution[0],j)
-        #jth_opinion_0 = evolution[0][jth_position_0][1]
+
         jth_times = 0
         for t in range(1, glob.nsteps) :
             jth_position_t = ID_position(evolution[t],j)
@@ -61,15 +60,14 @@ def decision_time_data(evolution) :
                 if jth_times>0 :
                     time_distribution.append(t-time_distribution[-1])
                 jth_times += 1
-                #break
             if jth_opinion_t==evolution[0][ID_position(evolution[0],j)][1] and t==glob.nsteps-1 :
                 time_distribution.append(t)
                 break
-    #assert len(time_distribution) == glob.npeople, 'ATTENTION: Some agents have missed the Time Distribution Analysis'
+    
     return time_distribution
 
 def ID_position(ambient, ID) :
-    assert len(ambient) == glob.dimension
+    assert len(ambient) == glob.dimension, 'ATTENTION: ID_position() needs a (dimension)-dim. array as first argument.'
     assert (ID!=-3) and (ID>=0) and (ID<glob.npeople), 'ATTENTION: ID_position() second argument must be integer and different from -3.'
 
     for i in range(glob.dimension) :
@@ -79,7 +77,8 @@ def ID_position(ambient, ID) :
 # THIS IS OK ########################################################
 # Function that returns x & y Coordinates of a Single Individual
 # given its Index in the Ambient Array.
-def xydata(ambient, which) :
+def xydata(which) :
+    assert (which>=0) and (which<glob.dimension), 'ATTENTION: xydata() needs a non-negative integer as argument, lower than dimension.'
 
     # Discovering of Y Position of which
     ywhich = 0
@@ -100,13 +99,15 @@ def xydata(ambient, which) :
 # THIS IS OK ########################################################
 # Function that defines the Chebyshev Distance in this 2D Discrete Space
 # taking into account the Periodic Conditions.
-def table_distance(ambient, first, second) :
+def table_distance(first, second) :
+    assert (first>=0) and (first<glob.dimension), 'ATTENTION: table_distance() needs a non-negative integer as first argument, lower than dimension.'
+    assert (second>=0) and (second<glob.dimension), 'ATTENTION: table_distance() needs a non-negative integer as second argument, lower than dimension.'
 
     # Coordinates x & y of first
-    xfirst, yfirst = xydata(ambient,first) 
+    xfirst, yfirst = xydata(first) 
 
     # Coordinates x & y of second
-    xsecond, ysecond = xydata(ambient,second)
+    xsecond, ysecond = xydata(second)
 
     # Arrays filled with all possible pairs of Coordinates x & y of second due to Periodic Conditions
     second_xs = [-3]*3
@@ -134,6 +135,8 @@ def table_distance(ambient, first, second) :
 # at (which)-th Site in the Ambient with Periodic Conditions, 
 # for both the Distance Control Model and the Partial Vision Model.
 def empty_spaces(ambient, which) :
+    assert len(ambient) == glob.dimension, 'ATTENTION: empty_spaces() needs a (dimension)-dim. array as first argument.'
+    assert (which>=0) and (which<glob.dimension), 'ATTENTION: empty_spaces() needs a non-negative integer as second argument, lower than dimension.'
 
     # Array filled with Indexes of Empty Spaces next to which
     empty_spaces = []
@@ -184,10 +187,11 @@ def empty_spaces(ambient, which) :
 # at (which)-th Site in the Ambient with Periodic Conditions, 
 # for the specific case of Gravitational Flocking Model.
 def empty_spaces_grav(ambient, which) :
+    assert len(ambient) == glob.dimension, 'ATTENTION: empty_spaces_grav() needs a (dimension)-dim. array as first argument.'
+    assert (which>=0) and (which<glob.dimension), 'ATTENTION: empty_spaces_grav() needs a non-negative integer as second argument, lower than dimension.'
 
     # Array filled with Indexes of Empty Spaces next to which
     spaces = []
-    #probs = []
     how_many = 0
 
     # Left Burden Management
@@ -200,10 +204,8 @@ def empty_spaces_grav(ambient, which) :
             if j>=0 and j<glob.dimension :
                 if ambient[j]!=[-3,-3] :
                     spaces.append(-3)
-                    #probs.append(0)
                 if ambient[j]==[-3,-3] :
                     spaces.append(j)
-                    #probs.append(1)
                     how_many += 1
     
     # Right Burden Management
@@ -216,10 +218,8 @@ def empty_spaces_grav(ambient, which) :
             if j>=0 and j<glob.dimension :
                 if ambient[j]!=[-3,-3] :
                     spaces.append(-3)
-                    #probs.append(0)
                 if ambient[j]==[-3,-3] :
                     spaces.append(j)
-                    #probs.append(1)
                     how_many += 1
     
     # General Case & High-Low Burden Management
@@ -232,10 +232,8 @@ def empty_spaces_grav(ambient, which) :
             if j>=0 and j<glob.dimension :
                 if ambient[j]!=[-3,-3] :
                     spaces.append(-3)
-                    #probs.append(0)
                 if ambient[j]==[-3,-3] :
                     spaces.append(j)
-                    #probs.append(1)
                     how_many += 1
 
     return spaces
@@ -247,13 +245,15 @@ def empty_spaces_grav(ambient, which) :
 # of the Individual at (which)-th Site in the Ambient with Periodic 
 # Conditions, for the specific case of Gravitational Flocking Model.
 def empty_probs_grav(ambient, spaces, which) :
+    assert len(ambient) == glob.dimension, 'ATTENTION: empty_probs_grav() needs a (dimension)-dim. array as first argument.'
+    assert len(spaces) == 5, 'ATTENTION: empty_probs_grav() needs a 5_dim. array as second argument.'
+    assert (which>=0) and (which<glob.dimension), 'ATTENTION: empty_probs_grav() needs a non-negative integer as third argument, lower than dimension.'
 
-    # Array filled with Indexes of Empty Spaces next to which
-    #spaces = []
+    # Array filled with Probabilities of Transition towards a specific Empty Space next to which
     probs = []
     how_many = 0
 
-    print('SPACES: ',spaces)
+    #print('SPACES: ',spaces)
     for i in range(5) :
         if spaces[i]==-3 :
             probs.append(0)
@@ -283,16 +283,16 @@ def empty_probs_grav(ambient, spaces, which) :
         prob_left  = 0.25
         prob_right = 0.25
     if grav_attraction[0]>0 or (grav_attraction[0]==0 and grav_attraction[1]!=0) :
-        prob_left = 0.25*(1-(grav_x2/grav_modulus2))
+        prob_left  = 0.25*(1-(grav_x2/grav_modulus2))
         prob_right = 0.25*(1+(grav_x2/grav_modulus2))
     if grav_attraction[0]<0 : 
-        prob_left = 0.25*(1+(grav_x2/grav_modulus2))
+        prob_left  = 0.25*(1+(grav_x2/grav_modulus2))
         prob_right = 0.25*(1-(grav_x2/grav_modulus2))
     if grav_attraction[1]>0 or (grav_attraction[1]==0 and grav_attraction[0]!=0) :
-        prob_up = 0.25*(1+(grav_y2/grav_modulus2))
+        prob_up   = 0.25*(1+(grav_y2/grav_modulus2))
         prob_down = 0.25*(1-(grav_y2/grav_modulus2)) 
     if grav_attraction[1]<0 :
-        prob_up = 0.25*(1-(grav_y2/grav_modulus2))   
+        prob_up   = 0.25*(1-(grav_y2/grav_modulus2))   
         prob_down = 0.25*(1+(grav_y2/grav_modulus2))
     rescaled_probs = [prob_down, prob_left, prob_right, prob_up]
 
@@ -340,10 +340,9 @@ def empty_probs_grav(ambient, spaces, which) :
     if max_==0 and how_many==0 :
         print('Shit, how tha fuck is this even possibleeeeeeeeeeeeeee? Explain me, Bazzani.')
 
-    print('PROBS: ',probs[0],probs[1],probs[2],probs[3],probs[4])
-    print('SUM: ',probs[0]+probs[1]+probs[2]+probs[3]+probs[4])
-    #assert probs[0]+probs[1]+probs[2]+probs[3]+probs[4] == 1
-
+    #print('PROBS: ',probs[0],probs[1],probs[2],probs[3],probs[4])
+    #print('SUM: ',probs[0]+probs[1]+probs[2]+probs[3]+probs[4])
+    assert probs[0]+probs[1]+probs[2]+probs[3]+probs[4] == 1, 'ATTENTION: empty_probs_grav is giving a Distribution of Transition Probabilities non-Normalized to 1.'
     return probs
 
 # THIS IS OK #########################################################
@@ -353,26 +352,24 @@ def empty_probs_grav(ambient, spaces, which) :
 # given by the extended Moore Neighborhood of 'distance' Radius.
 # It is valid both for Distance Variation Model and Gravitational Flocking Model.
 def influence_norm(ambient, which) :
+    assert len(ambient) == glob.dimension, 'ATTENTION: influence_norm() needs a (dimension)-dim. array as first argument.'
+    assert (which>=0) and (which<glob.dimension), 'ATTENTION: influence_norm() needs a non-negative integer as second argument, lower than dimension.'
 
     neighs = 0
     opinions = []
-    for d in range(1, glob.distance+1) :
-        for j in range(which-d*glob.side-glob.distance, which-d*glob.side+glob.distance+1) :
-            if j!=which and j>=0 and j<glob.dimension :
-                if ambient[j]!=[-3,-3] and table_distance(ambient,which,j)==d :
-                    opinions.append(ambient[j][1])
-                    neighs += 1
+    for j in range(0, glob.dimension) :
+        if j!=which :
+            if ambient[j]!=[-3,-3] and table_distance(which,j)<=glob.distance :
+                opinions.append(ambient[j][1])
+                neighs += 1
     #print(opinions)
 
     # Influence as the Mean Opinion
-    sum_opinions = 0
-    for i in range(len(opinions)) :
-        sum_opinions += opinions[i]   # Each of their Opinion with same Weight
-    influence = 0
-    his_own = ambient[which][1]
-    if neighs==0 :
-        influence = his_own # No Changements of Opinion in Absence of Friends
-    if neighs!=0 :
+    influence = ambient[which][1] # No Changements of Opinion in Absence of Friends
+    if neighs>0 :
+        sum_opinions = 0
+        for i in range(len(opinions)) :
+            sum_opinions += opinions[i]   # Each of their Opinion with same Weight
         influence = sum_opinions/neighs
     return influence
 
@@ -383,18 +380,39 @@ def influence_norm(ambient, which) :
 # given by the extended Moore Neighborhood of 'distance' Radius.
 # It is valid only for the Partial Vision Model.
 def influence_vis(ambient, which) :
-    viewed_people = partial_vision(ambient, which)
+    assert len(ambient) == glob.dimension, 'ATTENTION: influence_vis() needs a (dimension)-dim. array as first argument.'
+    assert (which>=0) and (which<glob.dimension), 'ATTENTION: influence_vis() needs a non-negative integer as second argument, lower than dimension.'
+
+    neighs = 0
     opinions = []
-    for j in range(len(viewed_people)) :
-        opinions.append(ambient[viewed_people[j]][1])
-                    
+    for j in range(0, glob.dimension) :
+        if j!=which :
+            if ambient[j]!=[-3,-3] and table_distance(which,j)<=glob.dimension :
+                opinions.append(ambient[j][1])
+                neighs += 1
+    
+    viewed_opinions = []
+    if len(opinions)>=glob.vision :
+        choice_indices = []
+        while len(choice_indices)<glob.vision :
+            choice_index = glob.np.random.randint(0,len(opinions))
+            if choice_indices.count(choice_index)==0 :
+                choice_indices.append(choice_index)
+                viewed_opinions.append(opinions[choice_indices])
+    if len(opinions)<glob.vision :
+        viewed_opinions = opinions
+
     # Influence as the Mean Opinion
-    sum_opinions = 0
-    for i in range(len(opinions)) :
-        sum_opinions += opinions[i]   # Each of their Opinion with same Weight
     influence = ambient[which][1]
-    if len(viewed_people)>0 :   
-        influence = sum_opinions/len(viewed_people)
+    if len(viewed_opinions)>0 : 
+        sum_opinions = 0
+        for i in range(len(viewed_opinions)) :
+            sum_opinions += viewed_opinions[i]  
+        influence = sum_opinions/len(viewed_opinions)
+        if len(viewed_opinions)==len(opinions) :
+            normal_influence = influence_norm(ambient, which)
+            print(influence,'&&&',normal_influence)
+            assert influence==normal_influence, 'ATTENTION: Partial Vision Influence does not reduce to Normal Influence when vision is elevated.'
     
     return influence
 
@@ -402,6 +420,8 @@ def influence_vis(ambient, which) :
 # Function that features the One-Step Time Evolution of the Population
 # on the Ambient for the 1° Scenario.
 def evolve_norm(initial) :
+    assert len(initial) == glob.dimension, 'ATTENTION: evolve_norm() needs a (dimension)-dim. array as argument.'
+
 
     final = [[-3,-3]]*glob.dimension
     eff_changes = 0
@@ -410,13 +430,12 @@ def evolve_norm(initial) :
         
         if initial[i]!=[-3,-3] :
             people += 1
-            # if people==glob.npeople : print('beneeeeeee')
             mean = influence_norm(initial, i)
             
             prob_change = glob.np.random.uniform(0,1)
 
             # First Attempt
-            changed_opinion = glob.np.sign(mean)#*float(initial[i][1]))
+            changed_opinion = glob.np.sign(mean)
             if changed_opinion==0 :
                 changed_opinion = initial[i][1]
 
@@ -429,9 +448,7 @@ def evolve_norm(initial) :
             
 
             # Event of Opinion Change
-            #if initial[i]==0 :
-            #    print(glob.neutral_prob-(glob.neutral_prob-0.5)*abs(initial[i]))
-            if prob_change<=glob.np.tanh(glob.T) : # semplificazione
+            if prob_change<=glob.np.tanh(glob.T) :
                 #if changed_opinion!=initial[i][1] :
                     #print(initial[i][1],'-->',mean,'-->',changed_opinion)
                     #eff_changes += 1
@@ -465,7 +482,7 @@ def evolve_norm(initial) :
                         final[empty_spacez[step_4dir]] = [initial[i][0], changed_opinion]
             
             # Event of Same Opinion as Before
-            if prob_change>glob.np.tanh(glob.T) :  #di nuovo per ora
+            if prob_change>glob.np.tanh(glob.T) :
        
                 match how_many:
                     case 1:
@@ -501,6 +518,7 @@ def evolve_norm(initial) :
 # Function that features the One-Step Time Evolution of the Population 
 # on the Ambient for the 2° Scenario
 def evolve_grav(initial) :
+    assert len(initial) == glob.dimension, 'ATTENTION: evolve_grav() needs a (dimension)-dim. array as argument.'
 
     final = [[-3,-3]]*glob.dimension
     eff_changes = 0
@@ -509,7 +527,6 @@ def evolve_grav(initial) :
         
         if initial[i]!=[-3,-3] :
             people += 1
-            # if people==glob.npeople : print('beneeeeeee')
             mean = influence_norm(initial, i)
             
             # First Attempt
@@ -519,29 +536,27 @@ def evolve_grav(initial) :
             
             #print('x =',mean,', y =',changed_opinion,', s =',initial[i])
             spaces = empty_spaces_grav(final, i)
-            print('WHO: ', i)
-            print('SPACES: ',spaces)
+            #print('WHO: ', i)
+            #print('SPACES: ',spaces)
             probs = empty_probs_grav(initial, spaces, i)
-            step_4dir = glob.np.random.randint(0,4)
-            step_3dir = glob.np.random.randint(0,3)
-            step_2dir = glob.np.random.randint(0,2)
+            #step_4dir = glob.np.random.randint(0,4)
+            #step_3dir = glob.np.random.randint(0,3)     # USELESSSSSSSS
+            #step_2dir = glob.np.random.randint(0,2)
 
             # Event of Opinion Change
             prob_change = glob.np.random.uniform(0,1)
-            if prob_change<=glob.np.sign(initial[i][1])*glob.np.tanh(initial[i][1]*glob.T) : #da cambiare (per ora)
+            if prob_change<=glob.np.tanh(glob.T) :
                 if changed_opinion!=initial[i][1] :
                     eff_changes += 1
                     print('There have been ', eff_changes, ' changements of opinion.')
                 
                 final[glob.np.random.choice(spaces, p=probs)] = [initial[i][0], changed_opinion] 
                 
-                
             # Event of Same Opinion as Before
             if prob_change>glob.np.sign(initial[i][1])*glob.np.tanh(initial[i][1]*glob.T) :  #di nuovo per ora
        
                 final[glob.np.random.choice(spaces, p=probs)] = initial[i]
 
-                 
     #print('\n\n')             
     return final
 
@@ -549,6 +564,7 @@ def evolve_grav(initial) :
 # Function that features the One-Step Time Evolution of the Population 
 # on the Ambient of the 3° Scenario
 def evolve_vis(initial) :
+    assert len(initial) == glob.dimension, 'ATTENTION: evolve_vis() needs a (dimension)-dim. array as argument.'
 
     final = [[-3,-3]]*glob.dimension
     eff_changes = 0
@@ -557,8 +573,8 @@ def evolve_vis(initial) :
         
         if initial[i]!=[-3,-3] :
             people += 1
-            # if people==glob.npeople : print('beneeeeeee')
             mean = influence_vis(initial, i)
+            #print('mean is',mean)
             
             prob_change = glob.np.random.uniform(0,1)
 
@@ -566,6 +582,9 @@ def evolve_vis(initial) :
             changed_opinion = glob.np.sign(mean)
             if changed_opinion==0 :
                 changed_opinion = initial[i][1]
+            #print('initial opinion is',initial[i][1])
+            #print('changed opinion is',changed_opinion)
+
 
             #print('x =',mean,', y =',changed_opinion,', s =',initial[i])
             step_4dir = glob.np.random.randint(0,4)
@@ -575,12 +594,11 @@ def evolve_vis(initial) :
             how_many = len(empty_spacez)
 
             # Event of Opinion Change
-            #if initial[i]==0 :
-            #    print(glob.neutral_prob-(glob.neutral_prob-0.5)*abs(initial[i]))
-            if prob_change<=glob.np.tanh(glob.T) : #da cambiare (per ora)
+            if prob_change<=glob.np.tanh(glob.T) :
                 if changed_opinion!=initial[i][1] :
                     eff_changes += 1
-                    #print('There have been ', eff_changes, ' changements of opinion.')
+                    print('There have been ', eff_changes, ' changements of opinion.')
+                    print(initial[i][1],'-->',changed_opinion)
                 match how_many:
                     case 1:
                         final[empty_spacez[0]] = [initial[i][0], changed_opinion] 
@@ -610,7 +628,7 @@ def evolve_vis(initial) :
                         final[empty_spacez[step_4dir]] = [initial[i][0], changed_opinion]
             
             # Event of Same Opinion as Before
-            if prob_change>glob.np.tanh(glob.T) :  #di nuovo per ora
+            if prob_change>glob.np.tanh(glob.T) :
        
                 match how_many:
                     case 1:
@@ -646,6 +664,9 @@ def evolve_vis(initial) :
 # Function that collects the X and Y Positions for each Individual with Opinion
 # corresponding to color in Two different Arrays
 def xydata_scatter(ambient, color) :
+    assert len(ambient) == glob.dimension, 'ATTENTION: xydata_scatter() needs a (dimension)-dim. array as first argument.'
+    assert (color=='empty') or (color=='red') or (color=='blue'), 'ATTENTION: xydata_scatter() needs a precise string literal as second argument.' 
+
     which_color = 0
     if color=='empty' :
         which_color = -3
@@ -666,35 +687,40 @@ def xydata_scatter(ambient, color) :
             xdata_color.append(xdata)
             ydata_color.append(ydata)
 
-    #print('ci sono',len(xdata_color),color)
     return xdata_color, ydata_color 
 
 # MAYBE, THIS IS USELESS ############################################
 # THIS IS OK ########################################################
 # Function that saves on CSV File the Info about the i-th Individual
-def data_extr(array, i, fout, t):
+def data_extr(ambient, i, fout, t):
+    assert len(ambient) == glob.dimension, 'ATTENTION: data_extr() needs a (dimension)-dim. array as first argument.'
+    assert (i>=0) and (i<glob.dimension), 'ATTENTION: data_extr() needs a non-negative integer as second argument, lower than dimension.'
+    assert (t>=0) and (t<glob.nsteps), 'ATTENTION: data_extr() needs a non-negative integer as fourth argument, lower than nsteps.'
+
     empty = 0
     red = 0
     blue = 0
     opinion_class = ['empty','red','blue']
-    if array[i]==[-3,-3] :
+    if ambient[i]==[-3,-3] :
         empty = i
-        fout.write(f'{opinion_class[0]}, {-3}, {array[i][1]}, {empty}, {t}\n')
-    if array[i][1]==-1 : 
+        fout.write(f'{opinion_class[0]}, {-3}, {ambient[i][1]}, {empty}, {t}\n')
+    if ambient[i][1]==-1 : 
         red = i
-        fout.write(f'{opinion_class[1]}, {array[i][0]}, {array[i][1]}, {red}, {t}\n')
-    if array[i][1]==+1 :
+        fout.write(f'{opinion_class[1]}, {ambient[i][0]}, {ambient[i][1]}, {red}, {t}\n')
+    if ambient[i][1]==+1 :
         blue = i
-        fout.write(f'{opinion_class[4]}, {array[i][0]}, {array[i][1]}, {blue}, {t}\n')
+        fout.write(f'{opinion_class[4]}, {ambient[i][0]}, {ambient[i][1]}, {blue}, {t}\n')
 
 def magnetization_data_storage(data, fout):
     assert len(data) == glob.nsteps, 'ATTENTION: magnetization_data_storage() needs a (nsteps)-dim. array of floats as first argument.'
+    
     fout.write('Time_Step, Magnetization_Value\n')
     for t in range(glob.nsteps) :
         fout.write(f'{t} {data[t]}\n')
 
 def decision_time_data_storage(data, fout):
     assert len(data) == glob.nsteps-1, 'ATTENTION: time_data_storage() needs a (nsteps)-dim. array of floats as first argument.'
+    
     fout.write('Occurrences, Corresponding_Decision_Time\n')
     for t in range(glob.nsteps) :
         fout.write(f'{t+1} {data[t]}\n')
@@ -702,6 +728,8 @@ def decision_time_data_storage(data, fout):
 # THIS IS OK ########################################################
 # Function that makes possible to view the Animation
 def update_scatter(time) :
+    assert (time>=0) and (time<glob.nsteps), 'ATTENTION: update_scatter() needs a non-negative integer as argument, lower than nsteps.'
+
     glob.ax_histo.clear()  
     glob.ax.clear()  
     glob.ax.set_title('Agent-Based Cellular Automata Simulation') 
@@ -727,10 +755,32 @@ def update_scatter(time) :
 
     # glob.plt.tight_layout() ERRORE DI COMPATIBIITà CON GLI ASSI
 
+def local_density2(ambient, which, distance) :
+    assert len(ambient) == glob.dimension, 'ATTENTION: local_density2() needs a (dimension)-dim. array as first argument.'
+    assert (which>=0) and (which<glob.dimension), 'ATTENTION: local_density2() needs a non-negative integer as second argument, lower than dimension.'
+    assert (distance>0) and (distance<=int((glob.side-1)/2)), 'ATTENTION: local_density2() needs a non-negative integer as third argument, lower than its max. value int((side-1)/2)).'
+
+    opinion = ambient[which][1]
+    assert opinion != -3, 'ATTENTION: The Individual passed through the Local Density Function is instead an Empty Space.'
+
+    density = 0
+    density_indices = []
+    for j in range(glob.dimension) :
+        if j!=which and j>=0 and j<glob.dimension :
+            if ambient[j][1]==opinion and table_distance(which,j)<=distance :
+                density_indices.append(j)
+                density += 1
+    
+    density_indices.sort()
+    return [density, which, density_indices]
+
 # THIS IS OK ########################################################
 # Function that return how many people with a certain opinion can be seen by a person with that opinion in his range of influence
 def local_density(opinion, ambient, distance) : #provo a scrivere una funzione che calcola la densità locale di una certa opinione (utile per il flocking)
-    
+    assert len(ambient) == glob.dimension, 'ATTENTION: local_density() needs a (dimension)-dim. array as second argument.'
+    assert (opinion==-1) or (opinion==+1), 'ATTENTION: local_density() needs a two-valued integer (-1 or +1) as first argument.'
+    assert (distance>0) and (distance<=int((glob.side-1)/2)), 'ATTENTION: local_density() needs a non-negative integer as third argument, lower than its max. value int((side-1)/2)).'
+
     grav_interaction = [] #densità, posizione
     
     for i in range(0, glob.dimension) : #scorro ambient ricercando persone con l'opinione desiderata
@@ -872,6 +922,10 @@ def local_density(opinion, ambient, distance) : #provo a scrivere una funzione c
             for g in range(0, len(known_box)) :
                 assert known_box.count(g) <= 1, print('stocazzo')
 
+            #####################################################################################################################
+            density_index.sort() # aggiunto da me ###############################################################################
+            #####################################################################################################################
+
             #print("Density:", density," at position ", i)
             grav_interaction.append([density, i, density_index])
 
@@ -884,16 +938,18 @@ def local_density(opinion, ambient, distance) : #provo a scrivere una funzione c
     return grav_interaction
 
 #SEEMS TO BE OK, mi serve una funzione simile a table distance ma che restituisca la distanza di x e di y
-def xy_distance(ambient, first, second) :
-    
+def xy_distance(first, second) :
+    assert (first>=0) and (first<glob.dimension), 'ATTENTION: xy_distance() needs a non-negative integer as first argument, lower than dimension.'
+    assert (second>=0) and (second<glob.dimension), 'ATTENTION: xy_distance() needs a non-negative integer as second argument, lower than dimension.'
+
     #salvo le coordinate in un array
     xy1 = []
-    xy1.append(xydata(ambient, first)[0])
-    xy1.append(xydata(ambient, first)[1])
+    xy1.append(xydata(first)[0])
+    xy1.append(xydata(first)[1])
     
     xy2 = []
-    xy2.append(xydata(ambient, second)[0])
-    xy2.append(xydata(ambient, second)[1])
+    xy2.append(xydata(second)[0])
+    xy2.append(xydata(second)[1])
 
     periodic_distance = [0, 0]
 
@@ -923,6 +979,8 @@ def xy_distance(ambient, first, second) :
 
 #OK? depends on xy_distance
 def gravity(ambient, which) :
+    assert len(ambient) == glob.dimension, 'ATTENTION: gravity() needs a (dimension)-dim. array as first argument.'
+    assert (which>=0) and (which<glob.dimension), 'ATTENTION: gravity() needs a non-negative integer as second argument, lower than dimension.'
 
     opinion = ambient[which][1]
     grav_int = local_density(opinion, ambient, int((glob.side-1)/2)) #passo il range massimo per renderla non locale (campo medio)
@@ -945,8 +1003,8 @@ def gravity(ambient, which) :
     
         #assert len(grav_int[nth-1][2]) == numero di persone di una data opinione - 1
         # x[0] normale, x[1] periodico
-        x = [xy_distance(ambient, which, grav_int[nth-1][2][j])[0][0], xy_distance(ambient, which, grav_int[nth-1][2][j])[1][0]]
-        y = [xy_distance(ambient, which, grav_int[nth-1][2][j])[0][1], xy_distance(ambient, which, grav_int[nth-1][2][j])[1][1]]
+        x = [xy_distance(which, grav_int[nth-1][2][j])[0][0], xy_distance(which, grav_int[nth-1][2][j])[1][0]]
+        y = [xy_distance(which, grav_int[nth-1][2][j])[0][1], xy_distance(which, grav_int[nth-1][2][j])[1][1]]
         
         #print("le x ",x,"le y ", y)
         # salvo i segni
@@ -1014,33 +1072,128 @@ def gravity(ambient, which) :
 
     return [gravitation_x, gravitation_y]
 
-def partial_vision(ambient, which) : #ritorna un array delle posizioni che vede un certo individuo
-    
+def gravity2(ambient, which) :
+    assert len(ambient) == glob.dimension, 'ATTENTION: gravity2() needs a (dimension)-dim. array as first argument.'
+    assert (which>=0) and (which<glob.dimension), 'ATTENTION: gravity2() needs a non-negative integer as second argument, lower than dimension.'
+
     opinion = ambient[which][1]
-    grav_int = local_density(opinion, ambient, glob.distance)
-    nth = 0 # mi darà la posizione ordinale della persona i all'interno dell'array grav_int
-    choosen = []
-    if opinion==-3 : return False
+    grav_int = local_density2(ambient, which, int((glob.side-1)/2)) #passo il range massimo per renderla non locale (campo medio)
+    nth = 0
+    gravitation_x = 0
+    gravitation_y = 0
+    force_x = 0
+    force_y = 0
+
+    #if opinion==-3 : return False
+    assert opinion != -3
     for k in range(0, glob.dimension) :
         if ambient[k][1]==opinion :
-            nth = nth+1
+            nth += 1
             if k==which : break
-     
-    if glob.vision>=len(grav_int[nth-1][2]) : 
-        return grav_int[nth-1][2] # lo lascia inalterato
 
-    if glob.vision<len(grav_int[nth-1][2]) :
-        for j in range(0, glob.vision) :
-            choice = glob.np.random.choice(grav_int[nth-1][2])
-            choosen.append(choice)
-            #controllo di non avere più volte la stessa estrazione
-            for i in range(0, len(choosen)) :
-                while choosen.count(choosen[i]) > 1 : #genero una scelta non doppione
-                    choosen[i] = glob.np.random.choice(grav_int[nth-1][2])
-
-        assert len(choosen) == glob.vision
-        #choosen.sort() 
-        #print(choosen)
+    #print (grav_int[nth-1]) #la persona alla posizione i sente una forza pari a density/pos?? dalle persone di density index
     
-        return choosen #funziona
+    for j in range(0, grav_int[0]) :
+    
+        #assert len(grav_int[nth-1][2]) == numero di persone di una data opinione - 1
+        # x[0] normale, x[1] periodico
+        x = [xy_distance(which, grav_int[2][j])[0][0], xy_distance(which, grav_int[2][j])[1][0]]
+        y = [xy_distance(which, grav_int[2][j])[0][1], xy_distance(which, grav_int[2][j])[1][1]]
+        
+        #print("le x ",x,"le y ", y)
+        # salvo i segni
+        sgnx0 = glob.np.sign(x[0])
+        sgnx1 = glob.np.sign(x[1])
+        sgny0 = glob.np.sign(y[0])
+        sgny1 = glob.np.sign(y[1])
+
+        # cerco i minori in valore assoluto
+        x_ = [abs(x[0]), abs(x[1])]
+        y_ = [abs(y[0]), abs(y[1])]
+
+        #print(x_)
+        #print(y_)
+
+        # mi ricordo dei segni
+        if sgnx0*min(x_)==x[0] : x_dist = x[0]
+        if sgnx1*min(x_)==x[1] : x_dist = x[1]
+        if sgny0*min(y_)==y[0] : y_dist = y[0]
+        if sgny1*min(y_)==y[1] : y_dist = y[1]
+        
+        #print(x_dist)
+        #print(y_dist)
+
+        if x_dist==0 : force_x = 0
+        if y_dist==0 : force_y = 0
+
+        if x[1]==x_dist and x_dist!=0 :
+            # le distanze contate periodicamente sono negative
+            '''volevo mettere density come costante moltilpicativa ma ha più senso non mettere nulla...è come avere le masse uguali a 1'''
+            #force_x = grav_int[nth-1][0]*(  -1*pow(x_dist, -2) )
+            #x_dist = -1*x_dist
+            force_x = ( glob.G*glob.np.sign(x_dist)/pow(x_dist, 2) )
+            #print(force_x)
+
+        if y[1]==y_dist and y_dist!=0 :
+            # le distanze contate periodicamente sono negative
+            #y_dist = -1*y_dist
+            force_y = ( glob.G*glob.np.sign(y_dist)/pow(y_dist, 2) )
+            #print(force_y)
+
+        if x[0]==x_dist and x_dist!=0 :
+            # le distanze contate normalmente sono positive
+            force_x = ( glob.G*glob.np.sign(x_dist)/pow(x_dist, 2) )
+            #print(force_x)
+
+        if y[0]==y_dist and y_dist!=0 :
+            # le distanze contate normalmente sono positive
+            force_y = ( glob.G*glob.np.sign(y_dist)/pow(y_dist, 2) )
+            #print(force_y)
+
+        #se le distanze sono uguali la forza è nulla
+        if x[0]==x[1] :
+            force_x = 0
+            #print("forza y nulla")
+
+        if y[0]==y[1] :
+            force_y = 0
+            #print("forza x nulla")
+        
+        #componente x e y totali del campo di forze, con segno
+        gravitation_x = gravitation_x+force_x
+        gravitation_y = gravitation_y+force_y
+    
+
+    return [gravitation_x, gravitation_y]
+
+
+#def partial_vision(ambient, which) : #ritorna un array delle posizioni che vede un certo individuo
+#    
+#    opinion = ambient[which][1]
+#    grav_int = local_density(opinion, ambient, glob.distance)
+#    nth = 0 # mi darà la posizione ordinale della persona i all'interno dell'array grav_int
+#    choosen = []
+#    if opinion==-3 : return False
+#    for k in range(0, glob.dimension) :
+#        if ambient[k][1]==opinion :
+#            nth = nth+1
+#            if k==which : break
+#     
+#    if glob.vision>=len(grav_int[nth-1][2]) : 
+#        return grav_int[nth-1][2] # lo lascia inalterato
+#
+#    if glob.vision<len(grav_int[nth-1][2]) :
+#        for j in range(0, glob.vision) :
+#            choice = glob.np.random.choice(grav_int[nth-1][2])
+#            choosen.append(choice)
+#            #controllo di non avere più volte la stessa estrazione
+#            for i in range(0, len(choosen)) :
+#                while choosen.count(choosen[i]) > 1 : #genero una scelta non doppione
+#                    choosen[i] = glob.np.random.choice(grav_int[nth-1][2])
+#
+#        assert len(choosen) == glob.vision
+#        #choosen.sort() 
+#        #print(choosen)
+#    
+#        return choosen #funziona
                 
