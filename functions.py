@@ -257,10 +257,6 @@ def empty_spaces_grav(ambient, which) :
                     spaces.append(j)
                     how_many += 1
         
-    if spaces[3]==-3 :
-        print('la vittima è in',which)
-        print('il bastardo è in',which+glob.side,'e il suo ID è',ambient[which+glob.side][0])
-    assert spaces[3] != -3, 'Questo dovrebbe essere sempre libero per implementazione dell\'aggiornamento dell\'ambiente.'
     end = glob.time.time()
     #print('empty_spaces_grav time:', end-start)
     return spaces
@@ -279,6 +275,7 @@ def empty_probs_grav(ambient, spaces, which) :
 
     # Array filled with Probabilities of Transition towards a specific Empty Space next to which
     probs = []
+    exception = 0
     how_many = 0
 
     #print('SPACES: ',spaces,'& WHICH:',which)
@@ -366,6 +363,8 @@ def empty_probs_grav(ambient, spaces, which) :
         #print('il numero è ', max_)
         probs[4] = 1
     if max_==0 and how_many==0 :
+        exception = 1
+        probs[4] = 1
         print('Shit, how tha fuck is this even possibleeeeeeeeeeeeeee? Explain me, Bazzani.')
 
     #print('PROBS: ',probs[0],probs[1],probs[2],probs[3],probs[4])
@@ -373,7 +372,48 @@ def empty_probs_grav(ambient, spaces, which) :
     assert (probs[0]+probs[1]+probs[2]+probs[3]+probs[4]>0.9999) and (probs[0]+probs[1]+probs[2]+probs[3]+probs[4]<1.0001),'ATTENTION: empty_probs_grav is giving a Distribution of Transition Probabilities non-Normalized to 1 at all.'
     end = glob.time.time()
     #print('empty_probs_grav time:', end-start)
-    return probs
+    return probs, exception
+
+def find_most_near(ambient, which) :
+    assert len(ambient) == glob.dimension, 'ATTENTION: find_most_near() needs a (dimension)-dim. array as first argument.'
+    assert (which>=0) and (which<glob.dimension), 'ATTENTION: find_most_near() needs a non-negative integer as second argument, lower than dimension.'
+
+    ywhich = xydata(which)[1]
+    d = 1
+    while d<int((glob.side-1)/2) :
+        low_ref = (ywhich-1-glob.distance)*glob.side
+        if low_ref<0 :
+            low_ref = glob.dimension+low_ref
+        #print('il mio low ref è',low_ref)
+        high_ref = (ywhich+glob.distance)*glob.side
+        if high_ref>glob.dimension :
+            high_ref = high_ref-glob.dimension
+        #print('il mio high ref è',high_ref)
+
+        equidistant_empties = []
+        j = 0
+        while j<glob.dimension :
+            if j!=which :
+                if low_ref<high_ref : # CASO NORMALE
+                    if j<low_ref :
+                        j = low_ref
+                    if j>high_ref :
+                        break
+                if low_ref>high_ref : # 2 CASI DI SFORO
+                    if j>high_ref and j<low_ref :
+                        j = low_ref
+                #print(j)
+                if ambient[j]==[-3,-3] and table_distance(which,j)==d :
+                    #print('il tipo in',which,'vede il tipo in',j,'con opinione',ambient[j][1])
+                    if equidistant_empties.count(j)==0 :
+                        equidistant_empties.append(j)
+            j += 1
+        if len(equidistant_empties)>0 :
+            which_empty = glob.np.random.choice(equidistant_empties)
+            return which_empty
+            break
+        d += 1
+    
 
 # THIS IS OK #########################################################
 # Function that defines the Opinion Influence acting on the Individual
@@ -386,17 +426,35 @@ def influence_norm(ambient, which) :
     assert len(ambient) == glob.dimension, 'ATTENTION: influence_norm() needs a (dimension)-dim. array as first argument.'
     assert (which>=0) and (which<glob.dimension), 'ATTENTION: influence_norm() needs a non-negative integer as second argument, lower than dimension.'
 
-    #xwhich, ywhich = xydata(which)
+    #print('io sono in',which)
+    ywhich = xydata(which)[1]
+    low_ref = (ywhich-1-glob.distance)*glob.side
+    if low_ref<0 :
+        low_ref = glob.dimension+low_ref
+    #print('il mio low ref è',low_ref)
+    high_ref = (ywhich+glob.distance)*glob.side
+    if high_ref>glob.dimension :
+        high_ref = high_ref-glob.dimension
+    #print('il mio high ref è',high_ref)
     neighs = 0
     opinions = []
-    for j in range(0, glob.dimension) :
+    j = 0
+    while j<glob.dimension :
         if j!=which :
-            #if j<(ywhich-glob.distance)*glob.side :
-            #    j = (ywhich-glob.distance)*glob.side
-            #if j>(ywhich+glob.distance)*glob.side
+            if low_ref<high_ref : # CASO NORMALE
+                if j<low_ref :
+                    j = low_ref
+                if j>high_ref :
+                    break
+            if low_ref>high_ref : # 2 CASI DI SFORO
+                if j>high_ref and j<low_ref :
+                    j = low_ref
+            #print(j)
             if ambient[j]!=[-3,-3] and table_distance(which,j)<=glob.distance :
+                #print('il tipo in',which,'vede il tipo in',j,'con opinione',ambient[j][1])
                 opinions.append(ambient[j][1])
                 neighs += 1
+        j += 1
     #print(opinions)
 
     # Influence as the Mean Opinion
@@ -422,13 +480,34 @@ def influence_vis(ambient, which) :
     assert len(ambient) == glob.dimension, 'ATTENTION: influence_vis() needs a (dimension)-dim. array as first argument.'
     assert (which>=0) and (which<glob.dimension), 'ATTENTION: influence_vis() needs a non-negative integer as second argument, lower than dimension.'
 
+    #print('io sono in',which)
+    ywhich = xydata(which)[1]
+    low_ref = (ywhich-1-glob.distance)*glob.side
+    if low_ref<0 :
+        low_ref = glob.dimension+low_ref
+    #print('il mio low ref è',low_ref)
+    high_ref = (ywhich+glob.distance)*glob.side
+    if high_ref>glob.dimension :
+        high_ref = high_ref-glob.dimension
+    #print('il mio high ref è',high_ref)
     neighs = 0
     opinions = []
-    for j in range(0, glob.dimension) :
+    j = 0
+    while j<glob.dimension :
         if j!=which :
+            if low_ref<high_ref : # CASO NORMALE
+                if j<low_ref :
+                    j = low_ref
+                if j>high_ref :
+                    break
+            if low_ref>high_ref : # 2 CASI DI SFORO
+                if j>high_ref and j<low_ref :
+                    j = low_ref
+            #print(j)
             if ambient[j]!=[-3,-3] and table_distance(which,j)<=glob.distance :
                 opinions.append(ambient[j][1])
                 neighs += 1
+        j += 1
     
     viewed_opinions = []
     if len(opinions)>=glob.vision :
@@ -586,7 +665,7 @@ def evolve_grav(initial) :
             spaces = empty_spaces_grav(final, i)
             #print('WHO: ', i)
             #print('SPACES: ',spaces)
-            probs = empty_probs_grav(initial, spaces, i)
+            probs, exception = empty_probs_grav(initial, spaces, i)
             #step_4dir = glob.np.random.randint(0,4)
             #step_3dir = glob.np.random.randint(0,3)     # USELESSSSSSSS
             #step_2dir = glob.np.random.randint(0,2)
@@ -597,13 +676,17 @@ def evolve_grav(initial) :
                 if changed_opinion!=initial[i][1] :
                     eff_changes += 1
                     print('There have been ', eff_changes, ' changements of opinion.')
-                
-                final[glob.np.random.choice(spaces, p=probs)] = [initial[i][0], changed_opinion] 
+                if exception==0 :
+                    final[glob.np.random.choice(spaces, p=probs)] = [initial[i][0], changed_opinion] 
+                else :
+                    final[find_most_near(final,i)] = [initial[i][0], changed_opinion]
                 
             # Event of Same Opinion as Before
             if prob_change>glob.np.sign(initial[i][1])*glob.np.tanh(initial[i][1]*glob.T) :  #di nuovo per ora
-       
-                final[glob.np.random.choice(spaces, p=probs)] = initial[i]
+                if exception==0 :
+                    final[glob.np.random.choice(spaces, p=probs)] = initial[i]
+                else :
+                    final[find_most_near(final,i)] = initial[i]
 
     #print('\n\n')  
     end = glob.time.time()
@@ -747,7 +830,7 @@ def xydata_scatter(ambient, color) :
 # MAYBE, THIS IS USELESS ############################################
 # THIS IS OK ########################################################
 # Function that saves on CSV File the Info about the i-th Individual
-def data_extr(ambient, i, fout, t):
+def data_extr(ambient, i, fout, t) :
     start = glob.time.time()
     assert len(ambient) == glob.dimension, 'ATTENTION: data_extr() needs a (dimension)-dim. array as first argument.'
     assert (i>=0) and (i<glob.dimension), 'ATTENTION: data_extr() needs a non-negative integer as second argument, lower than dimension.'
@@ -769,7 +852,7 @@ def data_extr(ambient, i, fout, t):
     end = glob.time.time()
     print('data_extr time:', end-start)
 
-def magnetization_data_storage(data, fout):
+def magnetization_data_storage(data, fout) :
     start = glob.time.time()
     assert len(data) == glob.nsteps, 'ATTENTION: magnetization_data_storage() needs a (nsteps)-dim. array of floats as first argument.'
     
@@ -802,9 +885,9 @@ def update_scatter(time) :
     glob.ax.set_ylabel('y')
     glob.ax.grid(False) #False to not show 
 
-    xempties, yempties = xydata_scatter(glob.ambient_evolution[3], 'empty')
-    xred, yred = xydata_scatter(        glob.ambient_evolution[3], 'red')
-    xblue, yblue = xydata_scatter(      glob.ambient_evolution[3], 'blue')
+    xempties, yempties = xydata_scatter(glob.ambient_evolution[time], 'empty')
+    xred, yred = xydata_scatter(        glob.ambient_evolution[time], 'red')
+    xblue, yblue = xydata_scatter(      glob.ambient_evolution[time], 'blue')
 
     glob.ax.scatter(xempties, yempties, s=200-0.15*glob.dimension, c='w', label= 'Step Temporale '+ str(time), alpha=0, edgecolors='k')
     glob.ax.scatter(xred, yred, s=200-0.15*glob.dimension, c='tab:red', label='Agente A', edgecolors='k')
@@ -832,13 +915,34 @@ def local_density2(ambient, which, distance) :
     opinion = ambient[which][1]
     assert opinion != -3, 'ATTENTION: The Individual passed through the Local Density Function is instead an Empty Space.'
 
+    #print('io sono in',which)
+    ywhich = xydata(which)[1]
+    low_ref = (ywhich-1-distance)*glob.side
+    if low_ref<0 :
+        low_ref = glob.dimension+low_ref
+    #print('il mio low ref è',low_ref)
+    high_ref = (ywhich+distance)*glob.side
+    if high_ref>glob.dimension :
+        high_ref = high_ref-glob.dimension
+    #print('il mio high ref è',high_ref)
     density = 0
     density_indices = []
-    for j in range(glob.dimension) :
-        if j!=which and j>=0 and j<glob.dimension :
+    j = 0
+    while j<glob.dimension :
+        if j!=which :
+            if low_ref<high_ref : # CASO NORMALE
+                if j<low_ref :
+                    j = low_ref
+                if j>high_ref :
+                    break
+            if low_ref>high_ref : # 2 CASI DI SFORO
+                if j>high_ref and j<low_ref :
+                    j = low_ref
+            #print(j)
             if ambient[j][1]==opinion and table_distance(which,j)<=distance :
                 density_indices.append(j)
                 density += 1
+        j += 1
     
     density_indices.sort()
     end = glob.time.time()
@@ -1157,7 +1261,6 @@ def gravity2(ambient, which) :
 
     opinion = ambient[which][1]
     grav_int = local_density2(ambient, which, int((glob.side-1)/2)) #passo il range massimo per renderla non locale (campo medio)
-    nth = 0
     gravitation_x = 0
     gravitation_y = 0
     force_x = 0
@@ -1165,10 +1268,6 @@ def gravity2(ambient, which) :
 
     #if opinion==-3 : return False
     assert opinion != -3
-    for k in range(0, glob.dimension) :
-        if ambient[k][1]==opinion :
-            nth += 1
-            if k==which : break
 
     #print (grav_int[nth-1]) #la persona alla posizione i sente una forza pari a density/pos?? dalle persone di density index
     
