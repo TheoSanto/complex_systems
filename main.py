@@ -2,7 +2,7 @@ import functions as f
 import global_variables as glob
 
 start_all = glob.time.time()
-glob.np.random.seed(196808829)
+glob.np.random.seed(196808819)
 
 # Random Positioning & Opinion Defining of the Individuals
 if glob.fixed_or_random==0 :
@@ -45,6 +45,9 @@ if glob.setup==0 :
         #        print(ith_gravity_try,'&&&',ith_gravity_truth,'\n')
         #        assert ith_gravity_try == ith_gravity_truth, 'ATTENTION: The 2 Gravity Functions give different results.'
 
+        #for i in range(glob.dimension) :
+        #    if glob.ambient_evolution[0][i]!=[-3,-3] :
+        #        ith_influence = f.influence_norm(glob.ambient_evolution[0],i)
 
         for t in range(glob.nsteps) : 
             #print("Step", t, ', Mode',glob.setup)
@@ -134,7 +137,7 @@ if glob.setup==2 :
     glob.plt.plot(times, magnetization_data, marker='.',linestyle='--')
     glob.plt.ylabel('Magnetization')
     glob.plt.xlabel('Time Step')
-    glob.plt.show()
+    #glob.plt.show()
 
 print('empty_spaces time:',glob.time_empty_spaces)
 print('influence_norm time:',glob.time_influence_norm)
