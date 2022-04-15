@@ -126,7 +126,14 @@ if glob.setup==2 :
                 print("Step", t, ', Mode',glob.setup)
                 if t>0 :
                     glob.ambient_evolution[t] = f.evolve_vis(glob.ambient_evolution[t-1])
+                    balance = f.stop_if_eq(glob.ambient_evolution[t], t) #sono in equilibrio?
+                    if balance != False : 
+                        print("Equilibrio raggiunto: ", balance)
+                        glob.nsteps = t
+                        break
     
+    #grafico magnetizzazione
+
     for t in range(glob.nsteps) :
         spin_data_t = f.count_all(glob.ambient_evolution[t]) #proportion of opinions
         m = (1/glob.npeople)*(spin_data_t[1]-spin_data_t[0]) #magnetizzazione al tempo t generico
