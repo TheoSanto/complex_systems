@@ -30,7 +30,7 @@ ambient = [[-3,-3]]*dimension
 ambient_evolution = [ambient]*(nsteps)
 
 # Scenario Choice
-setup = 2
+setup = 1
 # 0 per Scenario di Distanza, 
 # 1 per Scenario di Flocking Gravitazionale,
 # 2 per Scenario di Visione Parziale. 
