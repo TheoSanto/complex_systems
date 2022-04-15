@@ -1376,3 +1376,31 @@ def gravity2(ambient, which) :
 #    
 #        return choosen #funziona
                 
+def stop_if_eq (ambient, step) :
+
+    static_case = [] #condizion di equilibrio
+    counter = 0
+    count_red = 0 #sono i +1
+    count_blue = 0 # sono i -1
+
+    for i in range(len(ambient)) : 
+        if ambient[i][1] == +1 : count_red += 1
+        if ambient[i][1] == -1 : count_blue += 1
+    
+    assert count_red + count_blue == glob.npeople
+
+    if count_red == glob.npeople :
+        print("Stationary condition reached in ", step, " steps\n")
+        static_case.append([1, step])
+        counter += 1
+    if count_blue == glob.npeople :
+        print("Stationary condition reached in ", step, " steps\n")
+        static_case.append([-1, step])
+        counter += 1
+
+    if counter != 0 : 
+        assert len(static_case) == 1 # ho solo una delle condizioni di equilibrio
+        #primo elemento dice se rilassa blu o rosso, il secondo dice quanto ci impiega
+        return static_case
+    
+    else : return False
