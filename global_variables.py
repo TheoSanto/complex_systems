@@ -20,7 +20,7 @@ global ax_histo
 
 # Animation Settings
 nsimulations = 1
-nsteps = 100
+nsteps = 10000
 interval = 60 #ms
 
 # Ambient Variables
@@ -30,7 +30,7 @@ ambient = [[-3,-3]]*dimension
 ambient_evolution = [ambient]*(nsteps)
 
 # Scenario Choice
-setup = 1
+setup = 2
 # 0 per Scenario di Distanza, 
 # 1 per Scenario di Flocking Gravitazionale,
 # 2 per Scenario di Visione Parziale. 
