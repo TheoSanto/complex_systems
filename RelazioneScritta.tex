@@ -33,7 +33,7 @@ Questo progetto di carattere simulativo è finalizzato allo studio statistico de
 \\ Tuttavia, è però necessario avere l'accortezza di adattare le regole di evoluzione canoniche, in quanto a differenza degli atomi nei reticoli cristallini, su cui si è soliti applicare il Modello di Ising, gli individui sono in grado di compiere movimenti in modo simultaneo ad ogni step temporale. Dunque, per introdurre interazioni locali tra gli individui della popolazione si sceglie di definire un parametro di distanza d'influenza, che permetta di selezionare il numero finito di altri individui da cui ciascuno viene influenzato in termini di opinione.
 \\ Successivamente, è stata studiata la reazione del sistema in esame a due particolari codizioni, che a seguire andranno sotto il nome di visione parziale e flocking gravitazionale.
 \\ La prima consiste sostanzialmente nell'ipotesi di limitare il numero di individui da cui ciascuno viene influenzato ad un valore costante nel tempo ed uniforme sull'intera popolazione. Ciò, infatti, risulta essere un'interessante tema da approfondire, notando che mediamente nella società le singole persone manifestano, più o meno consapevolmente, una propensione ad interagire significativamente con solo poche delle proprie conoscenze effettive.
-\\ La seconda e ultima, invece, introduce nella dinamica del sistema una sorta di campo gravitazionale che implementi una attratività reciproca tra individui di medesima opinione, simulando così il fenomeno di formazione di comunità chiuse nella società.
+\\ La seconda e ultima, invece, introduce nella dinamica del sistema una sorta di campo gravitazionale che implementi una attratività reciproca tra individui di medesima opinione, simulando così il fenomeno di formazione di comunità omogenee nella società.
 
 
 \section{Modello Matematico}
@@ -129,18 +129,18 @@ Inoltre, come anticipato in Sezione~\ref{Sec:1}, ad ogni istante dell’evoluzio
 \filldraw[fill=red!40!red, draw=black] (7.25,0.75) circle (0.25cm);
 \end{tikzpicture}
 \caption{\textit{Intorni di Moore estesi di raggio 2 in due differenti casi.}}
-\label{fig:1}
+\label{fig:3}
 \end{figure}
 
-ATTENZIONE: DEFINIZIONE DI Di NON è DA RIFORMULARE E STARE ATTENTI SOPRATTUTTO ALLA METRICA DI CHEBYSHEV CHE DEVE ESSERE APPLICATA A VETTORI 2D IN \Zii NON ([0,1]x[0,1])
+In questi termini, è possibile quantificare l'influenza a cui un individuo generico $\textit{i} \in \{1,...,\textit{N} \}$ è soggetto all'istante temporale $\textit{t}$ come segue
 
-L’intorno di influenza per com è definito qui viene chiamato intorno/vicinato / quartiere di Moore esteso
-
-sia St: i--> s(i,t) la funzione che descrve lo stato del sistema al tempo t
 \begin{equation}
-    \sigma(i,t) = \sum_{n=-\infty}^\infty s(i+n, t)p(n)
+    \sigma(i,t) = \sum_{ \{ j \ | \ x_{j} \in \Delta_{i} \} } s(j, t)p(M_{i})
     \label{Eq:1}
 \end{equation}
+
+sia St: i--> s(i,t) la funzione che descrve lo stato del sistema al tempo t
+
 Sigma(i,t) è l'influenza pesata dell'individuo nell'elemento i-esimo dell'array all'istante t (NB: è un parametro reale in [-2,2] dato dalla media degli stati degli altri individui).
 Nel nostro caso, lo stato s dell'individuo non è {0,1}, ma {-2,-1,0,1,2} ed n (che va ad indagare lo stato degli altri individui) non è ]-inf;+inf[ (ossia conoscenza globale dello stato del sistema dell'individuo i), ma limitato dalla condizione di distanza di influenza del nostro sistema.
 In particolare, i valori di n saranno tali da esplorare lo stato dei soli individui all'interno del range di influenza.
