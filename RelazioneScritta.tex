@@ -1,0 +1,222 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[italian]{babel}
+\usepackage{anyfontsize}
+\usepackage{hyperref}
+\usepackage{nicefrac}
+\usepackage{tikz}
+
+\newcommand{\Zn}{$\mathbb{Z}^n_k$ } %comodità, per non riscrivere ogni volta 
+\newcommand{\Zii}{$\mathbb{Z}^2_k$ }
+
+
+\begin{document}
+
+\title{\Huge Simulazione di Dinamica di Opinione su Automa Cellulare 
+		\[\]\Large Relazione scritta per il corso di \quad \quad \quad \quad \quad \quad Introduzione alla fisica dei sistemi complessi \medskip
+		}
+\author{Matteo Santini, Matteo Costa}
+\date{DATA sticassi}
+
+\maketitle
+\bigskip
+\tableofcontents
+\bigskip
+
+\section{Introduzione}
+\label{Sec:1}
+Questo progetto di carattere simulativo è finalizzato allo studio statistico dell'evoluzione temporale di una popolazione di individui dotati di una opinione personale. 
+\\ A questo scopo, si decidono di introdurre alcune importanti approssimazioni, cercando di mantenersi sempre il più possibile realistici. Ad esempio, si riduce il parametro di opinione ad una mera variabile discreta a due soli valori possibili ($\pm$1), introducendo così una sorta di analogia al Modello di Ising 2D, che in meccanica statistica permette la descrizione di interazioni locali tra spin nel reticolo cristallino di un materiale condensato per spiegarne l'insorgenza di proprietà magnetiche tramite transizioni di fase interne.
+\\ Questo tipo di modello, infatti, si addice alla descrizione di numerosi sistemi fisici complessi, dove è possibile osservare fenomeni di auto-organizzazione, e quello trattato qui di seguito ne è un chiaro esempio. 
+\\ Tuttavia, è però necessario avere l'accortezza di adattare le regole di evoluzione canoniche, in quanto a differenza degli atomi nei reticoli cristallini, su cui si è soliti applicare il Modello di Ising, gli individui sono in grado di compiere movimenti in modo simultaneo ad ogni step temporale. Dunque, per introdurre interazioni locali tra gli individui della popolazione si sceglie di definire un parametro di distanza d'influenza, che permetta di selezionare il numero finito di altri individui da cui ciascuno viene influenzato in termini di opinione.
+\\ Successivamente, è stata studiata la reazione del sistema in esame a due particolari codizioni, che a seguire andranno sotto il nome di visione parziale e flocking gravitazionale.
+\\ La prima consiste sostanzialmente nell'ipotesi di limitare il numero di individui da cui ciascuno viene influenzato ad un valore costante nel tempo ed uniforme sull'intera popolazione. Ciò, infatti, risulta essere un'interessante tema da approfondire, notando che mediamente nella società le singole persone manifestano, più o meno consapevolmente, una propensione ad interagire significativamente con solo poche delle proprie conoscenze effettive.
+\\ La seconda e ultima, invece, introduce nella dinamica del sistema una sorta di campo gravitazionale che implementi una attratività reciproca tra individui di medesima opinione, simulando così il fenomeno di formazione di comunità chiuse nella società.
+
+
+\section{Modello Matematico}
+\label{Sec:2}
+\subsection{Automa Cellulare}
+\label{Sec:2.1}
+Il seguente modello ad automa cellulare intende porre le basi teoriche matematiche necessarie all'implementazione di una simulazione del comportamento di una popolazione all’interno di uno spazio bidimensionale discretizzato, dato da tutte le coppie di numeri interi nel prodotto cartesiano (0,31]x(0,31].
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+  scale=0.95,
+  mydot/.style={
+    circle,
+    fill=white,
+    draw,
+    outer sep=0pt,
+    inner sep=1pt
+  }
+]
+\draw[step=0.2cm,gray!50!white,very thin] (0,0) grid (6.2,6.2);
+\draw[thick,->] (0,0) -- (7,0) node[anchor=north west] {x};
+\draw[thick,->] (0,0) -- (0,7) node[anchor=south east] {y};
+\foreach \x in {0,5,10,15,20,25,30}
+   \draw (\x*0.2 cm,2pt) -- (\x*0.2 cm,-2pt) node[anchor=north] {$\x$};
+\foreach \y in {0,5,10,15,20,25,30}
+    \draw (2pt,\y*0.2 cm) -- (-2pt,\y*0.2 cm) node[anchor=east] {$\y$};
+\filldraw[fill=red!40!red, draw=black] (4,2) circle (0.1cm);
+\end{tikzpicture}
+\caption{\textit{Rappresentazione grafica dello spazio bidimensionale discretizzato, su cui è disposto arbitrariamente un individuo evidenziato in rosso.}}
+\label{fig:1}
+\end{figure}
+
+Come è possibile osservare in Figura~\ref{fig:1}, tali coppie compongono le coordinate di tutti i possibili siti dell'automa cellulare, che possono o meno essere occupati dagli individui.
+\\ La popolazione in esame è costituita da un numero costante \textit{N} di individui, anche detti agenti, i quali sono caratterizzati fondamentalmente da un parametro di opinione personale, che ne definisce univocamente lo stato.
+In particolare, questo può assumere solo i valori interi $\pm$1, i quali sono interpretati come l'assenso o il dissenso verso un certo tema politico-sociale.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+  scale=0.9,
+  mydot/.style={
+    circle,
+    fill=white,
+    draw,
+    outer sep=0pt,
+    inner sep=1pt
+  }
+]
+\draw[step=1cm,gray!50!white,very thin] (0.5,0.5) grid (4.5,4.5);
+\fill[fill=green!30!white] (2,2) rectangle (3,3);
+\filldraw[fill=green!30!white, draw=black] (2,1) rectangle (3,2);
+\filldraw[fill=green!30!white, draw=black] (1,2) rectangle (2,3);
+\filldraw[fill=green!30!white, draw=black] (2,3) rectangle (3,4);
+\filldraw[fill=green!30!white, draw=black] (3,2) rectangle (4,3);
+\filldraw[fill=red!40!red, draw=black] (2.5,2.5) circle (0.5cm);
+\put(60,85){$N$};
+\put(60,35){$S$};
+\put(35,60){$O$};
+\put(85,60){$E$};
+\end{tikzpicture}
+\caption{\textit{Visualizzazione di tutti i siti (in verde) appartenenti all'intorno di Von Neumann di un individuo (in rosso) con relative direzioni (Nord, Sud, Est, Ovest).}}
+\label{fig:2}
+\end{figure}
+
+Inoltre, come anticipato in Sezione~\ref{Sec:1}, ad ogni istante dell’evoluzione temporale del sistema, gli agenti sono in grado di compiere in modo simultaneo movimenti all'interno del proprio intorno di Von Neumann di raggio unitario, come rappresentato in Figura~\ref{fig:2}.
+\\ Da notare come in realtà sia contemplata anche la possibilità di rimanere fermi, ma limitatamente al caso in cui l'individuo si trovasse occupate tutte le celle nel proprio intorno. Ciò si è reso necessario affinchè in generale sia prediletta la scelta di compiere un movimento rispetto a quella di bloccarsi.
+\\ L'effettiva direzione degli spostamenti è scelta stocasticamente tra le quattro permesse (Nord, Sud, Est, Ovest + Stessa posizione nel caso particolare precedentemente descritto), attribuendo a ciascuna di esse una medesima probabilità $\nicefrac{1}{n}$ con n pari al numero di siti liberi adiacenti, tranne quando questo si annulla, in cui invece si permette all’individuo di mantenere la propria posizione, garantendo così sempre la normalizzazione ad 1.
+\\ Tali spostamenti all’interno dello spazio discretizzato bidimensionale (0,31]x(0,31] sono vincolati a condizioni al contorno periodiche. Ne segue dunque che topologicamente l’insieme dei siti dell’automa cellulare costituisce una struttura toroidale, indicata con \Zn con n=2 e k=31, rispettivamente le dimensioni spaziali ed il numero di siti per lato dell'automa cellulare.
+\\ Questa scelta implementativa è espressamente motivata dall’obiettivo di evitare moti attrattivi degli individui verso ai bordi, che andrebbero così ad influenzare non trascurabilmente l’evoluzione del sistema.
+\\ La dinamica del sistema, di fatto, prevede la scelta del valore di un parametro di controllo, ossia $\delta$ definito come il raggio di influenza, e limitato agli elementi del seguente insieme \{0,...,$\nicefrac{(31-1)}{2}=15$\}. In base al suo valore si decide che l'individuo arbitrario $\textit{i} \in \{1,...,\textit{N} \}$ può interagire solo con quegli altri la cui posizione è compresa nel suo intorno di influenza $\Delta_{i} = \{ x \in (0,31] \times (0,31] \ | \ d(x_{i},x)\leqslant \delta \}$ con $\textit{$x_{i}$}$ come posizione dell'individuo i, mentre $\textit{d(x,y)}$ come metrica di Chebyshev nello spazio discrezzato bidimensionale dell'automa cellulare. Da notare come la validità delle condizioni al contorno periodiche comporta la costruzione di range d'influenza, anche detti intorni di Moore estesi, molto particolari, di cui sono riportati alcuni esempi in Figura~\ref{fig:3}.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+  scale=0.7,
+  mydot/.style={
+    circle,
+    fill=white,
+    draw,
+    outer sep=0pt,
+    inner sep=1pt
+  }
+]
+\fill[fill=green!30!white] (1,2.5) rectangle (3.5,5);
+\fill[fill=green!30!white] (7,0) rectangle (8.5,2);
+\fill[fill=green!30!white] (7,5.5) rectangle (8.5,6);
+\fill[fill=green!30!white] (12,0) rectangle (13,2);
+\fill[fill=green!30!white] (12,5.5) rectangle (13,6);
+\draw[step=0.5cm,gray!50!white,very thin] (-1,0) grid (5,6);
+\draw[step=0.5cm,gray!50!white,very thin] (6.99,0) grid (13,6);
+\filldraw[fill=red!40!red, draw=black] (2.25,3.75) circle (0.25cm);
+\filldraw[fill=red!40!red, draw=black] (7.25,0.75) circle (0.25cm);
+\end{tikzpicture}
+\caption{\textit{Intorni di Moore estesi di raggio 2 in due differenti casi.}}
+\label{fig:1}
+\end{figure}
+
+ATTENZIONE: DEFINIZIONE DI Di NON è DA RIFORMULARE E STARE ATTENTI SOPRATTUTTO ALLA METRICA DI CHEBYSHEV CHE DEVE ESSERE APPLICATA A VETTORI 2D IN \Zii NON ([0,1]x[0,1])
+
+L’intorno di influenza per com è definito qui viene chiamato intorno/vicinato / quartiere di Moore esteso
+
+sia St: i--> s(i,t) la funzione che descrve lo stato del sistema al tempo t
+\begin{equation}
+    \sigma(i,t) = \sum_{n=-\infty}^\infty s(i+n, t)p(n)
+    \label{Eq:1}
+\end{equation}
+Sigma(i,t) è l'influenza pesata dell'individuo nell'elemento i-esimo dell'array all'istante t (NB: è un parametro reale in [-2,2] dato dalla media degli stati degli altri individui).
+Nel nostro caso, lo stato s dell'individuo non è {0,1}, ma {-2,-1,0,1,2} ed n (che va ad indagare lo stato degli altri individui) non è ]-inf;+inf[ (ossia conoscenza globale dello stato del sistema dell'individuo i), ma limitato dalla condizione di distanza di influenza del nostro sistema.
+In particolare, i valori di n saranno tali da esplorare lo stato dei soli individui all'interno del range di influenza.
+(i+n) appartente a Di(t)
+con Di(t) = {j in Zl (toro) t.c. distanza(j,i)<=r=rl=rr} %perchè Zl e non Znl
+
+Le p(n) nel nostro caso sono costanti, perchè assumiamo che l'influenza di ciascun individuo nel range di influenza sia equipesata.
+Nel caso generale, dato Ni(t)=numero di individui all'interno del range d'influenza dell'individuo nell'elemento i-esimo dell'array all'istante t,
+p(n)=pi(t)=1/Ni(t)
+in modo tale da soddisfare la condizione di normalizzazione
+sum (con n appartenente a Di(t)) p(n) = (1/Ni(t))*Ni(t) = 1
+
+\begin{equation}
+    i \mapsto s(i,t+1) = I_A(\sigma(i,t))
+    \label{Eq:2}
+\end{equation}
+
+L'evoluzione temporale s(i,t+1) dello stato s(i,t) dell'individuo nell'elemento i-esimo dell'array è determinata da una certa funzione IA dell'influenza di tale individuo all'istante t, che però non può essere definita come di seguito perchè nel nostro caso sigma(i,t) è in [-2,2].
+Nel nostro caso, la funzione IA(x) potrebbe essere una sorta di parte intera di una tangente iperbolica
+
+\subsubsection{Visione Parziale}
+\label{Sec:2.1.1}
+\subsection{Flocking Gravitazionale}
+\label{Sec:2.2}
+
+\begin{equation}
+    s'=[A(s)+B(\nicefrac{s}{2}) \cdot \tanh{(B(s)x)}]
+    \label{Eq:3}
+\end{equation}
+
+
+con [a] = parte intera di a {\footnotesize{$\in$}} $\mathbb{R}$
+       s’=s(i,t+1) stato dell’individuo i-esimo all’istante (t+1)
+       s=s(i,t) stato dell’individuo i-esimo all’istante t
+       x=$\sigma$(i,t) media pesata dello stato degli individui all’interno dell’intorno di influenza  
+                    dell’individuo i-esimo
+       A(s), B(s) rispettivamente parametri di shift verticale e modulazione dipendenti dallo stato
+                    iniziale s e costruiti in modo tale da soddisfare:
+
+                    | CONDIZIONI                         |
+                    | Se s=2  → A=3/2  e  B=1/2     |
+                    | Se s=1  → A=1  e  B=1           |
+                    | Se s=0  → A=0  e  B=1           |
+                    | Se s=-1 → A=-1  e  B=1         |
+                    | Se s=-2 → A=-3/2  e  B=1/2   |
+                    
+*espressione di A e espressione di B*
+immagine
+
+
+\section{Analisi}
+\label{Sec:3}
+\subsection{Confronto ai Dati}
+\label{Sec:3.1}
+confronto visivo dell'andamento della magnetizzazione per i dati e per la simulazione, stando attenti a fissare i parametri (distance, initial\_reds,...) in modo tale da renderli piuttosto simili
+\subsection{Distanza di Influenza}
+\label{Sec:3.2}
+grafici dei tempi di decisione a valori di distanza d'influenza diversi
+\\
+\\ FORSE METTERE ANCHE UN GRAFICO DELLA DISTRIBUZIONE DEI TEMPI MEDI NECESSARI AL RAGGIUNGIMENTO DELLA STAZIONARIETA AL VARIARE DELLA DISTANZA
+\subsection{Visione Parziale}
+\label{Sec:3.3}
+\subsection{Flocking Gravitazionale}
+\label{Sec:3.4}
+\section{Risultati e Discussione}
+\label{Sec:4}
+grafico di qualcosa
+
+\section{Implementazione}
+\label{Sec:5}
+Qui di seguito è riportato il codice python utilizzato per l'implementazione del modello. Per l'esecuzione si rammenta di scaricare l'\textit{interpreter} di \textit{python (v ${>=}$3.10)} compatibile con il proprio sistema operativo. Inoltre è necessario avere installato le librerie richieste, in caso contrario sono facilmente reperibili utilizzando dei \textit{package manager} come ad esempio \textit{pip}.
+
+\section{Conclusioni}
+\label{Sec:6}
+
+\section{Bibliografia}
+\label{Sec:7}
+
+\end{document}
