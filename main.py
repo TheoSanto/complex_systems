@@ -2,178 +2,139 @@ import functions as f
 import global_variables as glob
 
 start_all = glob.time.time()
-glob.np.random.seed(196808819)
+#glob.np.random.seed(196808819)
 
 # Random Positioning & Opinion Defining of the Individuals
-if glob.fixed_or_random==0 :
+if glob.fixed_init==False :
     glob.ambient_evolution[0] = f.init_random()
-if glob.fixed_or_random==1 :
+if glob.fixed_init==True :
     glob.ambient_evolution[0] = f.init_fixed()
 
 # CSV Files for Magnetization & Decision Time Data Storage
-#magnetization_data_file = 'magn_data_n100_t300_d15.csv'
-#decision_time_data_file = 'time_data_n100_t300_d15.csv'
 
 # Implementation and Storage of Time Evolution of 1° Scenario
 if glob.setup==0 :
-    # lista di array 2D per lo storage degli effetti prodotti da condizioni iniziali diverse
-    initial_conditions = []
-    final_conditions = []
-    for n in range(glob.nsimulations) :
-        #if n==0 or n==100 or n==200 or n==300 or n==400 or n==450 or n==490 :
-        print("Simulation n°", n)
+    
+    for t in range(glob.nsteps) : 
+        print("Step", t, ', Mode',glob.setup)
+        if t>0 :
+            glob.ambient_evolution[t] = f.evolve_norm(glob.ambient_evolution[t-1])
+            print(f.count_all(glob.ambient_evolution[t]))
+            if glob.balancing==True :
+                balance = f.stop_if_eq(glob.ambient_evolution[t], t) #sono in equilibrio?
+                if balance!=False : 
+                    print("Equilibrio raggiunto: ", balance)
+                    glob.nsteps = t
+                    break
 
-        if glob.fixed_or_random==0 :
-            glob.ambient_evolution[0] = f.init_random()
-        if glob.fixed_or_random==1 :
-            glob.ambient_evolution[0] = f.init_fixed()
+    # Magnetization Analysis
+    if glob.magnetization_analysis==True :
+        magnetization_data = []
+        for t in range(glob.nsteps) :
+            spin_data_t = f.count_all(glob.ambient_evolution[t])
+            magnetization_data.append((1/glob.npeople)*(spin_data_t[1]-spin_data_t[0]))
+        times = glob.np.linspace(0,glob.nsteps,glob.nsteps)
+        glob.plt.title('Magnetization\'s Time Evolution')
+        glob.plt.plot(times, magnetization_data, marker='.',linestyle='--')
+        glob.plt.ylabel('Magnetization')
+        glob.plt.xlabel('Time Step')
+        glob.plt.show()
+        
+        magnetization_data_file = 'magn_data_n100_d1.csv'
+        with open(magnetization_data_file, 'w') as magn_fout :
+            f.magnetization_data_storage(magnetization_data, magn_fout)
+    
+    # Decision Time Distribution Analysis
+    if glob.time_analysis==True :
+        decision_time_data = f.decision_time_data(glob.ambient_evolution)
+        fig1 = glob.plt.figure()
+        ax1 = fig1.add_axes([0.1, 0.1, 0.8, 0.8])
+        times_counts, bins = glob.np.histogram(decision_time_data,bins=glob.np.linspace(0,glob.nsteps,glob.nsteps))
+        glob.plt.title('Decision Time Occurrences')
+        glob.plt.plot(glob.np.linspace(1,glob.nsteps,glob.nsteps-1),times_counts,marker='.',linewidth=0)
+        glob.plt.ylabel('Occurrences')
+        glob.plt.xlabel('Time Steps')
+        glob.plt.yscale('log')
+        glob.plt.xscale('log')
+        glob.plt.show()
 
-        # Local Density 2 & Gravity 2 Testing ####################################################
-        #density_array = f.local_density(-1,glob.ambient_evolution[0],glob.distance)
-        #for i in range (glob.dimension) :
-        #    ith_density_truth = []
-        #    for j in range(glob.initial_reds) :
-        #        if density_array[j][1]==i :
-        #            ith_density_truth = density_array[j]
-        #    if glob.ambient_evolution[0][i][1]==-1 :
-        #        ith_density_try = f.local_density2(glob.ambient_evolution[0], i, glob.distance)
-        #        print(ith_density_try,'&&&',ith_density_truth)
-        #        assert ith_density_try == ith_density_truth, 'ATTENTION: The 2 Local Density Functions give different results.'
-        #
-        #        ith_gravity_truth = f.gravity(glob.ambient_evolution[0], i)
-        #        ith_gravity_try = f.gravity2(glob.ambient_evolution[0], i)
-        #        print(ith_gravity_try,'&&&',ith_gravity_truth,'\n')
-        #        assert ith_gravity_try == ith_gravity_truth, 'ATTENTION: The 2 Gravity Functions give different results.'
+        decision_time_data_file = 'time_data_n100_d1.csv'
+        with open(decision_time_data_file, 'w') as time_fout :
+            f.decision_time_data_storage(times_counts, time_fout)
 
-        #for i in range(glob.dimension) :
-        #    if glob.ambient_evolution[0][i]!=[-3,-3] :
-        #        ith_influence = f.influence_norm(glob.ambient_evolution[0],i)
-
-        for t in range(glob.nsteps) : 
-            #print("Step", t, ', Mode',glob.setup)
-            if t>0 :
-                glob.ambient_evolution[t] = f.evolve_norm(glob.ambient_evolution[t-1])
-
-        if n==0 : # this ensures that even if nsimulation>1, Magnetization & Decision Time Analysis are done just one time
-
-            # Magnetization Analysis
-
-            if glob.magnetization_analysis==1 :
-                magnetization_data = []
-                for t in range(glob.nsteps) :
-                    spin_data_t = f.count_all(glob.ambient_evolution[t])
-                    magnetization_data.append((1/glob.npeople)*(spin_data_t[1]-spin_data_t[0]))
-                times = glob.np.linspace(0,glob.nsteps,glob.nsteps)
-                glob.plt.title('Magnetization\'s Time Evolution')
-                glob.plt.plot(times, magnetization_data, marker='.',linestyle='--')
-                glob.plt.ylabel('Magnetization')
-                glob.plt.xlabel('Time Step')
-                glob.plt.show()
-
-                # da commentare per stima delle probabilità
-                #with open(magnetization_data_file, 'w') as magn_fout :
-                #    f.magnetization_data_storage(magnetization_data, magn_fout)
-
-            # Decision Time Distribution Analysis
-
-            if glob.time_analysis==1 :
-                decision_time_data = f.decision_time_data(glob.ambient_evolution)
-                fig1 = glob.plt.figure()
-                ax1 = fig1.add_axes([0.1, 0.1, 0.8, 0.8])
-                times_counts, bins = glob.np.histogram(decision_time_data,bins=glob.np.linspace(0,glob.nsteps,glob.nsteps))
-                glob.plt.title('Decision Time Occurrences')
-                glob.plt.plot(glob.np.linspace(1,glob.nsteps,glob.nsteps-1),times_counts,marker='.',linewidth=0)
-                glob.plt.ylabel('Occurrences')
-                glob.plt.xlabel('Time Steps')
-                glob.plt.yscale('log')
-                glob.plt.xscale('log')
-                glob.plt.show()
-
-                # da commentare per stima delle probabilità
-                #with open(decision_time_data_file, 'w') as time_fout :
-                #    f.decision_time_data_storage(times_counts, time_fout)
-
-        # Initial Conditions Influence Analysis
-
-        nth_opinion_data_in = f.count_all(glob.ambient_evolution[0])
-        nth_opinion_data_fin = f.count_all(glob.ambient_evolution[glob.nsteps-1])
-        initial_conditions.append(nth_opinion_data_in)
-        final_conditions.append(nth_opinion_data_fin)
-    prob_blue = (final_conditions.count([0, glob.npeople]))/(glob.nsimulations)
-    prob_red = (final_conditions.count([glob.npeople, 0]))/(glob.nsimulations)
-    assert (len(initial_conditions)==glob.nsimulations) and (len(final_conditions)==glob.nsimulations), 'ATTENTION: Something wrong about the Storage of Simulations\' initial and final conditions.'
-    print(final_conditions)
-    print(prob_blue, 'of Blue &', prob_red, 'of Red.')
-
-
-
-''''''''''''''''''''''''''''''''''''''''''''''''
-
+    # Initial Conditions Influence Analysis
+    if glob.init_analysis==True :
+        norm_file = 'init_data_sim500_d4_random.txt'
+        with open(norm_file, 'a') as n_fout :
+            n_fout.write(f'{balance}\n')
 
 
 # Implementation and Storage of Time Evolution of 2° Scenario
 if glob.setup==1 :
 
-    for t in range(0, glob.nsteps) : 
-                print("Step", t, ', Mode',glob.setup)
-                if t>0 :
-                    #print('la posizione di ID=1 è', f.ID_position(glob.ambient_evolution[t-1],1))
-                    glob.ambient_evolution[t] = f.evolve_grav(glob.ambient_evolution[t-1])
-                    if glob.balancing == True :
-                        balance = f.stop_if_eq(glob.ambient_evolution[t], t) #sono in equilibrio?
-                        if balance != False : 
-                            print("Equilibrio raggiunto: ", balance)
-                            glob.nsteps = t
-                            break
+    #third_stationary_duration = 0
+    for t in range(glob.nsteps) : 
+        print("Step", t, ', Mode',glob.setup)
+        if t>0 :
+            glob.ambient_evolution[t] = f.evolve_grav(glob.ambient_evolution[t-1])
+            print(f.count_all(glob.ambient_evolution[t]))
+            if glob.balancing==True :
+                #if f.count_all(glob.ambient_evolution[t])==f.count_all(glob.ambient_evolution[t-1]) :
+                #    third_stationary_duration += 1
+                #else : 
+                #    third_stationary_duration = 0
+                balance = f.stop_if_eq(glob.ambient_evolution[t], t) #sono in equilibrio?
+                if balance!=False : #or third_stationary_duration==100 : 
+                    print("Equilibrio raggiunto: ", balance)
+                    glob.nsteps = t
+                    break
 
-    #grafico magnetizzazione
+    # Magnetization Analysis
+    if glob.magnetization_analysis==True :
+        magnetization_data = [] 
+        for t in range(glob.nsteps) :
+            spin_data_t = f.count_all(glob.ambient_evolution[t]) #proportion of opinions
+            m = (1/glob.npeople)*(spin_data_t[1]-spin_data_t[0]) #magnetizzazione al tempo t generico
+            magnetization_data.append(m)
 
-    magnetization_data = [] 
+        times = glob.np.linspace(0,glob.nsteps,glob.nsteps)
+        glob.plt.title('Gravitational magnetization\'s Time Evolution')
+        glob.plt.plot(times, magnetization_data, marker='.',linestyle='--')
+        glob.plt.ylabel('Magnetization')
+        glob.plt.xlabel('Time Step')
+        glob.plt.show()
 
-    for t in range(glob.nsteps) :
-        spin_data_t = f.count_all(glob.ambient_evolution[t]) #proportion of opinions
-        m = (1/glob.npeople)*(spin_data_t[1]-spin_data_t[0]) #magnetizzazione al tempo t generico
-        magnetization_data.append(m)
+        flocking = 'flocking.csv'
+        with open(flocking, 'w') as flock_fout :
+            f.magnetization_data_storage(magnetization_data, flock_fout)
 
-    times = glob.np.linspace(0,glob.nsteps,glob.nsteps)
-    glob.plt.title('Gravitational magnetization\'s Time Evolution')
-    glob.plt.plot(times, magnetization_data, marker='.',linestyle='--')
-    glob.plt.ylabel('Magnetization')
-    glob.plt.xlabel('Time Step')
-    #glob.plt.show()
+    # Decision Time Distribution Analysis
+    if glob.time_analysis==True :
+        decision_time_data = f.decision_time_data(glob.ambient_evolution)
+        fig1 = glob.plt.figure()
+        ax1 = fig1.add_axes([0.1, 0.1, 0.8, 0.8])
+        times_counts, bins = glob.np.histogram(decision_time_data,bins=glob.np.linspace(0,glob.nsteps,glob.nsteps))
+        glob.plt.title('Gravitational decision Time Occurrences')
+        glob.plt.plot(glob.np.linspace(1,glob.nsteps,glob.nsteps-1),times_counts,marker='.',linewidth=0)
+        glob.plt.ylabel('Occurrences')
+        glob.plt.xlabel('Time Steps')
+        glob.plt.yscale('log')
+        glob.plt.xscale('log')
+        glob.plt.show()
 
-    #csv file magnetization
+        #csv file tau
+        '''problema'''
+        decision_time_data_file = 'grav_time_data.csv'
+        with open(decision_time_data_file, 'w') as gtime_fout :
+            f.decision_time_data_storage(times_counts, gtime_fout)
 
-    flocking = 'flocking.csv'
-    with open(flocking, 'w') as flock_fout :
-        f.magnetization_data_storage(magnetization_data, flock_fout)
-
-    #grafico tau
-
-    decision_time_data_file = 'grav_time_data.csv'
-    decision_time_data = f.decision_time_data(glob.ambient_evolution)
-    fig1 = glob.plt.figure()
-    ax1 = fig1.add_axes([0.1, 0.1, 0.8, 0.8])
-    times_counts, bins = glob.np.histogram(decision_time_data,bins=glob.np.linspace(0,glob.nsteps,glob.nsteps))
-    glob.plt.title('Gravitational decision Time Occurrences')
-    glob.plt.plot(glob.np.linspace(1,glob.nsteps,glob.nsteps-1),times_counts,marker='.',linewidth=0)
-    glob.plt.ylabel('Occurrences')
-    glob.plt.xlabel('Time Steps')
-    glob.plt.yscale('log')
-    glob.plt.xscale('log')
-    #glob.plt.show()
-
-    #calcolo probabilità
-
-    grav_file = "grav_prob.txt"
-    with open(grav_file, 'a') as g_fout :
-        g_fout.write(f'{balance}\n')
+    # Initial Conditions Influence Analysis
+    if glob.init_analysis==True :
+        grav_file = "grav_prob.txt"
+        with open(grav_file, 'a') as g_fout :
+            g_fout.write(f'{balance}\n')
         
-    #csv file tau
-    '''problema'''
-    with open(decision_time_data_file, 'w') as gtime_fout :
-        f.decision_time_data_storage(times_counts, gtime_fout)
-
+        
 
 ''''''''''''''''''''''''''''''''''''''''''''''''
 
@@ -183,74 +144,64 @@ if glob.setup==1 :
 # Implementation and Storage of Time Evolution of 3° Scenario
 if glob.setup==2 :
 
-    for t in range(0, glob.nsteps) : 
-                print("Step", t, ', Mode',glob.setup)
-                if t>0 :
-                    glob.ambient_evolution[t] = f.evolve_vis(glob.ambient_evolution[t-1])
-                    if glob.balancing == True :
-                        balance = f.stop_if_eq(glob.ambient_evolution[t], t) #sono in equilibrio?
-                        if balance != False : 
-                            print("Equilibrio raggiunto: ", balance)
-                            glob.nsteps = t
-                            break
+    for t in range(glob.nsteps) : 
+        print("Step", t, ', Mode',glob.setup)
+        if t>0 :
+            glob.ambient_evolution[t] = f.evolve_vis(glob.ambient_evolution[t-1])
+            if glob.balancing==True :
+                balance = f.stop_if_eq(glob.ambient_evolution[t], t) #sono in equilibrio?
+                if balance!=False : 
+                    print("Equilibrio raggiunto: ", balance)
+                    glob.nsteps = t
+                    break
     
-    #grafico magnetizzazione
+    # Magnetization Analysis 
+    if glob.magnetization_analysis==True :
+        magnetization_data = [] 
+        for t in range(glob.nsteps) :
+            spin_data_t = f.count_all(glob.ambient_evolution[t]) #proportion of opinions
+            m = (1/glob.npeople)*(spin_data_t[1]-spin_data_t[0]) #magnetizzazione al tempo t generico
+            magnetization_data.append(m)
 
-    magnetization_data = [] 
+        times = glob.np.linspace(0,glob.nsteps,glob.nsteps)
+        glob.plt.title('Partial magnetization\'s Time Evolution')
+        glob.plt.plot(times, magnetization_data, marker='.',linestyle='--')
+        glob.plt.ylabel('Magnetization')
+        glob.plt.xlabel('Time Step')
+        glob.plt.show()
 
-    for t in range(glob.nsteps) :
-        spin_data_t = f.count_all(glob.ambient_evolution[t]) #proportion of opinions
-        m = (1/glob.npeople)*(spin_data_t[1]-spin_data_t[0]) #magnetizzazione al tempo t generico
-        magnetization_data.append(m)
+        #csv file magnetization
+        partial_v= 'partial_vision_magnetization.csv'
+        with open(partial_v, 'w') as partial_fout :
+            f.magnetization_data_storage(magnetization_data, partial_fout)
 
-    times = glob.np.linspace(0,glob.nsteps,glob.nsteps)
-    glob.plt.title('Partial magnetization\'s Time Evolution')
-    glob.plt.plot(times, magnetization_data, marker='.',linestyle='--')
-    glob.plt.ylabel('Magnetization')
-    glob.plt.xlabel('Time Step')
-    glob.plt.show()
+    # Decision Time Distribution Analysis
+    if glob.time_analysis==True :
+        decision_time_data = f.decision_time_data(glob.ambient_evolution)
+        fig1 = glob.plt.figure()
+        ax1 = fig1.add_axes([0.1, 0.1, 0.8, 0.8])
+        times_counts, bins = glob.np.histogram(decision_time_data,bins=glob.np.linspace(0,glob.nsteps,glob.nsteps))
+        glob.plt.title('Partial decision Time Occurrences')
+        glob.plt.plot(glob.np.linspace(1,glob.nsteps,glob.nsteps-1),times_counts,marker='.',linewidth=0)
+        glob.plt.ylabel('Occurrences')
+        glob.plt.xlabel('Time Steps')
+        glob.plt.yscale('log')
+        glob.plt.xscale('log')
+        glob.plt.show()
 
-    #csv file magnetization
+        #csv file tau
+        decision_time_data_file = 'partial_time_data.csv'
+        with open(decision_time_data_file, 'w') as ptime_fout :
+            f.decision_time_data_storage(times_counts, ptime_fout)
 
-    partial_v= 'partial_vision_magnetization.csv'
-    with open(partial_v, 'w') as partial_fout :
-        f.magnetization_data_storage(magnetization_data, partial_fout)
-
-    #grafico tau
-
-    decision_time_data_file = 'partial_time_data.csv'
-    decision_time_data = f.decision_time_data(glob.ambient_evolution)
-    fig1 = glob.plt.figure()
-    ax1 = fig1.add_axes([0.1, 0.1, 0.8, 0.8])
-    times_counts, bins = glob.np.histogram(decision_time_data,bins=glob.np.linspace(0,glob.nsteps,glob.nsteps))
-    glob.plt.title('Partial decision Time Occurrences')
-    glob.plt.plot(glob.np.linspace(1,glob.nsteps,glob.nsteps-1),times_counts,marker='.',linewidth=0)
-    glob.plt.ylabel('Occurrences')
-    glob.plt.xlabel('Time Steps')
-    glob.plt.yscale('log')
-    glob.plt.xscale('log')
-    glob.plt.show()
-
-    #csv file tau
-
-    with open(decision_time_data_file, 'w') as ptime_fout :
-        f.decision_time_data_storage(times_counts, ptime_fout)
-
-
-
-
-
-
-
-
-
+    # Initial Conditions Influence Analysis
+    if glob.init_analysis==True :
+        vis_file = 'vis_prob_file.txt'
+        with open(vis_file, 'a') as v_fout :
+            v_fout.write(f'{balance}\n')
 
 
 #bench
-
-print('empty_spaces time:',glob.time_empty_spaces)
-print('influence_norm time:',glob.time_influence_norm)
-
 end_all = glob.time.time()
 print('all time:',end_all-start_all)
 
