@@ -105,34 +105,98 @@ if glob.setup==0 :
     print(final_conditions)
     print(prob_blue, 'of Blue &', prob_red, 'of Red.')
 
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+
 # Implementation and Storage of Time Evolution of 2° Scenario
 if glob.setup==1 :
-    flocking = 'flocking.csv'
-    with open(flocking, 'w') as flock_fout :
-        flock_fout.write('camadonna\n')
+
     for t in range(0, glob.nsteps) : 
                 print("Step", t, ', Mode',glob.setup)
                 if t>0 :
                     #print('la posizione di ID=1 è', f.ID_position(glob.ambient_evolution[t-1],1))
                     glob.ambient_evolution[t] = f.evolve_grav(glob.ambient_evolution[t-1])
+                    if glob.balancing == True :
+                        balance = f.stop_if_eq(glob.ambient_evolution[t], t) #sono in equilibrio?
+                        if balance != False : 
+                            print("Equilibrio raggiunto: ", balance)
+                            glob.nsteps = t
+                            break
+
+    #grafico magnetizzazione
+
+    magnetization_data = [] 
+
+    for t in range(glob.nsteps) :
+        spin_data_t = f.count_all(glob.ambient_evolution[t]) #proportion of opinions
+        m = (1/glob.npeople)*(spin_data_t[1]-spin_data_t[0]) #magnetizzazione al tempo t generico
+        magnetization_data.append(m)
+
+    times = glob.np.linspace(0,glob.nsteps,glob.nsteps)
+    glob.plt.title('Gravitational magnetization\'s Time Evolution')
+    glob.plt.plot(times, magnetization_data, marker='.',linestyle='--')
+    glob.plt.ylabel('Magnetization')
+    glob.plt.xlabel('Time Step')
+    #glob.plt.show()
+
+    #csv file magnetization
+
+    flocking = 'flocking.csv'
+    with open(flocking, 'w') as flock_fout :
+        f.magnetization_data_storage(magnetization_data, flock_fout)
+
+    #grafico tau
+
+    decision_time_data_file = 'grav_time_data.csv'
+    decision_time_data = f.decision_time_data(glob.ambient_evolution)
+    fig1 = glob.plt.figure()
+    ax1 = fig1.add_axes([0.1, 0.1, 0.8, 0.8])
+    times_counts, bins = glob.np.histogram(decision_time_data,bins=glob.np.linspace(0,glob.nsteps,glob.nsteps))
+    glob.plt.title('Gravitational decision Time Occurrences')
+    glob.plt.plot(glob.np.linspace(1,glob.nsteps,glob.nsteps-1),times_counts,marker='.',linewidth=0)
+    glob.plt.ylabel('Occurrences')
+    glob.plt.xlabel('Time Steps')
+    glob.plt.yscale('log')
+    glob.plt.xscale('log')
+    #glob.plt.show()
+
+    #calcolo probabilità
+
+    grav_file = "grav_prob.txt"
+    with open(grav_file, 'a') as g_fout :
+        g_fout.write(f'{balance}\n')
+        
+    #csv file tau
+    '''problema'''
+    with open(decision_time_data_file, 'w') as gtime_fout :
+        f.decision_time_data_storage(times_counts, gtime_fout)
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''
+
+
+
 
 # Implementation and Storage of Time Evolution of 3° Scenario
 if glob.setup==2 :
-    partial_v= 'partial_vision_magnetization.csv'
-    magnetization_data = [] 
-    with open(partial_v, 'w') as partial_fout :
-        partial_fout.write('camadonna\n')
+
     for t in range(0, glob.nsteps) : 
                 print("Step", t, ', Mode',glob.setup)
                 if t>0 :
                     glob.ambient_evolution[t] = f.evolve_vis(glob.ambient_evolution[t-1])
-                    balance = f.stop_if_eq(glob.ambient_evolution[t], t) #sono in equilibrio?
-                    if balance != False : 
-                        print("Equilibrio raggiunto: ", balance)
-                        glob.nsteps = t
-                        break
+                    if glob.balancing == True :
+                        balance = f.stop_if_eq(glob.ambient_evolution[t], t) #sono in equilibrio?
+                        if balance != False : 
+                            print("Equilibrio raggiunto: ", balance)
+                            glob.nsteps = t
+                            break
     
     #grafico magnetizzazione
+
+    magnetization_data = [] 
 
     for t in range(glob.nsteps) :
         spin_data_t = f.count_all(glob.ambient_evolution[t]) #proportion of opinions
@@ -144,13 +208,52 @@ if glob.setup==2 :
     glob.plt.plot(times, magnetization_data, marker='.',linestyle='--')
     glob.plt.ylabel('Magnetization')
     glob.plt.xlabel('Time Step')
-    #glob.plt.show()
+    glob.plt.show()
+
+    #csv file magnetization
+
+    partial_v= 'partial_vision_magnetization.csv'
+    with open(partial_v, 'w') as partial_fout :
+        f.magnetization_data_storage(magnetization_data, partial_fout)
+
+    #grafico tau
+
+    decision_time_data_file = 'partial_time_data.csv'
+    decision_time_data = f.decision_time_data(glob.ambient_evolution)
+    fig1 = glob.plt.figure()
+    ax1 = fig1.add_axes([0.1, 0.1, 0.8, 0.8])
+    times_counts, bins = glob.np.histogram(decision_time_data,bins=glob.np.linspace(0,glob.nsteps,glob.nsteps))
+    glob.plt.title('Partial decision Time Occurrences')
+    glob.plt.plot(glob.np.linspace(1,glob.nsteps,glob.nsteps-1),times_counts,marker='.',linewidth=0)
+    glob.plt.ylabel('Occurrences')
+    glob.plt.xlabel('Time Steps')
+    glob.plt.yscale('log')
+    glob.plt.xscale('log')
+    glob.plt.show()
+
+    #csv file tau
+
+    with open(decision_time_data_file, 'w') as ptime_fout :
+        f.decision_time_data_storage(times_counts, ptime_fout)
+
+
+
+
+
+
+
+
+
+
+
+#bench
 
 print('empty_spaces time:',glob.time_empty_spaces)
 print('influence_norm time:',glob.time_influence_norm)
 
 end_all = glob.time.time()
 print('all time:',end_all-start_all)
+
 ## Fulfilling of the CSV File for Initial State of the System 
 #data_in = 'data_in.csv'
 #with open(data_in, 'w') as fout1 :
