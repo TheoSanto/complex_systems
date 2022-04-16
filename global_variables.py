@@ -14,67 +14,72 @@ import matplotlib.pyplot as plt
 import time
 import unittest
 
-# Instance of Global Variables, Constants and Controls
+
+# Instance of Global Axes for Visualization ##################################
 global ax
 global ax_histo
 
-# Animation Settings
-nsimulations = 1
-nsteps = 20000
+
+# Animation Settings #########################################################
+nsteps = 100000
 interval = 60 #ms
 
-# Ambient Variables
+
+# Ambient Variables ##########################################################
 dimension = 961 
 side = int(np.sqrt(dimension)) # 31
 ambient = [[-3,-3]]*dimension
 ambient_evolution = [ambient]*(nsteps)
 
-# Scenario Choice
-setup = 1
+
+# Scenario Choice ############################################################
+setup = 0
 # 0 per Scenario di Distanza, 
 # 1 per Scenario di Flocking Gravitazionale,
 # 2 per Scenario di Visione Parziale. 
 
-# Global Analysis Selectors
-fixed_or_random = 0
-# 0 if Inizialization of the Ambient is Random
-# 1 if Inizialization of the Ambient is Pre-fixed
 
-time_analysis = 0
-# 0 if Representation of Time Distribution is not wanted
-# 1 if Representation of Time Distribution is wanted
+# Global Analysis Selectors ##################################################
+fixed_init = False
+# False if Inizialization of the Ambient is Random
+# True if Inizialization of the Ambient is Pre-fixed
 
-magnetization_analysis = 0
-# 0 if Representation of Time Distribution is not wanted
-# 1 if Representation of Time Distribution is wanted
+magnetization_analysis = True
+# False if Representation of Magnetization Time Evolution is not wanted
+# True if Representation of Magnetization Time Evolution is wanted
 
-balancing = True 
+time_analysis = True
+# False if Representation of Time Distribution is not wanted
+# True if Representation of Time Distribution is wanted
 
-# false if stationary condition analysis is wanted
-# true if stationary condition analysis is wanted
+init_analysis = False
+# False if Initial Conditions Analysis is not wanted
+# True if Initial Conditions Analysis is wanted
 
-# Control Parameters
+balancing = True
+# False if Stationary Condition Analysis is not wanted
+# True if Stationary Condition Analysis is wanted (recommended)
+
+
+# Control Parameters #######################################################
 npeople = 100
-distance = 4
+distance = 1
 G = 10
 T = 1
 vision = 2
 initial_reds = 50
 
-# Benchmark Variables
+
+# Benchmark Variables ######################################################
 time_influence_norm = 0
 time_empty_spaces = 0
 
-# Tests of Initialization's Consistence
-assert nsimulations >= 0, 'ATTENTION: Negative n° of Executing Simulations.'
+
+# Tests of Initialization's Consistence ####################################
 assert nsteps >= 0, 'ATTENTION: Negative n° of Time Steps.'
 assert interval > 0, 'ATTENTION: Negative Time Interval for Animation.'
 assert (side-np.sqrt(dimension)) == 0, 'ATTENTION: The Root of dimension is not Integer, as it should be.'
-assert (setup==0) or (setup==1) or (setup==2), 'ATTENTION: setup Value is not acceptable.'
-assert (fixed_or_random==0) or (fixed_or_random==1), 'ATTENTION: fixed_or_random Value is not acceptable.' 
-if setup!=0 :
-   assert fixed_or_random == 0, 'ATTENTION: Wrong Scenario for non-vanishing fixed_or_random.'
-assert (time_analysis==0) or (time_analysis==1), 'ATTENTION: time_analysis Value is not acceptable.'   
+assert (setup==0) or (setup==1) or (setup==2), 'ATTENTION: setup Value is not acceptable.' 
 assert (npeople>0) and (npeople<dimension), 'ATTENTION: Negative or too elevated npeople Value.' 
 assert (distance>0) and (distance<=int((side-1)/2)), 'ATTENTION: Negative or too elevated distance Value.'
 assert G > 0, 'ATTENTION: Negative Universal Gravitational Constant G.'
