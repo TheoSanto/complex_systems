@@ -20,7 +20,7 @@ global ax_histo
 
 # Animation Settings
 nsimulations = 1
-nsteps = 10000
+nsteps = 20000
 interval = 60 #ms
 
 # Ambient Variables
@@ -30,7 +30,7 @@ ambient = [[-3,-3]]*dimension
 ambient_evolution = [ambient]*(nsteps)
 
 # Scenario Choice
-setup = 2
+setup = 1
 # 0 per Scenario di Distanza, 
 # 1 per Scenario di Flocking Gravitazionale,
 # 2 per Scenario di Visione Parziale. 
@@ -48,6 +48,10 @@ magnetization_analysis = 0
 # 0 if Representation of Time Distribution is not wanted
 # 1 if Representation of Time Distribution is wanted
 
+balancing = True 
+
+# false if stationary condition analysis is wanted
+# true if stationary condition analysis is wanted
 
 # Control Parameters
 npeople = 100
