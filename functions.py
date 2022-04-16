@@ -1,6 +1,8 @@
 import global_variables as glob
 
 #####################################################################
+# Function that returns a 2-dim. list of integers indicating the total
+# number of Agents with Opinion +1 and -1 respectively.
 def count_all(ambient) :
     start = glob.time.time()
     nred = 0
@@ -12,6 +14,8 @@ def count_all(ambient) :
     return [nred, glob.npeople-nred]
 
 #####################################################################
+# Function that allows the Inizialization of the Ambient 
+# with randomly-chosen Positions for all Individuals.
 def init_random() :
     start = glob.time.time()
     ambient = [[-3,-3]]*glob.dimension
@@ -32,6 +36,10 @@ def init_random() :
     return ambient
 
 #####################################################################
+# Function that allows the Inizialization of the Ambient
+# with randomly-chosen Positions for all Individuals,
+# but the first 'initial_reds' are specifically reserved for
+# Agents with Opinion -1. 
 def init_fixed() :
     start = glob.time.time()
     ambient = [[-3,-3]]*glob.dimension
@@ -57,6 +65,9 @@ def init_fixed() :
     return ambient
 
 #####################################################################
+# Function that analyzes the Ambient Time Evolution to obtain a list 
+# of integers indicating the Time Interval needed to each Individual
+# one by one for changing its own Opinion.
 def decision_time_data(evolution) :
     start = glob.time.time()
     #if len(evolution)!=glob.nsteps :
@@ -86,6 +97,8 @@ def decision_time_data(evolution) :
     return time_distribution
 
 #####################################################################
+# Function that returns the Position Index of the Individual, identified 
+# by ID, on the Ambient.
 def ID_position(ambient, ID) :
     #start = glob.time.time()
     assert len(ambient) == glob.dimension, 'ATTENTION: ID_position() needs a (dimension)-dim. array as first argument.'
@@ -384,6 +397,10 @@ def empty_probs_grav(ambient, spaces, which) :
     return probs, exception
 
 #####################################################################
+# Function that handles a particular exception often occurring
+# in the 2° Scenario, because it could happen that the Individual
+# at the 'which'-th Site on the Ambient does not have any free 
+# Movement Direction, including its own actual Position.
 def find_most_near(ambient, which) :
     assert len(ambient) == glob.dimension, 'ATTENTION: find_most_near() needs a (dimension)-dim. array as first argument.'
     assert (which>=0) and (which<glob.dimension), 'ATTENTION: find_most_near() needs a non-negative integer as second argument, lower than dimension.'
@@ -858,6 +875,7 @@ def data_extr(ambient, i, fout, t) :
     print('data_extr time:', end-start)
 
 #####################################################################
+# Function that saves on CSV File the whole Magnetization Time Evolution.
 def magnetization_data_storage(data, fout) :
     start = glob.time.time()
     assert len(data) == glob.nsteps, 'ATTENTION: magnetization_data_storage() needs a (nsteps)-dim. array of floats as first argument.'
@@ -869,6 +887,8 @@ def magnetization_data_storage(data, fout) :
     print('magnetization_data_storage time:', end-start)
 
 #####################################################################
+# Function that saves on CSV File the Occurrences of all the detected
+# values of Decision Time.
 def decision_time_data_storage(data, fout):
     start = glob.time.time()
     assert len(data) == glob.nsteps-1, 'ATTENTION: time_data_storage() needs a (nsteps)-dim. array of floats as first argument.'
@@ -961,7 +981,10 @@ def local_density2(ambient, which, distance) :
     return [density, which, density_indices]
 
 #####################################################################
-#SEEMS TO BE OK, mi serve una funzione simile a table distance ma che restituisca la distanza di x e di y
+# Function that returns a 2-dim. list of 2-dim. arrays of the
+# x & y Coordinates of the Vector Distance between 'first'-th and
+# 'second'-th Sites on the Ambient. First without, and second with
+# taking into account the Periodic Boundary Conditions.
 def xy_distance(first, second) :
     start = glob.time.time()
     assert (first>=0) and (first<glob.dimension), 'ATTENTION: xy_distance() needs a non-negative integer as first argument, lower than dimension.'
@@ -1005,6 +1028,9 @@ def xy_distance(first, second) :
     return normal_distance, periodic_distance
 
 #####################################################################
+# Function that calculates the x & y Coordinates of the Gravitational 
+# Attraction Force acting on the Individual at 'which'-th Site
+# on the Ambient.
 def gravity2(ambient, which) :
     start = glob.time.time()
     assert len(ambient) == glob.dimension, 'ATTENTION: gravity2() needs a (dimension)-dim. array as first argument.'
@@ -1097,6 +1123,11 @@ def gravity2(ambient, which) :
     return [gravitation_x, gravitation_y]
 
 #####################################################################
+# Function that returns False until the Ambient reaches a known
+# Stationary Distribution of the Opinions at 'step' Instant,
+# when instead returns a 2-dim. list of integers indicating which of 
+# the Two Known Stationary Distributions is reached, and when this
+# finally occurred.
 def stop_if_eq (ambient, step) :
 
     static_case = [] #condizion di equilibrio
