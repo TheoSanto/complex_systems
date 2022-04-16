@@ -55,8 +55,8 @@ def init_fixed() :
 
 def decision_time_data(evolution) :
     start = glob.time.time()
-    assert len(evolution) == glob.nsteps, 'ATTENTION: decision_time_data() needs a (nsteps)-dim. array as argument.'
-
+    if glob.balancing == False : assert len(evolution) == glob.nsteps, 'ATTENTION: decision_time_data() needs a (nsteps)-dim. array as argument.'
+#lho messo altriemtni salta
     time_distribution = []
     for j in range(glob.npeople) :
 
@@ -854,7 +854,7 @@ def data_extr(ambient, i, fout, t) :
 
 def magnetization_data_storage(data, fout) :
     start = glob.time.time()
-    assert len(data) == glob.nsteps, 'ATTENTION: magnetization_data_storage() needs a (nsteps)-dim. array of floats as first argument.'
+    if glob.balancing == False : assert len(data) == glob.nsteps, 'ATTENTION: magnetization_data_storage() needs a (nsteps)-dim. array of floats as first argument.'
     
     fout.write('Time_Step, Magnetization_Value\n')
     for t in range(glob.nsteps) :
