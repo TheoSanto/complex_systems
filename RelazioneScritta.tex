@@ -104,7 +104,7 @@ Inoltre, come anticipato in Sezione~\ref{Sec:1}, ad ogni istante dell’evoluzio
 \\ L'effettiva direzione degli spostamenti è scelta stocasticamente tra le quattro permesse (Nord, Sud, Est, Ovest + Stessa posizione nel caso particolare precedentemente descritto), attribuendo a ciascuna di esse una medesima probabilità $\nicefrac{1}{n}$ con n pari al numero di siti liberi adiacenti, tranne quando questo si annulla, in cui invece si permette all’individuo di mantenere la propria posizione, garantendo così sempre la normalizzazione ad 1.
 \\ Tali spostamenti all’interno dello spazio discretizzato bidimensionale (0,31]x(0,31] sono vincolati a condizioni al contorno periodiche. Ne segue dunque che topologicamente l’insieme dei siti dell’automa cellulare costituisce una struttura toroidale, indicata con \Zn con n=2 e k=31, rispettivamente le dimensioni spaziali ed il numero di siti per lato dell'automa cellulare.
 \\ Questa scelta implementativa è espressamente motivata dall’obiettivo di evitare moti attrattivi degli individui verso ai bordi, che andrebbero così ad influenzare non trascurabilmente l’evoluzione del sistema.
-\\ La dinamica del sistema, di fatto, prevede la scelta del valore di un parametro di controllo, ossia $\delta$ definito come il raggio di influenza, e limitato agli elementi del seguente insieme \{0,...,$\nicefrac{(31-1)}{2}=15$\}. In base al suo valore si decide che l'individuo arbitrario $\textit{i} \in \{1,...,\textit{N} \}$ può interagire solo con quegli altri la cui posizione è compresa nel suo intorno di influenza $\Delta_{i} = \{ x \in (0,31] \times (0,31] \ | \ d(x_{i},x)\leqslant \delta \}$ con $\textit{$x_{i}$}$ come posizione dell'individuo i, mentre $\textit{d(x,y)}$ come metrica di Chebyshev nello spazio discrezzato bidimensionale dell'automa cellulare. Da notare come la validità delle condizioni al contorno periodiche comporta la costruzione di range d'influenza, anche detti intorni di Moore estesi, molto particolari, di cui sono riportati alcuni esempi in Figura~\ref{fig:3}.
+\\ La dinamica del sistema, di fatto, prevede la scelta del valore di un parametro di controllo, ossia $\delta$ definito come il raggio di influenza, e limitato agli elementi del seguente insieme \{0,...,$\nicefrac{(31-1)}{2}=15$\}. In base al suo valore si decide che l'individuo arbitrario $\textit{i} \in \{1,...,\textit{N} \}$ può interagire solo con coloro la cui posizione è compresa nel suo intorno di influenza $\Delta_{i}(t) = \{ x \in (0,31] \times (0,31] \ | \ d(x_{i}(t),x)\leqslant \delta \}$ con $\textit{$x_{i}$}(t)$ come posizione dell'individuo $\textit{i}$ all'istante $\textit{t}$, mentre $\textit{d(x,y)}$ come metrica di Chebyshev nello spazio discrezzato bidimensionale dell'automa cellulare. Da notare come la validità delle condizioni al contorno periodiche comporta la costruzione di range d'influenza, anche detti intorni di Moore estesi, molto particolari, di cui sono riportati alcuni esempi in Figura~\ref{fig:3}.
 
 \begin{figure}[h]
 \centering
@@ -132,39 +132,62 @@ Inoltre, come anticipato in Sezione~\ref{Sec:1}, ad ogni istante dell’evoluzio
 \label{fig:3}
 \end{figure}
 
-In questi termini, è possibile quantificare l'influenza a cui un individuo generico $\textit{i} \in \{1,...,\textit{N} \}$ è soggetto all'istante temporale $\textit{t}$ come segue
+In questi termini, una volta noto lo stato del sistema dato dalla conoscenza della corrispondenza $S(t): i \rightarrow s(i,t), $ è possibile quantificare l'influenza a cui un individuo generico $\textit{i} \in \{1,...,\textit{N} \}$ è soggetto all'istante temporale $\textit{t}$ come il seguente parametro reale nell'intervallo $\underline{compatto}$ $[-1,+1]$
 
 \begin{equation}
-    \sigma(i,t) = \sum_{ \{ j \ | \ x_{j} \in \Delta_{i} \} } s(j, t)p(M_{i})
+    \sigma(i,t) = \sum_{ \{ j \ | \ x_{j} \in \Delta_{i} \} } s(j, t)p(M_{i}(t))
+    \medskip
     \label{Eq:1}
 \end{equation}
 
-sia St: i--> s(i,t) la funzione che descrve lo stato del sistema al tempo t
-
-Sigma(i,t) è l'influenza pesata dell'individuo nell'elemento i-esimo dell'array all'istante t (NB: è un parametro reale in [-2,2] dato dalla media degli stati degli altri individui).
-Nel nostro caso, lo stato s dell'individuo non è {0,1}, ma {-2,-1,0,1,2} ed n (che va ad indagare lo stato degli altri individui) non è ]-inf;+inf[ (ossia conoscenza globale dello stato del sistema dell'individuo i), ma limitato dalla condizione di distanza di influenza del nostro sistema.
-In particolare, i valori di n saranno tali da esplorare lo stato dei soli individui all'interno del range di influenza.
-(i+n) appartente a Di(t)
-con Di(t) = {j in Zl (toro) t.c. distanza(j,i)<=r=rl=rr} %perchè Zl e non Znl
-
-Le p(n) nel nostro caso sono costanti, perchè assumiamo che l'influenza di ciascun individuo nel range di influenza sia equipesata.
-Nel caso generale, dato Ni(t)=numero di individui all'interno del range d'influenza dell'individuo nell'elemento i-esimo dell'array all'istante t,
-p(n)=pi(t)=1/Ni(t)
-in modo tale da soddisfare la condizione di normalizzazione
-sum (con n appartenente a Di(t)) p(n) = (1/Ni(t))*Ni(t) = 1
+che appunto consiste di una media uniformemente pesata degli stati, ossia delle opinioni, $\textit{s(j,t)}$ degli individui $\textit{j}$ la cui posizione è compresa nell'intorno d'influenza $\Delta_{i}(t)$ precedentemente definito all'istante $\textit{t}$. Infatti, i coefficienti moltiplicativi $\textit{p}$($M_{i}(t)$) $= \nicefrac{1}{M_{i}(t)}$, con $M_{i}(t)$ pari al numero di agenti influenti su $\textit{i}$ all'istante $\textit{t}$, non dipendono dall'indice $\textit{j}$ su cui viene eseguita l'operazione di sommatoria e soddisfano la condizione di normalizzazione:
 
 \begin{equation}
-    i \mapsto s(i,t+1) = I_A(\sigma(i,t))
+    \sum_{ \{ j \ | \ x_{j} \in \Delta_{i} \} } p(M_{i}(t)) = M_{i}(t) \cdot p(M_{i}(t)) =    M_{i}(t) \cdot \left ( \frac{1}{M_{i}(t)} \right ) = 1.
+    \medskip
     \label{Eq:2}
 \end{equation}
 
-L'evoluzione temporale s(i,t+1) dello stato s(i,t) dell'individuo nell'elemento i-esimo dell'array è determinata da una certa funzione IA dell'influenza di tale individuo all'istante t, che però non può essere definita come di seguito perchè nel nostro caso sigma(i,t) è in [-2,2].
-Nel nostro caso, la funzione IA(x) potrebbe essere una sorta di parte intera di una tangente iperbolica
+Per finire, si implementa l'evoluzione temporale locale dell'opinione dell'agente $\textit{i}$ valutando l'influenza associata $\sigma(i,t)$  calcolata in Equazione~\ref{Eq:1} tramite la funzione a valori interi $I_{A}$ che ne caratterizza l'andamento ed è così definita
+
+\begin{equation}
+    s(i,t+1) = I_A(\sigma(i,t)) = sign(\sigma(i,t))
+    \medskip
+    \label{Eq:3}
+\end{equation}
+
+La scelta di tale regola di evoluzione del sistema determina una forte sensibilità degli individui all'influenza percepita, perchè non appena questa assume un segno discorde dalla loro opinione si verifica una transizione di stato \mbox{(+1 $\longleftrightarrow$ -1)} nonostante il suo modulo risulti essere $|\sigma(i,t)| \ll 1$.
+\\ Al fine, quindi, di rallentare la dinamica delle opinioni, è stato introdotto un ulteriore parametro $\textit{T}$, definito positivo e analogo alla temperatura nei sistemi fisici, che moduli la velocità di rilassamento alla distribuzione stazionaria in termini di probabilità di transizione di stato $ \pi_{\pm} = \pi = \tanh (T)$.
+\\ Per considerazioni di convenienza computazionale, è stato scelto un valore costante $T=1$.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[line cap=round, line join=round,
+                            x=4.0cm, y=1.0cm, scale=1]
+\draw [->,color=black, line width=1.0pt] (-0.05,0) -- (2.5,0);
+\foreach \x in {1}
+\draw [shift={(\x,0)}, color=black] (0pt,2pt)
+-- (0pt,-2pt) node [below] {$\x$};
+\draw [color=black] (2.5,0) node [anchor= north west] {$T$};
+\draw [->,color=black, line width=1.0pt] (0,-0.1) -- (0,2);
+\foreach \y in {0.7616,1}
+\draw [shift={(0,\y)}, color=black] (2pt,0pt)
+-- (-2pt,0pt) node[left] {$\y$};
+\draw [color=black] (0,2) node [anchor= south east] {$\pi (T)$};
+\draw [color=black] (0pt,-10pt) node [left] {$0$};
+\draw [domain=0:2.3, line width=1.0pt, color=blue] plot (\x,{tanh(\x)});
+\draw [dashed, color=gray, line width=0.6pt] (1,0) -- (1,1);
+\draw [dashed, color=gray, line width=0.6pt] (0,1) -- (2.3,1);
+\draw [dashed, color=gray, line width=0.6pt] (0,0.7616) -- (1,0.7616);
+\end{tikzpicture}
+\caption{\textit{Andamento caratteristico della probabilità di transizione di stato al variare della temperatura T, con il valore scelto per le simulazioni in evidenza.}}
+\label{fig:4}
+\end{figure}
 
 \subsubsection{Visione Parziale}
-\label{Sec:2.1.1}
-\subsection{Flocking Gravitazionale}
 \label{Sec:2.2}
+\subsection{Flocking Gravitazionale}
+\label{Sec:2.3}
 
 \begin{equation}
     s'=[A(s)+B(\nicefrac{s}{2}) \cdot \tanh{(B(s)x)}]
