@@ -9,18 +9,16 @@
 \usepackage{tikz}
 \usepackage{pgfplots}
 \usepackage{caption}
-\usepackage{geometry}
 \usepackage{graphicx}
 \usepackage{subcaption}
 
 \newcommand{\Zn}{$\mathbb{Z}^n_k$ } %comodità, per non riscrivere ogni volta 
 \newcommand{\Zii}{$\mathbb{Z}^2_k$ }
 
-
 \begin{document}
 
 \title{\Huge Simulazione di Dinamica di Opinione su Automa Cellulare 
-		\[\]\Large Relazione scritta per il corso di \quad \quad \quad \quad \quad \quad Introduzione alla fisica dei sistemi complessi \medskip
+		\[\]\Large Relazione scritta per il corso di \\Introduzione alla fisica dei sistemi complessi \medskip
 		}
 \author{Matteo Santini, Matteo Costa}
 \date{DATA sticassi}
@@ -205,43 +203,22 @@ La scelta di tale regola di evoluzione del sistema determina una forte sensibili
 
 In questo modello ad automa cellulare è stato inserito un campo che agisce su tutti gli individui della stessa opinione attraverso una forza attrattiva proporzionale a $\nicefrac{1}{r^2}$. Fisicamente questo campo corrisponde ad un campo gravitazionale 
 \begin{equation}
-F(\vec{r}_{ij}): \mathbb{V} \rightarrow \mathbb{R}^2 
+F:  \mathbb{Z}^2 \rightarrow \mathbb{R}^2 
 \end{equation}
-la cui forza agente tra due individui i,j a distanza r e aventi la medesima opinione è
+la cui forza agente tra due individui i,j a distanza $\vec{r}_{ij}$ e aventi la medesima opinione è
 \begin{equation}
-    \vec{F_{ij}} = \dfrac{Gm_im_j}{r^2} \hat{r}
+    \vec{F}_{ij} = \dfrac{Gm_im_j}{r^2} \hat{r} \quad\quad con \quad i\neq j
 \end{equation}
-nell'ipotesi in cui tutti gli individui hanno massa m=1 e che la costante gravitazionale fosse G=10, per facilitare l'implementazione del modello. \\ L'introduzione di un campo di questo tipo favorisce il \textit{flocking}, ossia la formazione di assembramenti tra individui della stessa opinione. Questa richiesta permette di dare un senso alla dinamica degli individui nello spazio: come si osserva in una comunità reale, persone aventi opinione politica affine, tendono a stare assieme mentre persone immerse in un ambiente in cui la propria ideologia politica non è ben vista, tendono a spostarsi dove ci sono individui con la propria opinione. \\
-Avendo introdotto delle \textit{periodic boundary conditions}, la dinamica degli individui vive sul toroide \Zii. Questo può rappresentare un problema ai fini della dinamica, infatti ci sono sempre due possibili distanze tra due qualsiasi individui e la forza di attrazione gravitazionale deve fare una scelta per decidere il suo modulo, direzione e verso. 
-
-\begin{figure}
-    \centering
-    \label{fig:my_label}
-\begin{tikzpicture}
-\begin{axis} 
-[view={20}{55}, title={Toroide}, ytick=\empty, xtick=\empty, ztick=\empty, axis line style={draw=none}]
-\addplot3
-[domain=0:360, y domain=0:360, variable=\u, variable y=\v, mesh, samples=50, z buffer=sort, surf, colormap/blackwhite]
-({(3+cos(u))*cos(v)}, {(3+cos(u))*sin(v)}, {sin(u)});
-\filldraw[fill=red!40!red, draw=black] (420,210) circle (0.05cm);
-\filldraw[fill=red!40!red, draw=black] (200,450) circle (0.05cm);
-\filldraw[fill=red!40!red, draw=black] (590,690) circle (0.05cm);
-\filldraw[fill=red!40!red, draw=black] (300,550) circle (0.05cm);
-\filldraw[fill=blue!40!blue, draw=black] (620,800) circle (0.05cm);
-\filldraw[fill=blue!40!blue, draw=black] (455,250) circle (0.05cm);
-\filldraw[fill=blue!40!blue, draw=black] (400,900) circle (0.05cm);
-\filldraw[fill=red!40!red, draw=black] (380,800) circle (0.05cm);
-\filldraw[fill=blue!40!blue, draw=black] (150,680) circle (0.05cm);
-\filldraw[fill=blue!40!blue, draw=black] (0,700) circle (0.05cm);
-\filldraw[fill=blue!40!blue, draw=black] (400,700) circle (0.05cm);
-\filldraw[fill=red!40!red, draw=black] (100,1000) circle (0.05cm);
-\end{axis}
-\end{tikzpicture}
-    \caption{Caption}
-\end{figure}
-
-
-\begin{figure}
+nell'ipotesi in cui tutti gli individui hanno massa m=1 e che la costante gravitazionale fosse G=10, per facilitare l'implementazione del modello. \\ L'introduzione di un campo di questo tipo favorisce il \textit{flocking}, ossia la formazione di assembramenti tra individui della stessa opinione. Questa richiesta permette di dare un senso alla dinamica degli individui nello spazio \Zii: come si osserva in una comunità reale, persone aventi opinione politica affine tendono a stare assieme mentre, persone immerse in un ambiente in cui la propria ideologia politica non è ben vista, tendono a spostarsi dove ci sono individui che condividono la propria opinione. \bigskip
+\\
+Avendo introdotto delle \textit{periodic boundary conditions}, la dinamica degli individui vive sul toroide \Zii in quanto le linee di forza del campo F stanno sulla superficie del toroide (vedi Figura \ref{Fig:5}).\\ Questo può rappresentare un problema ai fini della dinamica, infatti per ogni componente della forza agente tra due individui ci sono sempre due possibili distanze ma è necessario che il modulo, direzione e verso siano univocamente definiti per una coppia di individui (i,j). Ad esempio, se consideriamo solo le componenti x della forza, per ogni coppia di individui (i,j) esiste una distanza (e quindi una forza) che segue il verso positivo dell'asse delle ascisse, che possiamo chiamare $r_x^+$, e una che va in senso opposto che chiamiamo $r_x^-$. Una considerazione del tutto analoga può essere fatta per la componente y della forza. Per questo motivo per calcolare la distanza dalla quale dipende la forza $\vec{F}_{ij}$ sono state prese le distanze $r_x(i,j)$ ed $r_y(i,j)$ in modo da soddisfare le condizioni
+\begin{align*} 
+&r_x(i,j) = min\{|r_x^+|, |r_x^-|\}\\
+&r_y(i,j) = min\{|r_y^+|, |r_y^-|\}\\
+&\vec{r}_{ij} = \vec{r}_x+\vec{r}_y
+\end{align*}
+Chiaramente è anche necessario introdurre delle opportune condizioni sulla forza $\vec{F}_{ij}$ per evitare dei punti singolari. Inanzitutto si assume che se $r_x(i,j)$ o $r_y(i,j)$ sono uguali a zero, allora la componente y o x della forza sarà nulla. È evidente che non è possibile avere entrambe $r_x(i,j)$ e $r_y(i,j)$ uguali a zero perchè questo va in contraddizione con la richiesta $i\neq j$ (gli individui non si possono compenetrare). Allora viene subito da domandarsi quando $\vec{F}_{ij}$ possa essere nulla: questo caso particolare richiede delle considerazioni di carattere geometrico che risiedono nella struttura del toroide topologico. Quando la condizione $r_x(i,j) = min\{|r_x^+|, |r_x^-|\}$ ammette come soluzione sia $r_x^+$ che $r_x^-$ (ovvero quando le due distanze sono uguali in modulo), si richiede $\vec{F}_{ij}$ = 0. Ne è un esempio la Figura \ref{Fig:6}.
+\begin{figure}[hb]
 \centering
 \begin{subfigure}[h]{0.48\textwidth}
 \centering
@@ -267,16 +244,17 @@ Avendo introdotto delle \textit{periodic boundary conditions}, la dinamica degli
 \begin{axis} 
 [view={0}{100}, ytick=\empty, xtick=\empty, ztick=\empty, axis line style={draw=none}]
 \addplot3
-[domain=0:360, y domain=0:360, variable=\u, variable y=\v, mesh, samples=50, z buffer=sort, surf, colormap/blackwhite]
+[domain=0:360, y domain=0:360, variable=\u, variable y=\v, mesh, samples=10, z buffer=sort, surf, colormap/blackwhite]
 ({(3+cos(u))*cos(v)}, {(3+cos(u))*sin(v)}, {sin(u)});
 \filldraw[fill=red!40!red, draw=black] (90,320) circle (0.06cm);
 \filldraw[fill=red!40!red, draw=black] (710,300) circle (0.06cm);
 \end{axis}
 \end{tikzpicture}
 \end{subfigure}
-
-\caption{\textit{Esempio di caso particolare in cui la forza agente tra i due individui in rosso è nulla. A sinistra la rappresentazione nell'automa cellulare di questa situazione, a destra la sua corrispondenza sul toroide \Zii che tiene conto delle periodic boundary conditions.}}
-\end{figure}
+\caption{\textit{Esempio in cui la forza agente tra i due individui in rosso è nulla. A sinistra la rappresentazione nell'automa cellulare di questa situazione, a destra la sua corrispondenza sul toroide \Zii che tiene conto delle periodic boundary conditions.}}
+\label{Fig:6}
+\end{figure}\\
+La scelta del movimento degli individui all'interno del proprio intorno unitario di Von Neumann, viene quindi condizionata dal campo F e tende a minimizzare la distanza tra gli individui di egual opinione, in modo da formare delle regioni ad alta densità di individui e regioni a bassa densità di individui. Questo ha effetti notevoli sulla dinamica delle opinioni in quanto le due fazioni corrispondenti ai due stati \textit{s} intraprendono una specie di ''guerra di logoramento'' in cui gli individui si dispongono in ''trincee'' e cercano di far prevalere la propria opinione (Vedi Fig.cazzoneso). Gli individui nei nuclei di queste trincee, che sono protetti dai vicini della stessa opinione, sono chiaramente difficili da conquistare mentre le parti più esterne, corrispondenti agli individui che si devono ancora aggregare al gruppo, sono più vulnerabili al cambio di opinione. La fine della guerra corrisponde a quando una delle due fazioni ha influenzato tutti gli individui dell'altra fazione, con il conseguente risultato di una distribuzione di opinioni omogenea corrispondente ad una condizione di equilibrio stabile. L'analisi delle condizioni stazionarie è presentata in Sezione \ref{Sec:4.4}.
 
 
 \section{Analisi e Risultati}
@@ -304,6 +282,31 @@ Qui di seguito è riportato il codice python utilizzato per l'implementazione de
 
 \section{Conclusioni}
 \label{Sec:6}
+\begin{figure}
+\centering
+\begin{tikzpicture}
+\begin{axis} 
+[view={20}{55}, title={Toroide}, ytick=\empty, xtick=\empty, ztick=\empty, axis line style={draw=none}]
+\addplot3
+[domain=0:360, y domain=0:360, variable=\u, variable y=\v, mesh, samples=10, z buffer=sort, surf, colormap/blackwhite]
+({(3+cos(u))*cos(v)}, {(3+cos(u))*sin(v)}, {sin(u)});
+\filldraw[fill=red!40!red, draw=black] (420,210) circle (0.05cm);
+\filldraw[fill=red!40!red, draw=black] (200,450) circle (0.05cm);
+\filldraw[fill=red!40!red, draw=black] (590,690) circle (0.05cm);
+\filldraw[fill=red!40!red, draw=black] (300,550) circle (0.05cm);
+\filldraw[fill=blue!40!blue, draw=black] (620,800) circle (0.05cm);
+\filldraw[fill=blue!40!blue, draw=black] (455,250) circle (0.05cm);
+\filldraw[fill=blue!40!blue, draw=black] (400,900) circle (0.05cm);
+\filldraw[fill=red!40!red, draw=black] (380,800) circle (0.05cm);
+\filldraw[fill=blue!40!blue, draw=black] (150,680) circle (0.05cm);
+\filldraw[fill=blue!40!blue, draw=black] (0,700) circle (0.05cm);
+\filldraw[fill=blue!40!blue, draw=black] (400,700) circle (0.05cm);
+\filldraw[fill=red!40!red, draw=black] (100,1000) circle (0.05cm);
+\end{axis}
+\end{tikzpicture}
+\caption{Caption}
+\label{Fig:5}
+\end{figure}
 
 \section{Bibliografia}
 \label{Sec:7}
