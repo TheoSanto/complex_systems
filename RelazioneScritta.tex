@@ -7,6 +7,11 @@
 \usepackage{hyperref}
 \usepackage{nicefrac}
 \usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{caption}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{subcaption}
 
 \newcommand{\Zn}{$\mathbb{Z}^n_k$ } %comodità, per non riscrivere ogni volta 
 \newcommand{\Zii}{$\mathbb{Z}^2_k$ }
@@ -21,7 +26,6 @@
 \date{DATA sticassi}
 
 \maketitle
-\tableofcontents
 \bigskip
 
  \section{Abstract}
@@ -199,6 +203,82 @@ La scelta di tale regola di evoluzione del sistema determina una forte sensibili
 \subsection{Flocking Gravitazionale}
 \label{Sec:3.3}
 
+In questo modello ad automa cellulare è stato inserito un campo che agisce su tutti gli individui della stessa opinione attraverso una forza attrattiva proporzionale a $\nicefrac{1}{r^2}$. Fisicamente questo campo corrisponde ad un campo gravitazionale 
+\begin{equation}
+F(\vec{r}_{ij}): \mathbb{V} \rightarrow \mathbb{R}^2 
+\end{equation}
+la cui forza agente tra due individui i,j a distanza r e aventi la medesima opinione è
+\begin{equation}
+    \vec{F_{ij}} = \dfrac{Gm_im_j}{r^2} \hat{r}
+\end{equation}
+nell'ipotesi in cui tutti gli individui hanno massa m=1 e che la costante gravitazionale fosse G=10, per facilitare l'implementazione del modello. \\ L'introduzione di un campo di questo tipo favorisce il \textit{flocking}, ossia la formazione di assembramenti tra individui della stessa opinione. Questa richiesta permette di dare un senso alla dinamica degli individui nello spazio: come si osserva in una comunità reale, persone aventi opinione politica affine, tendono a stare assieme mentre persone immerse in un ambiente in cui la propria ideologia politica non è ben vista, tendono a spostarsi dove ci sono individui con la propria opinione. \\
+Avendo introdotto delle \textit{periodic boundary conditions}, la dinamica degli individui vive sul toroide \Zii. Questo può rappresentare un problema ai fini della dinamica, infatti ci sono sempre due possibili distanze tra due qualsiasi individui e la forza di attrazione gravitazionale deve fare una scelta per decidere il suo modulo, direzione e verso. 
+
+\begin{figure}
+    \centering
+    \label{fig:my_label}
+\begin{tikzpicture}
+\begin{axis} 
+[view={20}{55}, title={Toroide}, ytick=\empty, xtick=\empty, ztick=\empty, axis line style={draw=none}]
+\addplot3
+[domain=0:360, y domain=0:360, variable=\u, variable y=\v, mesh, samples=50, z buffer=sort, surf, colormap/blackwhite]
+({(3+cos(u))*cos(v)}, {(3+cos(u))*sin(v)}, {sin(u)});
+\filldraw[fill=red!40!red, draw=black] (420,210) circle (0.05cm);
+\filldraw[fill=red!40!red, draw=black] (200,450) circle (0.05cm);
+\filldraw[fill=red!40!red, draw=black] (590,690) circle (0.05cm);
+\filldraw[fill=red!40!red, draw=black] (300,550) circle (0.05cm);
+\filldraw[fill=blue!40!blue, draw=black] (620,800) circle (0.05cm);
+\filldraw[fill=blue!40!blue, draw=black] (455,250) circle (0.05cm);
+\filldraw[fill=blue!40!blue, draw=black] (400,900) circle (0.05cm);
+\filldraw[fill=red!40!red, draw=black] (380,800) circle (0.05cm);
+\filldraw[fill=blue!40!blue, draw=black] (150,680) circle (0.05cm);
+\filldraw[fill=blue!40!blue, draw=black] (0,700) circle (0.05cm);
+\filldraw[fill=blue!40!blue, draw=black] (400,700) circle (0.05cm);
+\filldraw[fill=red!40!red, draw=black] (100,1000) circle (0.05cm);
+\end{axis}
+\end{tikzpicture}
+    \caption{Caption}
+\end{figure}
+
+
+\begin{figure}
+\centering
+\begin{subfigure}[h]{0.48\textwidth}
+\centering
+\begin{tikzpicture}[
+  scale=0.7,
+  mydot/.style={
+    circle,
+    fill=white,
+    draw,
+    outer sep=0pt,
+    inner sep=1pt
+  }
+]
+\draw[step=0.3cm,gray!50!white,very thin] (-1,0) grid (5,6);
+\filldraw[fill=red!40!red, draw=black] (2.25,3.15) circle (0.1cm);
+\filldraw[fill=red!40!red, draw=black] (-0.75,3.15) circle (0.1cm);
+\end{tikzpicture}
+\end{subfigure}
+\hfill
+\begin{subfigure}[h]{0.48\textwidth}
+         \centering
+\begin{tikzpicture}
+\begin{axis} 
+[view={0}{100}, ytick=\empty, xtick=\empty, ztick=\empty, axis line style={draw=none}]
+\addplot3
+[domain=0:360, y domain=0:360, variable=\u, variable y=\v, mesh, samples=50, z buffer=sort, surf, colormap/blackwhite]
+({(3+cos(u))*cos(v)}, {(3+cos(u))*sin(v)}, {sin(u)});
+\filldraw[fill=red!40!red, draw=black] (90,320) circle (0.06cm);
+\filldraw[fill=red!40!red, draw=black] (710,300) circle (0.06cm);
+\end{axis}
+\end{tikzpicture}
+\end{subfigure}
+
+\caption{\textit{Esempio di caso particolare in cui la forza agente tra i due individui in rosso è nulla. A sinistra la rappresentazione nell'automa cellulare di questa situazione, a destra la sua corrispondenza sul toroide \Zii che tiene conto delle periodic boundary conditions.}}
+\end{figure}
+
+
 \section{Analisi e Risultati}
 \label{Sec:4}
 
@@ -229,3 +309,4 @@ Qui di seguito è riportato il codice python utilizzato per l'implementazione de
 \label{Sec:7}
 
 \end{document}
+
