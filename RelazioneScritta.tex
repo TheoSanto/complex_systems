@@ -18,12 +18,13 @@
 \begin{document}
 
 \title{\Huge Simulazione di Dinamica di Opinione su Automa Cellulare 
-		\[\]\Large Relazione scritta per il corso di \\Introduzione alla fisica dei sistemi complessi \medskip
+		\[\]\Large Relazione scritta per il corso di \\ Introduzione alla fisica dei sistemi complessi \medskip
 		}
 \author{Matteo Santini, Matteo Costa}
 \date{DATA sticassi}
 
 \maketitle
+\tableofcontents
 \bigskip
 
  \section{Abstract}
@@ -46,7 +47,7 @@ Questo progetto di carattere simulativo è finalizzato allo studio statistico de
 
 \subsection{Automa Cellulare}
 \label{Sec:3.1}
-Il seguente modello ad automa cellulare intende porre le basi teoriche matematiche necessarie all'implementazione di una simulazione del comportamento di una popolazione all’interno di uno spazio bidimensionale discretizzato, dato da tutte le coppie di numeri interi nel prodotto cartesiano (0,31]x(0,31].
+Il seguente modello ad automa cellulare intende porre le basi teoriche matematiche necessarie all'implementazione di una simulazione del comportamento di una popolazione all’interno di uno spazio bidimensionale discretizzato, dato da tutte le coppie di numeri interi nel prodotto cartesiano (0,31]x(0,31] (forse è più corretto [1,L+1]x[1,L+1] con L=31).
 
 \begin{figure}[h]
 \centering
@@ -74,7 +75,7 @@ Il seguente modello ad automa cellulare intende porre le basi teoriche matematic
 \end{figure}
 
 Come è possibile osservare in Figura~\ref{fig:1}, tali coppie compongono le coordinate di tutti i possibili siti dell'automa cellulare, che possono o meno essere occupati dagli individui.
-\\ La popolazione in esame è costituita da un numero costante \textit{N} di individui, anche detti agenti, i quali sono caratterizzati fondamentalmente da un parametro di opinione personale, che ne definisce univocamente lo stato.
+\\ La popolazione in esame è costituita da un numero costante \textit{N=100} di individui, anche detti agenti, i quali sono caratterizzati fondamentalmente da un parametro di opinione personale, che ne definisce univocamente lo stato.
 In particolare, questo può assumere solo i valori interi $\pm$1, i quali sono interpretati come l'assenso o il dissenso verso un certo tema politico-sociale.
 \bigskip \bigskip
 \\ Inoltre, come anticipato in Sezione~\ref{Sec:2}, ad ogni istante dell’evoluzione temporale del sistema, gli agenti sono in grado di compiere in modo simultaneo movimenti all'interno del proprio intorno di Von Neumann di raggio unitario, come rappresentato in Figura~\ref{fig:2}.
@@ -109,11 +110,38 @@ In particolare, questo può assumere solo i valori interi $\pm$1, i quali sono i
 
 Da notare come in realtà sia contemplata anche la possibilità di rimanere fermi, ma limitatamente al caso in cui l'individuo si trovasse occupate tutte le celle nel proprio intorno. Ciò si è reso necessario affinchè in generale sia prediletta la scelta di compiere un movimento rispetto a quella di bloccarsi.
 \\ L'effettiva direzione degli spostamenti è scelta stocasticamente tra le quattro permesse (Nord, Sud, Est, Ovest + Stessa posizione nel caso particolare precedentemente descritto), attribuendo a ciascuna di esse una medesima probabilità $\nicefrac{1}{n}$ con n pari al numero di siti liberi adiacenti, tranne quando questo si annulla, in cui invece si permette all’individuo di mantenere la propria posizione, garantendo così sempre la normalizzazione ad 1.
-\\ Tali spostamenti all’interno dello spazio discretizzato bidimensionale (0,31]x(0,31] sono vincolati a condizioni al contorno periodiche. Ne segue dunque che topologicamente l’insieme dei siti dell’automa cellulare costituisce una struttura toroidale, indicata con \Zn con n=2 e k=31, rispettivamente le dimensioni spaziali ed il numero di siti per lato dell'automa cellulare.
+\\ Tali spostamenti all’interno dello spazio discretizzato bidimensionale (0,31]x(0,31] sono vincolati a condizioni al contorno periodiche. Ne segue dunque che topologicamente l’insieme dei siti dell’automa cellulare costituisce una struttura toroidale, esplicitata in Figura~\ref{fig:3} e d'ora in poi indicata con \Zn, dove n=2 e k=31 sono rispettivamente le dimensioni spaziali ed il numero di siti per lato dell'automa cellulare.
 \\ Questa scelta implementativa è espressamente motivata dall’obiettivo di evitare moti attrattivi degli individui verso ai bordi, che andrebbero così ad influenzare non trascurabilmente l’evoluzione del sistema.
-\\ La dinamica del sistema, di fatto, prevede la scelta del valore di un parametro di controllo, ossia $\delta$ definito come il raggio di influenza, e limitato agli elementi del seguente insieme \{0,...,$\nicefrac{(31-1)}{2}=15$\}. In base al suo valore si decide che l'individuo arbitrario $\textit{i} \in \{1,...,\textit{N} \}$ può interagire solo con coloro la cui posizione è compresa nel suo intorno di influenza $\Delta_{i}(t) = \{ x \in (0,31] \times (0,31] \ | \ d(x_{i}(t),x)\leqslant \delta \}$ con $\textit{$x_{i}$}(t)$ come posizione dell'individuo $\textit{i}$ all'istante $\textit{t}$, mentre $\textit{d(x,y)}$ come metrica di Chebyshev nello spazio discrezzato bidimensionale dell'automa cellulare. 
-\bigskip \bigskip \bigskip
-\\ Da notare come la validità delle condizioni al contorno periodiche comporta la costruzione di range d'influenza, anche detti intorni di Moore estesi, molto particolari, di cui sono riportati alcuni esempi in Figura~\ref{fig:3}.
+\\ La dinamica del sistema, di fatto, prevede la scelta del valore di un parametro di controllo, ossia $\delta$ definito come il raggio di influenza, e limitato agli elementi del seguente insieme \{0,...,$\nicefrac{(31-1)}{2}=15$\}. In base al suo valore si decide che l'individuo arbitrario \textit{i} $\in$ $\{1,...,\textit{N} \}$ può interagire solo con coloro la cui posizione è compresa nel suo intorno di influenza $\Delta_{i}(t)$ = $\{ x \in \ $\Zii$ \ | \ d(x_{i}(t),x)\leqslant \delta \}$ con \textit{$x_{i}$(t)} come posizione dell'individuo \textit{i} all'istante \textit{t}, mentre \textit{d(x,y)} come metrica di Chebyshev nello spazio discrezzato bidimensionale dell'automa cellulare. 
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}
+\begin{axis} 
+[view={20}{55}, title={Toroide}, ytick=\empty, xtick=\empty, ztick=\empty, axis line style={draw=none}]
+\addplot3
+[domain=0:360, y domain=0:360, variable=\u, variable y=\v, mesh, samples=10, z buffer=sort, surf, colormap/blackwhite]
+({(3+cos(u))*cos(v)}, {(3+cos(u))*sin(v)}, {sin(u)});
+\filldraw[fill=red!40!red, draw=black] (420,210) circle (0.05cm);
+\filldraw[fill=red!40!red, draw=black] (200,450) circle (0.05cm);
+\filldraw[fill=red!40!red, draw=black] (590,690) circle (0.05cm);
+\filldraw[fill=red!40!red, draw=black] (300,550) circle (0.05cm);
+\filldraw[fill=blue!40!blue, draw=black] (620,800) circle (0.05cm);
+\filldraw[fill=blue!40!blue, draw=black] (455,250) circle (0.05cm);
+\filldraw[fill=blue!40!blue, draw=black] (400,900) circle (0.05cm);
+\filldraw[fill=red!40!red, draw=black] (380,800) circle (0.05cm);
+\filldraw[fill=blue!40!blue, draw=black] (150,680) circle (0.05cm);
+\filldraw[fill=blue!40!blue, draw=black] (0,700) circle (0.05cm);
+\filldraw[fill=blue!40!blue, draw=black] (400,700) circle (0.05cm);
+\filldraw[fill=red!40!red, draw=black] (100,1000) circle (0.05cm);
+\end{axis}
+\end{tikzpicture}
+\caption{Caption}
+\label{fig:3}
+\end{figure}
+
+\bigskip \bigskip
+Da notare come la validità delle condizioni al contorno periodiche comporta la costruzione di range d'influenza, anche detti intorni di Moore estesi, molto particolari, di cui sono riportati alcuni esempi in Figura~\ref{fig:3}.
 
 \begin{figure}[h]
 \centering
@@ -138,7 +166,7 @@ Da notare come in realtà sia contemplata anche la possibilità di rimanere ferm
 \filldraw[fill=red!40!red, draw=black] (7.25,0.75) circle (0.25cm);
 \end{tikzpicture}
 \caption{\textit{Intorni di Moore estesi di raggio 2 in due differenti casi.}}
-\label{fig:3}
+\label{fig:4}
 \end{figure}
 
 In questi termini, una volta noto lo stato del sistema dato dalla conoscenza della corrispondenza $S(t): i \rightarrow s(i,t), $ è possibile quantificare l'influenza a cui un individuo generico $\textit{i} \in \{1,...,\textit{N} \}$ è soggetto all'istante temporale $\textit{t}$ come il seguente parametro reale nell'intervallo compatto $[-1,+1]$
@@ -166,14 +194,14 @@ Per finire, si implementa l'evoluzione temporale locale dell'opinione dell'agent
 \end{equation}
 
 La scelta di tale regola di evoluzione del sistema determina una forte sensibilità degli individui all'influenza percepita, perchè non appena questa assume un segno discorde dalla loro opinione si verifica una transizione di stato \mbox{(+1 $\longleftrightarrow$ -1)} nonostante il suo modulo risulti essere $|\sigma(i,t)| \ll 1$.
-\bigskip
-\\ Al fine, quindi, di rallentare la dinamica delle opinioni, è stato introdotto un ulteriore parametro $\textit{T}$, definito positivo e analogo alla temperatura nei sistemi fisici, che moduli la velocità di rilassamento alla distribuzione stazionaria in termini di probabilità di transizione di stato $ \pi_{\pm}(T) = \pi(T) = \tanh (T)$.
+\\ Al fine, quindi, di rallentare la dinamica delle opinioni, è stato introdotto un ulteriore parametro \textit{T}, definito positivo e analogo alla temperatura nei sistemi fisici, che moduli la velocità di rilassamento alla distribuzione stazionaria in termini di probabilità di transizione di stato $ \pi_{\pm}(T) = \pi(T) = \tanh (T)$.
 \\ Per considerazioni di convenienza computazionale, è stato scelto un valore costante $T=1$.
 
+\bigskip
 \begin{figure}[h]
 \centering
 \begin{tikzpicture}[line cap=round, line join=round,
-                            x=4.0cm, y=1.0cm, scale=1]
+                            x=3.0cm, y=2.0cm, scale=1]
 \draw [->,color=black, line width=1.0pt] (-0.05,0) -- (2.5,0);
 \foreach \x in {1}
 \draw [shift={(\x,0)}, color=black] (0pt,2pt)
@@ -185,39 +213,79 @@ La scelta di tale regola di evoluzione del sistema determina una forte sensibili
 -- (-2pt,0pt) node[left] {$\y$};
 \draw [color=black] (0,2) node [anchor= south east] {$\pi (T)$};
 \draw [color=black] (0pt,-10pt) node [left] {$0$};
-\draw [domain=0:2.3, line width=1.0pt, color=blue] plot (\x,{tanh(\x)});
+\draw [domain=0:2.4, line width=1.0pt, color=blue] plot (\x,{tanh(\x)});
 \draw [dashed, color=gray, line width=0.6pt] (1,0) -- (1,1);
-\draw [dashed, color=gray, line width=0.6pt] (0,1) -- (2.3,1);
+\draw [dashed, color=gray, line width=0.6pt] (0,1) -- (2.45,1);
 \draw [dashed, color=gray, line width=0.6pt] (0,0.7616) -- (1,0.7616);
 \filldraw[fill=white, draw=blue, line width=0.8pt] (1,0.7616) circle (0.08cm);
 \end{tikzpicture}
 \caption{\textit{Andamento caratteristico della probabilità di transizione di stato al variare della temperatura T, con il valore scelto per le simulazioni in evidenza.}}
-\label{fig:4}
+\label{fig:5}
 \end{figure}
 
+\bigskip \bigskip
 \subsection{Visione Parziale}
 \label{Sec:3.2}
+
+Come anticipato in Sezione \ref{Sec:2}, il sistema appena descritto viene sottoposto ad una condizione esterna globale, detta visione parziale. Questa prevede l'introduzione di un ulteriore parametro di controllo discreto $\eta$ e la scelta di un valore fissato arbitrario di distanza d'influenza (ad esempio, nelle simulazioni $\delta=4$).
+\\ Il parametro $\eta$ decide il numero massimo di individui da cui ciascuno può essere influenzato, ed è costante nel tempo, uniforme su tutta la popolazione e limitato agli elementi del seguente insieme $\{ 1, ..., (2\delta+1)(2\delta+1)-1=80\}$, come si può dedurre da Figura \ref{fig:6}.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+  scale=0.95,
+  mydot/.style={
+    circle,
+    fill=white,
+    draw,
+    outer sep=0pt,
+    inner sep=1pt
+  }
+]
+\fill[fill=green!30!white] (1,1) rectangle (2.8,2.8);
+\draw[step=0.2cm,gray!50!white,very thin] (0,0) grid (4,4);
+\draw[thick,->] (1,4.1) -- (2.8,4.1) node[] {};
+\draw[thick,->] (2.8,4.1) -- (1,4.1) node[] {};
+\draw[thick,->] (4.1,1) -- (4.1,2.8) node[] {};
+\draw[thick,->] (4.1,2.8) -- (4.1,1) node[] {};
+\filldraw[fill=red!40!red, draw=black] (1.9,1.9) circle (0.1cm);
+\put(35,118){$(2\delta+1)$};
+\put(115,48){$(2\delta+1)$};
+\end{tikzpicture}
+\caption{\textit{Rappresentazione grafica dell'intorno d'influenza $\Delta$ di un individuo, posizionato arbitrariamente, con $\delta$=4. Utile per comprendere che necessariamente il limite superiore di $\eta$ debba essere il numero di siti in $\Delta$, escluso quello occupato dall'individuo stesso.}}
+\label{fig:6}
+\end{figure}
+
+Oltre a questa peculiaretà, la dinamica e l'evoluzione temporale delle opinioni seguono sostanzialmente le medesime regole valide per l'automa cellulare, specificate in Sezione \ref{Sec:3.1}.
+
 
 \subsection{Flocking Gravitazionale}
 \label{Sec:3.3}
 
-In questo modello ad automa cellulare è stato inserito un campo che agisce su tutti gli individui della stessa opinione attraverso una forza attrattiva proporzionale a $\nicefrac{1}{r^2}$. Fisicamente questo campo corrisponde ad un campo gravitazionale 
+In questo modello ad automa cellulare è stato inserito un campo che agisce su tutti gli individui della stessa opinione attraverso una forza attrattiva proporzionale a $\nicefrac{1}{r^2}$. Fisicamente questo campo corrisponde ad un campo gravitazionale
+ 
 \begin{equation}
 F:  \mathbb{Z}^2 \rightarrow \mathbb{R}^2 
 \end{equation}
+
 la cui forza agente tra due individui i,j a distanza $\vec{r}_{ij}$ e aventi la medesima opinione è
+
 \begin{equation}
     \vec{F}_{ij} = \dfrac{Gm_im_j}{r^2} \hat{r} \quad\quad con \quad i\neq j
 \end{equation}
-nell'ipotesi in cui tutti gli individui hanno massa m=1 e che la costante gravitazionale fosse G=10, per facilitare l'implementazione del modello. \\ L'introduzione di un campo di questo tipo favorisce il \textit{flocking}, ossia la formazione di assembramenti tra individui della stessa opinione. Questa richiesta permette di dare un senso alla dinamica degli individui nello spazio \Zii: come si osserva in una comunità reale, persone aventi opinione politica affine tendono a stare assieme mentre, persone immerse in un ambiente in cui la propria ideologia politica non è ben vista, tendono a spostarsi dove ci sono individui che condividono la propria opinione. \bigskip
+
+nell'ipotesi in cui tutti gli individui hanno massa m=1 e che la costante gravitazionale fosse G=10, per facilitare l'implementazione del modello. \\ L'introduzione di un campo di questo tipo favorisce il \textit{flocking}, ossia la formazione di assembramenti tra individui della stessa opinione. Questa richiesta permette di dare un senso alla dinamica degli individui nello spazio \Zii: come si osserva in una comunità reale, persone aventi opinione politica affine tendono a stare assieme mentre, persone immerse in un ambiente in cui la propria ideologia politica non è ben vista, tendono a spostarsi dove ci sono individui che condividono la propria opinione. %\bigskip
 \\
-Avendo introdotto delle \textit{periodic boundary conditions}, la dinamica degli individui vive sul toroide \Zii in quanto le linee di forza del campo F stanno sulla superficie del toroide (vedi Figura \ref{Fig:5}).\\ Questo può rappresentare un problema ai fini della dinamica, infatti per ogni componente della forza agente tra due individui ci sono sempre due possibili distanze ma è necessario che il modulo, direzione e verso siano univocamente definiti per una coppia di individui (i,j). Ad esempio, se consideriamo solo le componenti x della forza, per ogni coppia di individui (i,j) esiste una distanza (e quindi una forza) che segue il verso positivo dell'asse delle ascisse, che possiamo chiamare $r_x^+$, e una che va in senso opposto che chiamiamo $r_x^-$. Una considerazione del tutto analoga può essere fatta per la componente y della forza. Per questo motivo per calcolare la distanza dalla quale dipende la forza $\vec{F}_{ij}$ sono state prese le distanze $r_x(i,j)$ ed $r_y(i,j)$ in modo da soddisfare le condizioni
+Avendo introdotto delle \textit{periodic boundary conditions}, la dinamica degli individui vive sul toroide \Zii in quanto le linee di forza del campo F stanno sulla superficie del toroide (vedi Figura \ref{fig:3}).\\ Questo può rappresentare un problema ai fini della dinamica, infatti per ogni componente della forza agente tra due individui ci sono sempre due possibili distanze ma è necessario che il modulo, direzione e verso siano univocamente definiti per una coppia di individui (i,j). Ad esempio, se consideriamo solo le componenti x della forza, per ogni coppia di individui (i,j) esiste una distanza (e quindi una forza) che segue il verso positivo dell'asse delle ascisse, che possiamo chiamare $r_x^+$, e una che va in senso opposto che chiamiamo $r_x^-$. Una considerazione del tutto analoga può essere fatta per la componente y della forza. Per questo motivo per calcolare la distanza dalla quale dipende la forza $\vec{F}_{ij}$ sono state prese le distanze $r_x(i,j)$ ed $r_y(i,j)$ in modo da soddisfare le condizioni
+
 \begin{align*} 
 &r_x(i,j) = min\{|r_x^+|, |r_x^-|\}\\
 &r_y(i,j) = min\{|r_y^+|, |r_y^-|\}\\
 &\vec{r}_{ij} = \vec{r}_x+\vec{r}_y
 \end{align*}
+
 Chiaramente è anche necessario introdurre delle opportune condizioni sulla forza $\vec{F}_{ij}$ per evitare dei punti singolari. Inanzitutto si assume che se $r_x(i,j)$ o $r_y(i,j)$ sono uguali a zero, allora la componente y o x della forza sarà nulla. È evidente che non è possibile avere entrambe $r_x(i,j)$ e $r_y(i,j)$ uguali a zero perchè questo va in contraddizione con la richiesta $i\neq j$ (gli individui non si possono compenetrare). Allora viene subito da domandarsi quando $\vec{F}_{ij}$ possa essere nulla: questo caso particolare richiede delle considerazioni di carattere geometrico che risiedono nella struttura del toroide topologico. Quando la condizione $r_x(i,j) = min\{|r_x^+|, |r_x^-|\}$ ammette come soluzione sia $r_x^+$ che $r_x^-$ (ovvero quando le due distanze sono uguali in modulo), si richiede $\vec{F}_{ij}$ = 0. Ne è un esempio la Figura \ref{Fig:6}.
+
 \begin{figure}[hb]
 \centering
 \begin{subfigure}[h]{0.48\textwidth}
@@ -252,8 +320,10 @@ Chiaramente è anche necessario introdurre delle opportune condizioni sulla forz
 \end{tikzpicture}
 \end{subfigure}
 \caption{\textit{Esempio in cui la forza agente tra i due individui in rosso è nulla. A sinistra la rappresentazione nell'automa cellulare di questa situazione, a destra la sua corrispondenza sul toroide \Zii che tiene conto delle periodic boundary conditions.}}
-\label{Fig:6}
-\end{figure}\\
+\label{Fig:7}
+\end{figure}
+
+
 La scelta del movimento degli individui all'interno del proprio intorno unitario di Von Neumann, viene quindi condizionata dal campo F e tende a minimizzare la distanza tra gli individui di egual opinione, in modo da formare delle regioni ad alta densità di individui e regioni a bassa densità di individui. Questo ha effetti notevoli sulla dinamica delle opinioni in quanto le due fazioni corrispondenti ai due stati \textit{s} intraprendono una specie di ''guerra di logoramento'' in cui gli individui si dispongono in ''trincee'' e cercano di far prevalere la propria opinione (Vedi Fig.cazzoneso). Gli individui nei nuclei di queste trincee, che sono protetti dai vicini della stessa opinione, sono chiaramente difficili da conquistare mentre le parti più esterne, corrispondenti agli individui che si devono ancora aggregare al gruppo, sono più vulnerabili al cambio di opinione. La fine della guerra corrisponde a quando una delle due fazioni ha influenzato tutti gli individui dell'altra fazione, con il conseguente risultato di una distribuzione di opinioni omogenea corrispondente ad una condizione di equilibrio stabile. L'analisi delle condizioni stazionarie è presentata in Sezione \ref{Sec:4.4}.
 
 
@@ -282,34 +352,8 @@ Qui di seguito è riportato il codice python utilizzato per l'implementazione de
 
 \section{Conclusioni}
 \label{Sec:6}
-\begin{figure}
-\centering
-\begin{tikzpicture}
-\begin{axis} 
-[view={20}{55}, title={Toroide}, ytick=\empty, xtick=\empty, ztick=\empty, axis line style={draw=none}]
-\addplot3
-[domain=0:360, y domain=0:360, variable=\u, variable y=\v, mesh, samples=10, z buffer=sort, surf, colormap/blackwhite]
-({(3+cos(u))*cos(v)}, {(3+cos(u))*sin(v)}, {sin(u)});
-\filldraw[fill=red!40!red, draw=black] (420,210) circle (0.05cm);
-\filldraw[fill=red!40!red, draw=black] (200,450) circle (0.05cm);
-\filldraw[fill=red!40!red, draw=black] (590,690) circle (0.05cm);
-\filldraw[fill=red!40!red, draw=black] (300,550) circle (0.05cm);
-\filldraw[fill=blue!40!blue, draw=black] (620,800) circle (0.05cm);
-\filldraw[fill=blue!40!blue, draw=black] (455,250) circle (0.05cm);
-\filldraw[fill=blue!40!blue, draw=black] (400,900) circle (0.05cm);
-\filldraw[fill=red!40!red, draw=black] (380,800) circle (0.05cm);
-\filldraw[fill=blue!40!blue, draw=black] (150,680) circle (0.05cm);
-\filldraw[fill=blue!40!blue, draw=black] (0,700) circle (0.05cm);
-\filldraw[fill=blue!40!blue, draw=black] (400,700) circle (0.05cm);
-\filldraw[fill=red!40!red, draw=black] (100,1000) circle (0.05cm);
-\end{axis}
-\end{tikzpicture}
-\caption{Caption}
-\label{Fig:5}
-\end{figure}
 
 \section{Bibliografia}
 \label{Sec:7}
 
 \end{document}
-
