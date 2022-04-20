@@ -262,29 +262,59 @@ Oltre a questa peculiaretà, la dinamica e l'evoluzione temporale delle opinioni
 \subsection{Flocking Gravitazionale}
 \label{Sec:3.3}
 
-In questo modello ad automa cellulare è stato inserito un campo che agisce su tutti gli individui della stessa opinione attraverso una forza attrattiva proporzionale a $\nicefrac{1}{r^2}$. Fisicamente questo campo corrisponde ad un campo gravitazionale
- 
+In questo modello ad automa cellulare sono stati inseriti due campi che agiscono su tutti gli individui della stessa opinione attraverso una forza attrattiva proporzionale a $\nicefrac{1}{r^2}$. Fisicamente questi campi corrispondono ad una coppia di campi gravitazionali
 \begin{equation}
-F:  \mathbb{Z}^2 \rightarrow \mathbb{R}^2 
+\begin{aligned}
+\begin{cases}
+F_x:  \mathbb{Z}^2_k \rightarrow \mathbb{R}^2 \\
+F_y:  \mathbb{Z}^2_k \rightarrow \mathbb{R}^2 
+\end{cases}
+\end{aligned}
 \end{equation}
-
-la cui forza agente tra due individui i,j a distanza $\vec{r}_{ij}$ e aventi la medesima opinione è
+la cui forza agente tra due individui (i,j), a distanza $\vec{r}_{x}$ lungo le ascisse e $\vec{r}_{y}$ lungo le ordinate, aventi la medesima opinione è
 
 \begin{equation}
-    \vec{F}_{ij} = \dfrac{Gm_im_j}{r^2} \hat{r} \quad\quad con \quad i\neq j
+\begin{aligned}
+    \vec{F}_x^{(i,j)} =& \dfrac{Gm_im_j}{r_x^2} \hat{r_x} \quad\quad con \quad i\neq j\\
+    \vec{F}_y^{(i,j)} =& \dfrac{Gm_im_j}{r_y^2} \hat{r_y} \quad\quad con \quad i\neq j
+\end{aligned}
 \end{equation}
+nell'ipotesi in cui tutti gli individui abbiano massa m=1 e che la costante gravitazionale sia G=10, per facilitare l'implementazione del modello (vedi Figura \ref{Fig:7}). 
 
-nell'ipotesi in cui tutti gli individui hanno massa m=1 e che la costante gravitazionale fosse G=10, per facilitare l'implementazione del modello. \\ L'introduzione di un campo di questo tipo favorisce il \textit{flocking}, ossia la formazione di assembramenti tra individui della stessa opinione. Questa richiesta permette di dare un senso alla dinamica degli individui nello spazio \Zii: come si osserva in una comunità reale, persone aventi opinione politica affine tendono a stare assieme mentre, persone immerse in un ambiente in cui la propria ideologia politica non è ben vista, tendono a spostarsi dove ci sono individui che condividono la propria opinione. %\bigskip
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[
+  scale=0.7,
+  mydot/.style={
+    circle,
+    fill=white,
+    draw,
+    outer sep=0pt,
+    inner sep=1pt
+  }
+]
+\draw[step=0.3cm,gray!50!white,very thin] (-1,0) grid (5,6);
+\filldraw[fill=red!40!red, draw=black] (1.95,3.15) circle (0.1cm);
+\draw [-latex] (2.05, 3.15) -- (4.05, 3.15);
+\draw [-latex] (1.85, 3.15) -- (-0.15, 3.15);
+\draw [-latex] (1.95, 3.25) -- (1.95, 5.25);
+\draw [-latex] (1.95, 3.05) -- (1.95, 1.15);
+\draw (0.65,5.2) node[] {} node[right] {$+F_y$};
+\draw (1.95,1.2) node[] {} node[right] {$-F_y$};
+\draw (-0.5,2.75) node[] {} node[right] {$-F_x$};
+\draw (3.75,3.5) node[] {} node[right] {$+F_x$};
+\end{tikzpicture}
+\caption{\textit{Rappresentazione grafica delle possibili combinazione di coppie di forze agenti su un individuo}}.
+\label{Fig:7}
+\end{figure}
+L'introduzione di campi di questo tipo favorisce il fenomeno del \textit{flocking}, ossia la formazione di assembramenti tra individui della stessa opinione. Questo fenomeno introduce degli attrattori nella dinamica degli individui nello spazio \Zii: come si osserva in una comunità reale, persone aventi opinione politica affine tendono a stare assieme mentre, persone immerse in un ambiente in cui la propria ideologia politica non è ben vista, tendono a spostarsi dove ci sono individui che condividono la propria opinione. %\bigskip
 \\
-Avendo introdotto delle \textit{periodic boundary conditions}, la dinamica degli individui vive sul toroide \Zii in quanto le linee di forza del campo F stanno sulla superficie del toroide (vedi Figura \ref{fig:3}).\\ Questo può rappresentare un problema ai fini della dinamica, infatti per ogni componente della forza agente tra due individui ci sono sempre due possibili distanze ma è necessario che il modulo, direzione e verso siano univocamente definiti per una coppia di individui (i,j). Ad esempio, se consideriamo solo le componenti x della forza, per ogni coppia di individui (i,j) esiste una distanza (e quindi una forza) che segue il verso positivo dell'asse delle ascisse, che possiamo chiamare $r_x^+$, e una che va in senso opposto che chiamiamo $r_x^-$. Una considerazione del tutto analoga può essere fatta per la componente y della forza. Per questo motivo per calcolare la distanza dalla quale dipende la forza $\vec{F}_{ij}$ sono state prese le distanze $r_x(i,j)$ ed $r_y(i,j)$ in modo da soddisfare le condizioni
-
+Avendo introdotto delle condizioni al contorno periodiche, la dinamica degli individui vive sul toroide \Zii in quanto le linee di forza dei campi $F_x, F_y$ stanno sulla superficie del toroide (vedi Figura \ref{fig:3}).\\ Questo può rappresentare un problema ai fini della dinamica, infatti per ognuna delle due forze agenti tra due individui ci sono sempre due possibili distanze ma è necessario che il modulo, direzione e verso di queste forze siano univocamente definiti per ogni coppia di individui (i,j). Ad esempio, se consideriamo solo le forze agenti in direzione x, per ogni coppia di individui (i,j) esiste una distanza (e quindi una forza) che segue il verso positivo dell'asse delle ascisse, che possiamo chiamare $r_x^+$, e una che va in senso opposto che chiamiamo $r_x^-$. Una considerazione del tutto analoga può essere fatta per le forze agenti in y. Per questo motivo, nel calcolare la distanza dalla quale dipendono le forze $\vec{F}^{(i,j)}_x$ e $\vec{F}^{(i,j)}_y$, sono state scelte le distanze $r_x(i,j)$ ed $r_y(i,j)$ in modo da soddisfare le condizioni
 \begin{align*} 
 &r_x(i,j) = min\{|r_x^+|, |r_x^-|\}\\
-&r_y(i,j) = min\{|r_y^+|, |r_y^-|\}\\
-&\vec{r}_{ij} = \vec{r}_x+\vec{r}_y
+&r_y(i,j) = min\{|r_y^+|, |r_y^-|\}.\\
 \end{align*}
-
-Chiaramente è anche necessario introdurre delle opportune condizioni sulla forza $\vec{F}_{ij}$ per evitare dei punti singolari. Inanzitutto si assume che se $r_x(i,j)$ o $r_y(i,j)$ sono uguali a zero, allora la componente y o x della forza sarà nulla. È evidente che non è possibile avere entrambe $r_x(i,j)$ e $r_y(i,j)$ uguali a zero perchè questo va in contraddizione con la richiesta $i\neq j$ (gli individui non si possono compenetrare). Allora viene subito da domandarsi quando $\vec{F}_{ij}$ possa essere nulla: questo caso particolare richiede delle considerazioni di carattere geometrico che risiedono nella struttura del toroide topologico. Quando la condizione $r_x(i,j) = min\{|r_x^+|, |r_x^-|\}$ ammette come soluzione sia $r_x^+$ che $r_x^-$ (ovvero quando le due distanze sono uguali in modulo), si richiede $\vec{F}_{ij}$ = 0. Ne è un esempio la Figura \ref{Fig:6}.
+Chiaramente è anche necessario introdurre delle opportune condizioni sulle forze per evitare dei punti singolari. Inanzitutto si assume che se $r_x(i,j)$ o $r_y(i,j)$ sono uguali a zero, allora la forza corrispondente in y o in x sarà nulla. È evidente che non è possibile avere entrambe $r_x(i,j)$ e $r_y(i,j)$ uguali a zero perchè questo va in contraddizione con la richiesta $i\neq j$ (gli individui non si possono compenetrare). Allora viene subito da domandarsi quando sia $\vec{F}^{(i,j)}_x$ che $\vec{F}^{(i,j)}_y$ possano essere entrambe nulle: questo caso particolare richiede delle considerazioni di carattere geometrico che risiedono nella struttura del toroide topologico. Quando la condizione $r_x(i,j) = min\{|r_x^+|, |r_x^-|\}$ ammette come soluzione sia $r_x^+$ che $r_x^-$ (ovvero quando le due distanze sono uguali in modulo), si richiede $\vec{F}^{(i,j)}_x$ = 0. Ne è un esempio la Figura \ref{Fig:8}.
 
 \begin{figure}[hb]
 \centering
@@ -320,11 +350,25 @@ Chiaramente è anche necessario introdurre delle opportune condizioni sulla forz
 \end{tikzpicture}
 \end{subfigure}
 \caption{\textit{Esempio in cui la forza agente tra i due individui in rosso è nulla. A sinistra la rappresentazione nell'automa cellulare di questa situazione, a destra la sua corrispondenza sul toroide \Zii che tiene conto delle periodic boundary conditions.}}
-\label{Fig:7}
+\label{Fig:8}
 \end{figure}
 
 
-La scelta del movimento degli individui all'interno del proprio intorno unitario di Von Neumann, viene quindi condizionata dal campo F e tende a minimizzare la distanza tra gli individui di egual opinione, in modo da formare delle regioni ad alta densità di individui e regioni a bassa densità di individui. Questo ha effetti notevoli sulla dinamica delle opinioni in quanto le due fazioni corrispondenti ai due stati \textit{s} intraprendono una specie di ''guerra di logoramento'' in cui gli individui si dispongono in ''trincee'' e cercano di far prevalere la propria opinione (Vedi Fig.cazzoneso). Gli individui nei nuclei di queste trincee, che sono protetti dai vicini della stessa opinione, sono chiaramente difficili da conquistare mentre le parti più esterne, corrispondenti agli individui che si devono ancora aggregare al gruppo, sono più vulnerabili al cambio di opinione. La fine della guerra corrisponde a quando una delle due fazioni ha influenzato tutti gli individui dell'altra fazione, con il conseguente risultato di una distribuzione di opinioni omogenea corrispondente ad una condizione di equilibrio stabile. L'analisi delle condizioni stazionarie è presentata in Sezione \ref{Sec:4.4}.
+La scelta del movimento degli individui all'interno del proprio intorno unitario di Von Neumann, viene quindi condizionata dai campi $F_x,F_y$ e tende a minimizzare la distanza tra gli individui di egual opinione, in modo da formare delle regioni ad alta densità di individui e regioni a bassa densità di individui. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+MATTEQUISEVUOIMETTIQUALCOSASULLASCELTADEIMOVIMENTI
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Questo ha effetti notevoli sulla dinamica delle opinioni in quanto le due fazioni corrispondenti ai due stati \textit{s} intraprendono una specie di ''guerra di logoramento'' in cui gli individui si dispongono in ''trincee'' e cercano di far prevalere la propria opinione (Vedi Fig.\ref{Fig:9}). 
+\begin{figure}[h]
+\centering
+\includegraphics{trincea.jpg}
+\caption{\textit{Configurazione caratteristica degli individui in una dinamica di flocking gravitazionale.}}
+\label{Fig:9}
+
+\end{figure}
+
+Gli individui nei nuclei di queste trincee, che sono protetti dai vicini della stessa opinione, sono chiaramente difficili da conquistare mentre le parti più esterne, corrispondenti agli individui che si devono ancora aggregare al gruppo, sono più vulnerabili al cambio di opinione. La fine della guerra corrisponde a quando una delle due fazioni ha influenzato tutti gli individui dell'altra fazione, con il conseguente risultato di una distribuzione di opinioni omogenea corrispondente ad una condizione di equilibrio stabile. L'analisi delle condizioni stazionarie è presentata in Sezione \ref{Sec:4.4}.
 
 
 \section{Analisi e Risultati}
