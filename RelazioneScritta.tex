@@ -12,8 +12,8 @@
 \usepackage{graphicx}
 \usepackage{subcaption}
 
-\newcommand{\Zn}{$\mathbb{Z}^n_k$ } %comodità, per non riscrivere ogni volta 
-\newcommand{\Zii}{$\mathbb{Z}^2_k$ }
+\newcommand{\Zn}{$\mathbb{Z}^n_k$} %comodità, per non riscrivere ogni volta 
+\newcommand{\Zii}{$\mathbb{Z}^2_k$}
 
 \begin{document}
 
@@ -112,7 +112,7 @@ Da notare come in realtà sia contemplata anche la possibilità di rimanere ferm
 \\ L'effettiva direzione degli spostamenti è scelta stocasticamente tra le quattro permesse (Nord, Sud, Est, Ovest + Stessa posizione nel caso particolare precedentemente descritto), attribuendo a ciascuna di esse una medesima probabilità $\nicefrac{1}{n}$ con n pari al numero di siti liberi adiacenti, tranne quando questo si annulla, in cui invece si permette all’individuo di mantenere la propria posizione, garantendo così sempre la normalizzazione ad 1.
 \\ Tali spostamenti all’interno dello spazio discretizzato bidimensionale (0,31]x(0,31] sono vincolati a condizioni al contorno periodiche. Ne segue dunque che topologicamente l’insieme dei siti dell’automa cellulare costituisce una struttura toroidale, esplicitata in Figura~\ref{fig:3} e d'ora in poi indicata con \Zn, dove n=2 e k=31 sono rispettivamente le dimensioni spaziali ed il numero di siti per lato dell'automa cellulare.
 \\ Questa scelta implementativa è espressamente motivata dall’obiettivo di evitare moti attrattivi degli individui verso ai bordi, che andrebbero così ad influenzare non trascurabilmente l’evoluzione del sistema.
-\\ La dinamica del sistema, di fatto, prevede la scelta del valore di un parametro di controllo, ossia $\delta$ definito come il raggio di influenza, e limitato agli elementi del seguente insieme \{0,...,$\nicefrac{(31-1)}{2}=15$\}. In base al suo valore si decide che l'individuo arbitrario \textit{i} $\in$ $\{1,...,\textit{N} \}$ può interagire solo con coloro la cui posizione è compresa nel suo intorno di influenza $\Delta_{i}(t)$ = $\{ x \in \ $\Zii$ \ | \ d(x_{i}(t),x)\leqslant \delta \}$ con \textit{$x_{i}$(t)} come posizione dell'individuo \textit{i} all'istante \textit{t}, mentre \textit{d(x,y)} come metrica di Chebyshev nello spazio discrezzato bidimensionale dell'automa cellulare. 
+\\ La dinamica del sistema, di fatto, prevede la scelta del valore di un parametro di controllo, ossia $\delta$ definito come il raggio di influenza, e limitato agli elementi del seguente insieme \{0,...,$\nicefrac{(31-1)}{2}=15$\}. In base al suo valore si decide che l'individuo arbitrario \textit{i} $\in$ $\{1,...,\textit{N} \}$ può interagire solo con coloro la cui posizione è compresa nel suo intorno di influenza $\Delta_{i}(t)$ = $\{ x \in \ $\Zii$ \ | \  \ d(x_{i}(t),x)\leqslant \delta \}$ con \textit{$x_{i}$(t)} come posizione dell'individuo \textit{i} all'istante \textit{t}, mentre \textit{d(x,y)} come metrica di Chebyshev nello spazio discrezzato bidimensionale dell'automa cellulare. 
 
 \begin{figure}[h]
 \centering
@@ -177,7 +177,7 @@ In questi termini, una volta noto lo stato del sistema dato dalla conoscenza del
     \label{Eq:1}
 \end{equation}
 
-che appunto consiste di una media uniformemente pesata degli stati, ossia delle opinioni, $\textit{s(j,t)}$ degli individui $\textit{j}$ la cui posizione è compresa nell'intorno d'influenza $\Delta_{i}(t)$ precedentemente definito all'istante $\textit{t}$. Infatti, i coefficienti moltiplicativi $\textit{p}$($M_{i}(t)$) $= \nicefrac{1}{M_{i}(t)}$, con $M_{i}(t)$ pari al numero di agenti influenti su $\textit{i}$ all'istante $\textit{t}$, non dipendono dall'indice $\textit{j}$ su cui viene eseguita l'operazione di sommatoria e soddisfano la condizione di normalizzazione:
+che appunto consiste di una media uniformemente pesata degli stati, ossia delle opinioni, \textit{s(j,t)} degli individui \textit{j} la cui posizione è compresa nell'intorno d'influenza $\Delta_{i}(t)$ precedentemente definito all'istante \textit{t}. Infatti, i coefficienti moltiplicativi \textit{p}($M_{i}(t)$) = $\nicefrac{1}{M_{i}(t)}$, con $M_{i}(t)$ pari al numero di agenti influenti su \textit{i} all'istante \textit{t}, non dipendono dall'indice \textit{j} su cui viene eseguita l'operazione di sommatoria e soddisfano la condizione di normalizzazione:
 
 \begin{equation}
     \sum_{ \{ j \ | \ x_{j} \in \Delta_{i} \} } p(M_{i}(t)) = M_{i}(t) \cdot p(M_{i}(t)) =    M_{i}(t) \cdot \left ( \frac{1}{M_{i}(t)} \right ) = 1.
@@ -185,10 +185,10 @@ che appunto consiste di una media uniformemente pesata degli stati, ossia delle 
     \label{Eq:2}
 \end{equation}
 
-Per finire, si implementa l'evoluzione temporale locale dell'opinione dell'agente $\textit{i}$ valutando l'influenza associata $\sigma(i,t)$  calcolata in Equazione~\ref{Eq:1} tramite la funzione a valori interi $I_{A}$ che ne caratterizza l'andamento ed è così definita
+Per finire, si implementa l'evoluzione temporale locale dell'opinione dell'agente \textit{i} valutando l'influenza associata $\sigma(i,t)$  calcolata in Equazione~\ref{Eq:1} tramite la funzione a valori interi $I_{A}$ che ne caratterizza l'andamento ed è così definita
 
 \begin{equation}
-    s(i,t+1) = I_A(\sigma(i,t)) = sign(\sigma(i,t))
+    s(i,t+1) = I_A(\sigma(i,t)) = sign(\sigma(i,t)).
     \medskip
     \label{Eq:3}
 \end{equation}
@@ -263,6 +263,7 @@ Oltre a questa peculiaretà, la dinamica e l'evoluzione temporale delle opinioni
 \label{Sec:3.3}
 
 In questo modello ad automa cellulare sono stati inseriti due campi che agiscono su tutti gli individui della stessa opinione attraverso una forza attrattiva proporzionale a $\nicefrac{1}{r^2}$. Fisicamente questi campi corrispondono ad una coppia di campi gravitazionali
+
 \begin{equation}
 \begin{aligned}
 \begin{cases}
@@ -271,7 +272,8 @@ F_y:  \mathbb{Z}^2_k \rightarrow \mathbb{R}^2
 \end{cases}
 \end{aligned}
 \end{equation}
-la cui forza agente tra due individui (i,j), a distanza $\vec{r}_{x}$ lungo le ascisse e $\vec{r}_{y}$ lungo le ordinate, aventi la medesima opinione è
+
+la cui forza agente tra due individui \textit{i}, \textit{j} a distanza $\vec{r}_{x}$ lungo le ascisse e $\vec{r}_{y}$ lungo le ordinate, aventi la medesima opinione è
 
 \begin{equation}
 \begin{aligned}
@@ -279,6 +281,7 @@ la cui forza agente tra due individui (i,j), a distanza $\vec{r}_{x}$ lungo le a
     \vec{F}_y^{(i,j)} =& \dfrac{Gm_im_j}{r_y^2} \hat{r_y} \quad\quad con \quad i\neq j
 \end{aligned}
 \end{equation}
+
 nell'ipotesi in cui tutti gli individui abbiano massa m=1 e che la costante gravitazionale sia G=10, per facilitare l'implementazione del modello (vedi Figura \ref{Fig:7}). 
 
 \begin{figure}[h]
@@ -304,17 +307,22 @@ nell'ipotesi in cui tutti gli individui abbiano massa m=1 e che la costante grav
 \draw (-0.5,2.75) node[] {} node[right] {$-F_x$};
 \draw (3.75,3.5) node[] {} node[right] {$+F_x$};
 \end{tikzpicture}
-\caption{\textit{Rappresentazione grafica delle possibili combinazione di coppie di forze agenti su un individuo}}.
+\caption{\textit{Rappresentazione grafica delle possibili combinazioni di coppie di forze agenti su un individuo}}.
 \label{Fig:7}
 \end{figure}
-L'introduzione di campi di questo tipo favorisce il fenomeno del \textit{flocking}, ossia la formazione di assembramenti tra individui della stessa opinione. Questo fenomeno introduce degli attrattori nella dinamica degli individui nello spazio \Zii: come si osserva in una comunità reale, persone aventi opinione politica affine tendono a stare assieme mentre, persone immerse in un ambiente in cui la propria ideologia politica non è ben vista, tendono a spostarsi dove ci sono individui che condividono la propria opinione. %\bigskip
+
+L'introduzione di campi di questo tipo favorisce il fenomeno del \textit{flocking}, ossia la formazione di assembramenti tra individui della stessa opinione. Questo fenomeno introduce degli attrattori nella dinamica degli individui nello spazio \Zii: come si osserva in una comunità reale, persone aventi opinione politica affine tendono a stare assieme mentre, persone immerse in un ambiente in cui la propria ideologia politica non è ben vista, tendono a spostarsi dove ci sono individui che condividono la propria opinione.
 \\
-Avendo introdotto delle condizioni al contorno periodiche, la dinamica degli individui vive sul toroide \Zii in quanto le linee di forza dei campi $F_x, F_y$ stanno sulla superficie del toroide (vedi Figura \ref{fig:3}).\\ Questo può rappresentare un problema ai fini della dinamica, infatti per ognuna delle due forze agenti tra due individui ci sono sempre due possibili distanze ma è necessario che il modulo, direzione e verso di queste forze siano univocamente definiti per ogni coppia di individui (i,j). Ad esempio, se consideriamo solo le forze agenti in direzione x, per ogni coppia di individui (i,j) esiste una distanza (e quindi una forza) che segue il verso positivo dell'asse delle ascisse, che possiamo chiamare $r_x^+$, e una che va in senso opposto che chiamiamo $r_x^-$. Una considerazione del tutto analoga può essere fatta per le forze agenti in y. Per questo motivo, nel calcolare la distanza dalla quale dipendono le forze $\vec{F}^{(i,j)}_x$ e $\vec{F}^{(i,j)}_y$, sono state scelte le distanze $r_x(i,j)$ ed $r_y(i,j)$ in modo da soddisfare le condizioni
-\begin{align*} 
+Le condizioni al contorno periodiche, che determinano la struttura toroidale dell'automa cellulare come spiegato in Sezione \ref{Sec:3.1}, possono rappresentare un difficoltà aggiuntiva ai fini della dinamica. Infatti, per ognuna delle due forze agenti tra due individui ci sono sempre due possibili distanze, ma è necessario che il modulo, direzione e verso di queste forze siano univocamente definiti per ogni coppia. Ad esempio, se consideriamo solo le forze agenti in direzione x, per ogni coppia di individui \textit{i}, \textit{j}, esiste una distanza che segue il verso positivo dell'asse delle ascisse, indicata con $r_x^+$, e una che va in senso opposto, denominata invece $r_x^-$. Assumendo una considerazione del tutto analoga anche per le forze agenti in y, le distanze utilizzate per i due campi vettoriali $\vec{F}^{(i,j)}_x$ e $\vec{F}^{(i,j)}_y$ sono state calcolate in base alle seguenti definizioni: rispettivamente,
+
+\begin{equation}
+\begin{aligned} 
 &r_x(i,j) = min\{|r_x^+|, |r_x^-|\}\\
-&r_y(i,j) = min\{|r_y^+|, |r_y^-|\}.\\
-\end{align*}
-Chiaramente è anche necessario introdurre delle opportune condizioni sulle forze per evitare dei punti singolari. Inanzitutto si assume che se $r_x(i,j)$ o $r_y(i,j)$ sono uguali a zero, allora la forza corrispondente in y o in x sarà nulla. È evidente che non è possibile avere entrambe $r_x(i,j)$ e $r_y(i,j)$ uguali a zero perchè questo va in contraddizione con la richiesta $i\neq j$ (gli individui non si possono compenetrare). Allora viene subito da domandarsi quando sia $\vec{F}^{(i,j)}_x$ che $\vec{F}^{(i,j)}_y$ possano essere entrambe nulle: questo caso particolare richiede delle considerazioni di carattere geometrico che risiedono nella struttura del toroide topologico. Quando la condizione $r_x(i,j) = min\{|r_x^+|, |r_x^-|\}$ ammette come soluzione sia $r_x^+$ che $r_x^-$ (ovvero quando le due distanze sono uguali in modulo), si richiede $\vec{F}^{(i,j)}_x$ = 0. Ne è un esempio la Figura \ref{Fig:8}.
+&r_y(i,j) = min\{|r_y^+|, |r_y^-|\}.
+\end{aligned}
+\end{equation}
+
+Chiaramente, è necessario imporre delle ulteriori condizioni sulle forze per evitare dei punti singolari. Innanzitutto, si assume che se $r_x(i,j)$ o $r_y(i,j)$ si annulla, allora la forza corrispondente in x o y sarà nulla. È anche evidente che non è possibile avere entrambe $r_x(i,j)$ e $r_y(i,j)$ uguali a zero, perchè questo va in contraddizione con la richiesta $i\neq j$ (gli individui non si possono compenetrare). Allora, viene subito da domandarsi quando $\vec{F}^{(i,j)}_x$ e $\vec{F}^{(i,j)}_y$ possano essere entrambe nulle: questo caso particolare richiede delle considerazioni di carattere geometrico che risiedono nella struttura del toroide topologico. Quando, infatti, si realizza la condizione $r_x(i,j) = min\{|r_x^+|, |r_x^-|\} = |r_x^+| = |r_x^-|$ (ovvero quando le due distanze coincidono), si richiede che $\vec{F}^{(i,j)}_x$ = 0. Analogamente, ciò vale anche per $\vec{F}^{(i,j)}_y$, quando $r_y(i,j) = min\{|r_y^+|, |r_y^-|\} = |r_y^+| = |r_y^-|$. Ne è un chiaro esempio la configurazione in Figura \ref{Fig:8}.
 
 \begin{figure}[hb]
 \centering
@@ -349,26 +357,55 @@ Chiaramente è anche necessario introdurre delle opportune condizioni sulle forz
 \end{axis}
 \end{tikzpicture}
 \end{subfigure}
-\caption{\textit{Esempio in cui la forza agente tra i due individui in rosso è nulla. A sinistra la rappresentazione nell'automa cellulare di questa situazione, a destra la sua corrispondenza sul toroide \Zii che tiene conto delle periodic boundary conditions.}}
+\caption{\textit{Esempio in cui la forza agente tra i due individui in rosso è nulla. A sinistra la rappresentazione nell'automa cellulare di questa situazione, a destra la sua corrispondenza sul toroide \Zii  che tiene conto delle periodic boundary conditions.}}
 \label{Fig:8}
 \end{figure}
 
+Una volta determinati i contributi attrattivi $F_x^{(i,j)}(t)$ e $F_y^{(i,j)}(t)$ dovuti a tutti gli accoppiamenti possibili dell'individuo arbitrario \textit{i} con i suoi simili \textit{j} nella popolazione, si può passare alla stima delle forze gravitazionali totali $F_x^{(i)}(t)$ e $F_y^{(i)}(t)$ agenti proprio su \textit{i} all'istante temporale \textit{t} tramite le seguenti somme vettoriali
 
-La scelta del movimento degli individui all'interno del proprio intorno unitario di Von Neumann, viene quindi condizionata dai campi $F_x,F_y$ e tende a minimizzare la distanza tra gli individui di egual opinione, in modo da formare delle regioni ad alta densità di individui e regioni a bassa densità di individui. 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-MATTEQUISEVUOIMETTIQUALCOSASULLASCELTADEIMOVIMENTI
+\begin{equation}
+\begin{aligned}
+    \vec{F}_x^{(i)}(t) = \sum_{ \{ j \ | \ s(j,t)=s(i,t) \} } \vec{F}_x^{(i,j)}(t) \\
+    \vec{F}_y^{(i)}(t) = \sum_{ \{ j \ | \ s(j,t)=s(i,t) \} } \vec{F}_y^{(i,j)}(t).
+\end{aligned}
+\end{equation}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-Questo ha effetti notevoli sulla dinamica delle opinioni in quanto le due fazioni corrispondenti ai due stati \textit{s} intraprendono una specie di ''guerra di logoramento'' in cui gli individui si dispongono in ''trincee'' e cercano di far prevalere la propria opinione (Vedi Fig.\ref{Fig:9}). 
-\begin{figure}[h]
-\centering
-\includegraphics{trincea.jpg}
-\caption{\textit{Configurazione caratteristica degli individui in una dinamica di flocking gravitazionale.}}
-\label{Fig:9}
+Sono questi vettori, dunque, i veri responsabili della particolare dinamica di \textit{flocking} gravitazionale.
+\\ In base al loro modulo, direzione e verso vengono modificate le probabilità di scelta della direzione di spostamento dei singoli individui all'interno del proprio intorno unitario di Von Neumann, minimizzando progressivamente la distanza tra gli individui di egual opinione, in modo da formare delle regioni ad alta densità di individui e regioni a bassa densità di individui. 
+\\ In particolare, la distribuzione di probabilità nella scelta della direzione degli spostamenti di ciascun individuo non sarà più uniforme, come descritto in Sezione \ref{Sec:3.1} per l'automa cellulare "imperturbato", ma polarizzata verso le direzioni parallele e concordi alle forze risultanti in modo tale da rispettare sempre la normalizzazione ad 1.
+\\ Ciò è stato realizzato riscalando la crescita o decrescita di probabilità di scelta di una certa direzione rispetto al modulo quadro della forza totale risultante, ossia $|\vec{F}_{TOT}^{(i)}(t)|^2 =|\vec{F}_x^{(i)}(t)|^2+|\vec{F}_y^{(i)}(t)|^2$, nel seguente modo:
 
-\end{figure}
+\begin{equation}
+\begin{aligned}
+\begin{cases}
+P_x^{(i, \pm)}(t) = \dfrac{1}{4} \left ( 1 \pm \dfrac{|\vec{F}_x^{(i)}(t)|^2}{|\vec{F}_{TOT}^{(i)}(t)|^2} \right ) \\ \\
+P_y^{(i, \pm)}(t) = \dfrac{1}{4} \left ( 1 \pm \dfrac{|\vec{F}_y^{(i)}(t)|^2}{|\vec{F}_{TOT}^{(i)}(t)|^2} \right )
+\end{cases}
+\end{aligned}
+\end{equation}
 
-Gli individui nei nuclei di queste trincee, che sono protetti dai vicini della stessa opinione, sono chiaramente difficili da conquistare mentre le parti più esterne, corrispondenti agli individui che si devono ancora aggregare al gruppo, sono più vulnerabili al cambio di opinione. La fine della guerra corrisponde a quando una delle due fazioni ha influenzato tutti gli individui dell'altra fazione, con il conseguente risultato di una distribuzione di opinioni omogenea corrispondente ad una condizione di equilibrio stabile. L'analisi delle condizioni stazionarie è presentata in Sezione \ref{Sec:4.4}.
+dove i pedici x ed y distinguono la direzione di cui si sta valutando la probabilità, mentre gli apici $\pm$ specificano rispettivamente se il verso è quello concorde o discorde alla relativa forza gravitazionale.
+\\ Tuttavia, definizioni di questo tipo possono essere valide soltanto nel caso banale in cui si considerino tutti i siti adiacenti come disponibili, perchè esclusivamente in tale configurazione sarebbe garantita la normalizzazione ad 1.
+\\ Di conseguenza, nel caso più realistico di occupazione parziale o completa dei posti adiacenti ad un certo individuo, si inizia con l'imposizione di annullamento della probabilità di spostamento nelle direzioni già impegnate. Dunque, si ridistribuiscono i valori, che nel caso normale sarebbero stati assegnati a tali probabilità, affinchè sia conservata più inalterata possibile la dinamica del sistema e allo stesso tempo sia soddisfatta la normalizzazione ad 1 richiesta.
+\\ Infatti, ipotizzando che un individuo \textit{i} arbitrario abbia un numero di siti adiacenti liberi pari a \textit{n=2} e che quelli occupati siano uno in direzione x e verso discorde alla forza $\vec{F}_x^{(i)}$ e l'altro in direzione y e verso concorde alla forza $\vec{F}_x^{(i)}$, le probabilità di scelta saranno date da
+
+\begin{equation}
+\begin{aligned}
+\begin{cases}
+P_x^{(i, +)} = \dfrac{1}{4} \left ( 1 + \dfrac{|\vec{F}_x^{(i)}|^2}{|\vec{F}_{TOT}^{(i)}|^2} \right ) + \dfrac{1}{4n} \left ( 1 - \dfrac{|\vec{F}_x^{(i)}|^2}{|\vec{F}_{TOT}^{(i)}|^2} \right ) + \dfrac{1}{4n} \left ( 1 + \dfrac{|\vec{F}_y^{(i)}|^2}{|\vec{F}_{TOT}^{(i)}|^2} \right ) \\
+P_x^{(i, -)} = 0 \\
+P_y^{(i, +)} = 0 \\
+P_y^{(i, -)} = \dfrac{1}{4} \left ( 1 - \dfrac{|\vec{F}_y^{(i)}|^2}{|\vec{F}_{TOT}^{(i)}|^2} \right ) + \dfrac{1}{4n} \left ( 1 - \dfrac{|\vec{F}_x^{(i)}|^2}{|\vec{F}_{TOT}^{(i)}|^2} \right ) + \dfrac{1}{4n} \left ( 1 + \dfrac{|\vec{F}_y^{(i)}|^2}{|\vec{F}_{TOT}^{(i)}|^2} \right )
+\end{cases}
+\end{aligned}
+\end{equation}
+
+e così soddisfino semplicemente la condizione di normalizzazione ad 1.
+\\ Da notare come, similarmente al modello ad automa cellulare descritto in Sezione \ref{Sec:3.1}, per \textit{n=0} è permessa la possibilità di rimanere fermi tra un istante temporale e quello successivo.
+
+%\begin{equation}
+%P_x^{(i, +)} + P_x^{(i, -)} + P_y^{(i, +)} + P_y^{(i, -)} = 1 + \dfrac{|\vec{F}_x^{(i)}|^2}{4|\vec{F}_{TOT}^{(i)}|^2} - \dfrac{|\vec{F}_x^{(i)}|^2}{4|\vec{F}_{TOT}^{(i)}|^2} + \dfrac{|\vec{F}_y^{(i)}|^2}{4|\vec{F}_{TOT}^{(i)}|^2} - \dfrac{|\vec{F}_y^{(i)}|^2}{4|\vec{F}_{TOT}^{(i)}|^2} = 1.
+%\end{equation}
 
 
 \section{Analisi e Risultati}
@@ -389,6 +426,21 @@ grafici dei tempi di decisione a valori di distanza d'influenza diversi
 
 \subsection{Flocking Gravitazionale}
 \label{Sec:4.4}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+QUESTA PARTE è PIù ADATTA ALLA PARTE DI ANALISI IN CUI SI PRESENTANO I RISULTATI DELLE SIMULAZIONI (DA QUI...)
+\\Questo ha effetti notevoli sulla dinamica delle opinioni in quanto le due fazioni corrispondenti ai due stati $\pm1$ intraprendono una specie di ''guerra di logoramento'' in cui gli individui si dispongono in ''trincee'' e cercano di far prevalere la propria opinione (Vedi Fig.\ref{Fig:9}). 
+\begin{figure}[h]
+\centering
+\includegraphics{trincea.jpg}
+\caption{\textit{Configurazione caratteristica degli individui in una dinamica di flocking gravitazionale.}}
+\label{Fig:9}
+
+\end{figure}
+
+Gli individui nei nuclei di queste trincee, che sono protetti dai vicini della stessa opinione, sono chiaramente difficili da conquistare mentre le parti più esterne, corrispondenti agli individui che si devono ancora aggregare al gruppo, sono più vulnerabili al cambio di opinione. La fine della guerra corrisponde a quando una delle due fazioni ha influenzato tutti gli individui dell'altra fazione, con il conseguente risultato di una distribuzione di opinioni omogenea corrispondente ad una condizione di equilibrio stabile. L'analisi delle condizioni stazionarie è presentata in Sezione \ref{Sec:4.4}.
+\\ (... A QUI)
+
 
 \section{Implementazione}
 \label{Sec:5}
