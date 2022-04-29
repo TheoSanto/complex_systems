@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass[letterpaper,10pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -13,8 +13,14 @@
 \usepackage{subcaption}
 \usetikzlibrary{patterns,plotmarks}
 \usepackage{multirow}
+\usepackage[
+backend=bibtex,
+style=numeric,
+sorting=ynt
+]{biblatex}
+\addbibresource{biblio.bib}
 
-\newcommand{\Zn}{$\mathbb{Z}^n_k$} %comodità, per non riscrivere ogni volta 
+\newcommand{\Zn}{$\mathbb{Z}^n_k$}
 \newcommand{\Zii}{$\mathbb{Z}^2_k$}
 
 \begin{document}
@@ -35,7 +41,7 @@ Il presente progetto si occupa di analizzare il comportamento di una popolazione
 \section{Introduzione}
 \label{Sec:2}
 Questo progetto di carattere simulativo è finalizzato allo studio statistico dell'evoluzione temporale di una popolazione di individui dotati di una opinione personale. 
-\\ A questo scopo, si decidono di introdurre alcune importanti approssimazioni, cercando di mantenersi sempre il più possibile realistici. Ad esempio, si riduce il parametro di opinione ad una mera variabile discreta a due soli valori possibili ($\pm$1), introducendo così una sorta di analogia al Modello di Ising 2D, che in meccanica statistica permette la descrizione di interazioni locali tra spin nel reticolo cristallino di un materiale condensato per spiegarne l'insorgenza di proprietà magnetiche tramite transizioni di fase interne.
+\\ A questo scopo, si decidono di introdurre alcune importanti approssimazioni, cercando di mantenersi sempre il più possibile realistici. Ad esempio, si riduce il parametro di opinione ad una mera variabile discreta a due soli valori possibili ($\pm$1), introducendo così una sorta di analogia al Modello di Ising 2D \cite{ising}, che in meccanica statistica permette la descrizione di interazioni locali tra spin nel reticolo cristallino di un materiale condensato per spiegarne l'insorgenza di proprietà magnetiche tramite transizioni di fase interne.
 \\ Questo tipo di modello, infatti, si addice alla descrizione di numerosi sistemi fisici complessi, dove è possibile osservare fenomeni di auto-organizzazione, e quello trattato qui di seguito ne è un chiaro esempio. 
 \\ Tuttavia, è però necessario avere l'accortezza di adattare le regole di evoluzione canoniche, in quanto a differenza degli atomi nei reticoli cristallini, su cui si è soliti applicare il Modello di Ising, gli individui sono in grado di compiere movimenti in modo simultaneo ad ogni step temporale. Dunque, per introdurre interazioni locali tra gli individui della popolazione si sceglie di definire un parametro di distanza d'influenza, che permetta di selezionare il numero finito di altri individui da cui ciascuno viene influenzato in termini di opinione.
 \\ Successivamente, è stata studiata la reazione del sistema in esame a due particolari codizioni, che a seguire andranno sotto il nome di visione parziale e flocking gravitazionale.
@@ -49,7 +55,7 @@ Questo progetto di carattere simulativo è finalizzato allo studio statistico de
 
 \subsection{Automa Cellulare}
 \label{Sec:3.1}
-Il seguente modello ad automa cellulare intende porre le basi teoriche matematiche necessarie all'implementazione di una simulazione del comportamento di una popolazione all’interno di uno spazio bidimensionale discretizzato, dato da tutte le coppie di numeri interi nel prodotto cartesiano (0,31]x(0,31] (forse è più corretto [1,L+1]x[1,L+1] con L=31).
+Il seguente modello ad automa cellulare \cite{modeling} intende porre le basi teoriche matematiche necessarie all'implementazione di una simulazione del comportamento di una popolazione all’interno di uno spazio bidimensionale discretizzato, dato da tutte le coppie di numeri interi nel prodotto cartesiano $[1,k+1]\times[1,k+1]$ con $k=31$.
 
 \begin{figure}[h]
 \centering
@@ -73,14 +79,14 @@ Il seguente modello ad automa cellulare intende porre le basi teoriche matematic
 \filldraw[fill=red!40!red, draw=black] (4,2) circle (0.1cm);
 \end{tikzpicture}
 \caption{\textit{Rappresentazione grafica dello spazio bidimensionale discretizzato, su cui è disposto arbitrariamente un individuo evidenziato in rosso.}}
-\label{fig:1}
+\label{Fig:1}
 \end{figure}
 
 Come è possibile osservare in Figura~\ref{fig:1}, tali coppie compongono le coordinate di tutti i possibili siti dell'automa cellulare, che possono o meno essere occupati dagli individui.
 \\ La popolazione in esame è costituita da un numero costante \textit{N=100} di individui, anche detti agenti, i quali sono caratterizzati fondamentalmente da un parametro di opinione personale, che ne definisce univocamente lo stato.
 In particolare, questo può assumere solo i valori interi $\pm$1, i quali sono interpretati come l'assenso o il dissenso verso un certo tema politico-sociale.
 \bigskip \bigskip
-\\ Inoltre, come anticipato in Sezione~\ref{Sec:2}, ad ogni istante dell’evoluzione temporale del sistema, gli agenti sono in grado di compiere in modo simultaneo movimenti all'interno del proprio intorno di Von Neumann di raggio unitario, come rappresentato in Figura~\ref{fig:2}.
+\\ Inoltre, come anticipato in Sezione~\ref{Sec:2}, ad ogni istante dell’evoluzione temporale del sistema, gli agenti sono in grado di compiere in modo simultaneo movimenti all'interno del proprio intorno di Von Neumann di raggio unitario, come rappresentato in Figura~\ref{Fig:2}.
 
 \begin{figure}[h]
 \centering
@@ -107,12 +113,12 @@ In particolare, questo può assumere solo i valori interi $\pm$1, i quali sono i
 \put(85,60){$E$};
 \end{tikzpicture}
 \caption{\textit{Visualizzazione di tutti i siti (in verde) appartenenti all'intorno di Von Neumann di un individuo (in rosso) con relative direzioni (Nord, Sud, Est, Ovest).}}
-\label{fig:2}
+\label{Fig:2}
 \end{figure}
 
 Da notare come in realtà sia contemplata anche la possibilità di rimanere fermi, ma limitatamente al caso in cui l'individuo si trovasse occupate tutte le celle nel proprio intorno. Ciò si è reso necessario affinchè in generale sia prediletta la scelta di compiere un movimento rispetto a quella di bloccarsi.
 \\ L'effettiva direzione degli spostamenti è scelta stocasticamente tra le quattro permesse (Nord, Sud, Est, Ovest + Stessa posizione nel caso particolare precedentemente descritto), attribuendo a ciascuna di esse una medesima probabilità $\nicefrac{1}{n}$ con n pari al numero di siti liberi adiacenti, tranne quando questo si annulla, in cui invece si permette all’individuo di mantenere la propria posizione, garantendo così sempre la normalizzazione ad 1.
-\\ Tali spostamenti all’interno dello spazio discretizzato bidimensionale (0,31]x(0,31] sono vincolati a condizioni al contorno periodiche. Ne segue dunque che topologicamente l’insieme dei siti dell’automa cellulare costituisce una struttura toroidale, esplicitata in Figura~\ref{fig:3} e d'ora in poi indicata con \Zn, dove n=2 e k=31 sono rispettivamente le dimensioni spaziali ed il numero di siti per lato dell'automa cellulare.
+\\ Tali spostamenti all’interno dello spazio discretizzato bidimensionale (0,31]x(0,31] sono vincolati a condizioni al contorno periodiche. Ne segue dunque che topologicamente l’insieme dei siti dell’automa cellulare costituisce una struttura toroidale, esplicitata in Figura~\ref{Fig:3} e d'ora in poi indicata con \Zn, dove n=2 e k=31 sono rispettivamente le dimensioni spaziali ed il numero di siti per lato dell'automa cellulare.
 \\ Questa scelta implementativa è espressamente motivata dall’obiettivo di evitare moti attrattivi degli individui verso ai bordi, che andrebbero così ad influenzare non trascurabilmente l’evoluzione del sistema.
 \\ La dinamica del sistema, di fatto, prevede la scelta del valore di un parametro di controllo, ossia $\delta$ definito come il raggio di influenza, e limitato agli elementi del seguente insieme \{0,...,$\nicefrac{(31-1)}{2}=15$\}. In base al suo valore si decide che l'individuo arbitrario \textit{i} $\in$ $\{1,...,\textit{N} \}$ può interagire solo con coloro la cui posizione è compresa nel suo intorno di influenza $\Delta_{i}(t)$ = $\{ x \in \ $\Zii$ \ | \  \ d(x_{i}(t),x)\leqslant \delta \}$ con \textit{$x_{i}$(t)} come posizione dell'individuo \textit{i} all'istante \textit{t}, mentre \textit{d(x,y)} come metrica di Chebyshev nello spazio discrezzato bidimensionale dell'automa cellulare. 
 
@@ -139,11 +145,11 @@ Da notare come in realtà sia contemplata anche la possibilità di rimanere ferm
 \end{axis}
 \end{tikzpicture}
 \caption{Caption}
-\label{fig:3}
+\label{Fig:3}
 \end{figure}
 
 \bigskip \bigskip
-Da notare come la validità delle condizioni al contorno periodiche comporta la costruzione di range d'influenza, anche detti intorni di Moore estesi, molto particolari, di cui sono riportati alcuni esempi in Figura~\ref{fig:3}.
+Da notare come la validità delle condizioni al contorno periodiche comporta la costruzione di range d'influenza, anche detti intorni di Moore estesi, molto particolari, di cui sono riportati alcuni esempi in Figura~\ref{Fig:4}.
 
 \begin{figure}[h]
 \centering
@@ -168,10 +174,10 @@ Da notare come la validità delle condizioni al contorno periodiche comporta la 
 \filldraw[fill=red!40!red, draw=black] (7.25,0.75) circle (0.25cm);
 \end{tikzpicture}
 \caption{\textit{Intorni di Moore estesi di raggio 2 in due differenti casi.}}
-\label{fig:4}
+\label{Fig:4}
 \end{figure}
 
-In questi termini, una volta noto lo stato del sistema dato dalla conoscenza della corrispondenza $S(t): i \rightarrow s(i,t), $ è possibile quantificare l'influenza a cui un individuo generico $\textit{i} \in \{1,...,\textit{N} \}$ è soggetto all'istante temporale $\textit{t}$ come il seguente parametro reale nell'intervallo compatto $[-1,+1]$
+In questi termini, una volta noto lo stato del sistema dato dalla conoscenza della corrispondenza $S(t): i \rightarrow s(i,t), $ è possibile quantificare l'influenza a cui un individuo generico $\textit{i} \in \{1,...,\textit{N} \}$ è soggetto all'istante temporale \textit{t} come il seguente parametro reale nell'intervallo compatto $[-1,+1]$
 
 \begin{equation}
     \sigma(i,t) = \sum_{ \{ j \ | \ x_{j} \in \Delta_{i} \} } s(j, t)p(M_{i}(t))
@@ -222,7 +228,7 @@ La scelta di tale regola di evoluzione del sistema determina una forte sensibili
 \filldraw[fill=white, draw=blue, line width=0.8pt] (1,0.7616) circle (0.08cm);
 \end{tikzpicture}
 \caption{\textit{Andamento caratteristico della probabilità di transizione di stato al variare della temperatura T, con il valore scelto per le simulazioni in evidenza.}}
-\label{fig:5}
+\label{Fig:5}
 \end{figure}
 
 \bigskip \bigskip
@@ -230,7 +236,7 @@ La scelta di tale regola di evoluzione del sistema determina una forte sensibili
 \label{Sec:3.2}
 
 Come anticipato in Sezione \ref{Sec:2}, il sistema appena descritto viene sottoposto ad una condizione esterna globale, detta visione parziale. Questa prevede l'introduzione di un ulteriore parametro di controllo discreto $\eta$ e la scelta di un valore fissato arbitrario di distanza d'influenza (ad esempio, nelle simulazioni $\delta=4$).
-\\ Il parametro $\eta$ decide il numero massimo di individui da cui ciascuno può essere influenzato, ed è costante nel tempo, uniforme su tutta la popolazione e limitato agli elementi del seguente insieme $\{ 1, ..., (2\delta+1)(2\delta+1)-1=80\}$, come si può dedurre da Figura \ref{fig:6}.
+\\ Il parametro $\eta$ decide il numero massimo di individui da cui ciascuno può essere influenzato, ed è costante nel tempo, uniforme su tutta la popolazione e limitato agli elementi del seguente insieme $\{ 1, ..., (2\delta+1)(2\delta+1)-1=80\}$, come si può dedurre da Figura \ref{Fig:6}.
 
 \begin{figure}[h]
 \centering
@@ -255,7 +261,7 @@ Come anticipato in Sezione \ref{Sec:2}, il sistema appena descritto viene sottop
 \put(115,48){$(2\delta+1)$};
 \end{tikzpicture}
 \caption{\textit{Rappresentazione grafica dell'intorno d'influenza $\Delta$ di un individuo, posizionato arbitrariamente, con $\delta$=4. Utile per comprendere che necessariamente il limite superiore di $\eta$ debba essere il numero di siti in $\Delta$, escluso quello occupato dall'individuo stesso.}}
-\label{fig:6}
+\label{Fig:6}
 \end{figure}
 
 Oltre a questa peculiaretà, la dinamica e l'evoluzione temporale delle opinioni seguono sostanzialmente le medesime regole valide per l'automa cellulare, specificate in Sezione \ref{Sec:3.1}.
@@ -273,6 +279,7 @@ F_x:  \mathbb{Z}^2_k \rightarrow \mathbb{R}^2 \\
 F_y:  \mathbb{Z}^2_k \rightarrow \mathbb{R}^2 
 \end{cases}
 \end{aligned}
+\label{Eq:4}
 \end{equation}
 
 la cui forza agente tra due individui \textit{i}, \textit{j} a distanza $\vec{r}_{x}$ lungo le ascisse e $\vec{r}_{y}$ lungo le ordinate, aventi la medesima opinione è
@@ -282,6 +289,7 @@ la cui forza agente tra due individui \textit{i}, \textit{j} a distanza $\vec{r}
     \vec{F}_x^{(i,j)} =& \dfrac{Gm_im_j}{r_x^2} \hat{r_x} \quad\quad con \quad i\neq j\\
     \vec{F}_y^{(i,j)} =& \dfrac{Gm_im_j}{r_y^2} \hat{r_y} \quad\quad con \quad i\neq j
 \end{aligned}
+\label{Eq:5}
 \end{equation}
 
 nell'ipotesi in cui tutti gli individui abbiano massa m=1 e che la costante gravitazionale sia G=10, per facilitare l'implementazione del modello (vedi Figura \ref{Fig:7}). 
@@ -322,6 +330,7 @@ Le condizioni al contorno periodiche, che determinano la struttura toroidale del
 &r_x(i,j) = min\{|r_x^+|, |r_x^-|\}\\
 &r_y(i,j) = min\{|r_y^+|, |r_y^-|\}.
 \end{aligned}
+\label{Eq:6}
 \end{equation}
 
 Chiaramente, è necessario imporre delle ulteriori condizioni sulle forze per evitare dei punti singolari. Innanzitutto, si assume che se $r_x(i,j)$ o $r_y(i,j)$ si annulla, allora la forza corrispondente in x o y sarà nulla. È anche evidente che non è possibile avere entrambe $r_x(i,j)$ e $r_y(i,j)$ uguali a zero, perchè questo va in contraddizione con la richiesta $i\neq j$ (gli individui non si possono compenetrare). Allora, viene subito da domandarsi quando $\vec{F}^{(i,j)}_x$ e $\vec{F}^{(i,j)}_y$ possano essere entrambe nulle: questo caso particolare richiede delle considerazioni di carattere geometrico che risiedono nella struttura del toroide topologico. Quando, infatti, si realizza la condizione $r_x(i,j) = min\{|r_x^+|, |r_x^-|\} = |r_x^+| = |r_x^-|$ (ovvero quando le due distanze coincidono), si richiede che $\vec{F}^{(i,j)}_x$ = 0. Analogamente, ciò vale anche per $\vec{F}^{(i,j)}_y$, quando $r_y(i,j) = min\{|r_y^+|, |r_y^-|\} = |r_y^+| = |r_y^-|$. Ne è un chiaro esempio la configurazione in Figura \ref{Fig:8}.
@@ -370,6 +379,7 @@ Una volta determinati i contributi attrattivi $F_x^{(i,j)}(t)$ e $F_y^{(i,j)}(t)
     \vec{F}_x^{(i)}(t) = \sum_{ \{ j \ | \ s(j,t)=s(i,t) \} } \vec{F}_x^{(i,j)}(t) \\
     \vec{F}_y^{(i)}(t) = \sum_{ \{ j \ | \ s(j,t)=s(i,t) \} } \vec{F}_y^{(i,j)}(t).
 \end{aligned}
+\label{Eq:7}
 \end{equation}
 
 Sono questi vettori, dunque, i veri responsabili della particolare dinamica di \textit{flocking} gravitazionale.
@@ -384,6 +394,7 @@ P_x^{(i, \pm)}(t) = \dfrac{1}{4} \left ( 1 \pm \dfrac{|\vec{F}_x^{(i)}(t)|^2}{|\
 P_y^{(i, \pm)}(t) = \dfrac{1}{4} \left ( 1 \pm \dfrac{|\vec{F}_y^{(i)}(t)|^2}{|\vec{F}_{TOT}^{(i)}(t)|^2} \right )
 \end{cases}
 \end{aligned}
+\label{Eq:8}
 \end{equation}
 
 dove i pedici x ed y distinguono la direzione di cui si sta valutando la probabilità, mentre gli apici $\pm$ specificano rispettivamente se il verso è quello concorde o discorde alla relativa forza gravitazionale.
@@ -400,15 +411,11 @@ P_y^{(i, +)} = 0 \\
 P_y^{(i, -)} = \dfrac{1}{4} \left ( 1 - \dfrac{|\vec{F}_y^{(i)}|^2}{|\vec{F}_{TOT}^{(i)}|^2} \right ) + \dfrac{1}{4n} \left ( 1 - \dfrac{|\vec{F}_x^{(i)}|^2}{|\vec{F}_{TOT}^{(i)}|^2} \right ) + \dfrac{1}{4n} \left ( 1 + \dfrac{|\vec{F}_y^{(i)}|^2}{|\vec{F}_{TOT}^{(i)}|^2} \right )
 \end{cases}
 \end{aligned}
+\label{Eq:9}
 \end{equation}
 
 e così soddisfino semplicemente la condizione di normalizzazione ad 1.
 \\ Da notare come, similarmente al modello ad automa cellulare descritto in Sezione \ref{Sec:3.1}, per \textit{n=0} è permessa la possibilità di rimanere fermi tra un istante temporale e quello successivo.
-
-%\begin{equation}
-%P_x^{(i, +)} + P_x^{(i, -)} + P_y^{(i, +)} + P_y^{(i, -)} = 1 + \dfrac{|\vec{F}_x^{(i)}|^2}{4|\vec{F}_{TOT}^{(i)}|^2} - \dfrac{|\vec{F}_x^{(i)}|^2}{4|\vec{F}_{TOT}^{(i)}|^2} + \dfrac{|\vec{F}_y^{(i)}|^2}{4|\vec{F}_{TOT}^{(i)}|^2} - \dfrac{|\vec{F}_y^{(i)}|^2}{4|\vec{F}_{TOT}^{(i)}|^2} = 1.
-%\end{equation}
-
 
 \section{Analisi e Risultati}
 \label{Sec:4}
@@ -420,28 +427,68 @@ L'analisi temporale dell'osservabile di magnetizzazione, definito in analogia al
 
 \begin{equation}
 M(t) = \dfrac{1}{N} \sum_{i = 0}^{N} s(i,t)
+\label{Eq:10}
 \end{equation}
 
 permette lo studio del comportamento medio del sistema nell'arco delle simulazioni.
-\\ In questo modo, applicando valori sempre maggiori del parametro di distanza d'influenza $\delta$, è stato possibile osservare come ciò comporti una significativa accelerazione della dinamica. Infatti, gli esempi in Figura \ref{Fig:9} riportano chiaramente che il tempo necessario al raggiungimento di una delle due distribuzioni stazionarie ("Tutti +1" e "Tutti -1") si riduce sensibilmente all'aumentare di $\delta$.
+\\ In questo modo, applicando valori sempre maggiori del parametro di distanza d'influenza $\delta$, è stato possibile osservare come ciò comporti una significativa accelerazione della dinamica. 
 
 \begin{figure}[h]
-{\centering\par
-\makebox[0 pt]{\includegraphics[width=1.3\linewidth]{distance_magnetization_graphs.png}}
-\par}
-\caption{\textit{Grafici riguardanti l'evoluzione temporale della magnetizzazione per quattro valori di distanza d'influenza (in ordine dall'alto verso il basso e da sinistra a destra: $\delta$ = 1, 2, 4, 8) in simulazioni da 500 steps temporali ciascuna.}}
+\centering
+\begin{subfigure}{0.8\textwidth}
+\includegraphics[width=\linewidth]{magn_graph_d1.png}
+\end{subfigure}
+\begin{subfigure}{0.8\textwidth}
+\includegraphics[width=\linewidth]{magn_graph_d2.png}
+\end{subfigure}
+\end{figure}
+\begin{figure}
+\ContinuedFloat
+\centering
+\begin{subfigure}{0.8\textwidth}
+\includegraphics[width=\linewidth]{magn_graph_d4.png}
+\end{subfigure}
+\begin{subfigure}{0.8\textwidth}
+\includegraphics[width=\linewidth]{magn_graph_d8.png}
+\end{subfigure}
+\caption{\textit{Grafici riguardanti l'evoluzione temporale della magnetizzazione per quattro valori di distanza d'influenza (in ordine dall'alto verso il basso: $\delta$ = 1, 2, 4, 8) in simulazioni da 500 steps temporali ciascuna.}}
 \label{Fig:9}
 \end{figure}
 
-Inoltre, per analizzare più dettagliatamente la proprietà di $\delta$ di ridurre le tempistiche del sistema sono stati raccolti ulteriori dati riguardanti i tempi di decisione $\tau$, ossia gli intervalli di tempo necessari a ciascun individuo di cambiare la propria opinione.
-\\ La loro rappresentazione grafica, in Figura  \ref{Fig:10}, ha evidenziato un andamento tipico di una legge a potenza, come ha dimostrato il fit rispetto
+Infatti, gli esempi in Figura \ref{Fig:9} riportano chiaramente che il tempo necessario al raggiungimento di una delle due distribuzioni stazionarie ("Tutti +1" e "Tutti -1") si riduce sensibilmente all'aumentare di $\delta$.
+\\ Inoltre, per analizzare più dettagliatamente la proprietà di $\delta$ di ridurre le tempistiche del sistema sono stati raccolti ulteriori dati riguardanti i tempi di decisione $\tau$, ossia gli intervalli di tempo necessari a ciascun individuo della popolazione di cambiare la propria opinione.
+
+\begin{figure}[h]
+\centering
+\begin{subfigure}{0.8\textwidth}
+\includegraphics[width=\linewidth]{time_graph_d1.png}
+\end{subfigure}
+\begin{subfigure}{0.8\textwidth}
+\includegraphics[width=\linewidth]{time_graph_d2.png}
+\end{subfigure}
+\end{figure}
+\begin{figure}
+\ContinuedFloat
+\centering
+\begin{subfigure}{0.8\textwidth}
+\includegraphics[width=\linewidth]{time_graph_d4.png}
+\end{subfigure}
+\begin{subfigure}{0.8\textwidth}
+\includegraphics[width=\linewidth]{time_graph_d8.png}
+\end{subfigure}
+\caption{\textit{Illustrazioni delle distribuzioni $\phi(\tau)$ dei tempi di decisione $\tau$, ottenute dalle medesime simulazioni, la cui magnetizzazione è riportata in Figura \ref{Fig:9}, assieme al relativo fit di power law in rosso, in scala logaritmica.  }}
+\label{Fig:10}
+\end{figure}
+
+\bigskip  \bigskip  \bigskip  \bigskip
+La loro rappresentazione grafica, in Figura  \ref{Fig:10}, ha evidenziato un andamento tipico di una legge a potenza, come ha dimostrato il fit rispetto
 
 \begin{equation}
 f(\tau) = c \ \tau ^{a}
 \label{Eq:11}
 \end{equation}
 
-con \textit{c} e \textit{a} costanti, i cui valori stimati sono in Tabella . 
+con \textit{c} e \textit{a} costanti, i cui valori stimati sono nella seguente tabella.
 
 \begin{center}
 \begin{tabular}{ |c|c|c|c| } 
@@ -456,31 +503,19 @@ con \textit{c} e \textit{a} costanti, i cui valori stimati sono in Tabella .
 \end{tabular}
 \end{center}
 
-\begin{figure}[h]
-{\centering\par
-\makebox[0 pt]{
-\includegraphics[width=0.57\linewidth]{time_graph_d1.png}
-\includegraphics[width=0.57\linewidth]{time_graph_d2.png}}
-\par}
-{\centering\par
-\makebox[0 pt]{
-\includegraphics[width=0.57\linewidth]{time_graph_d4.png}
-\includegraphics[width=0.57\linewidth]{time_graph_d8.png}}
-\par}
-\caption{\textit{Illustrazioni delle distribuzioni $\phi(\tau)$ dei tempi di decisione $\tau$, ottenute dalle medesime simulazioni, la cui magnetizzazione è riportata in Figura \ref{Fig:9}, assieme al relativo fit di power law in rosso.  }}
-\label{Fig:10}
-\end{figure}
+All'aumentare di $\delta$ è possibile osservare una crescita in valore assoluto sia del coefficiente moltiplicativo \textit{c} sia dell'esponente \textit{a}, che rende la distribuzione $\phi(\tau)$ dei tempi di decisione $\tau$ del sistema sempre più piccata verso lo zero.
+
 
 \subsection{Influenza delle Condizioni Iniziali}
-\label{Sec:4.4}
+\label{Sec:4.2}
 
 Uno degli scopi principali di questa tipolologia di modelli di \textit{opinion dynamics} è quello di comprendere le eventuali correlazioni tra condizioni iniziali e distribuzioni stazionarie del sistema.
 \\ A tal fine, è stata fatta variare la concentrazione iniziale $c_{-}^{in} = (\nicefrac{N_{-}^{in}}{N})$ di agenti d'opinione -1 nella popolazione in esame e per ciascuno dei valori selezionati sono state svolte 500 simulazioni, così da avere un campione statistico valido per la stima della probabilità di osservazione dei due stati stazionari noti.
 
 \begin{figure}[h]
 \centering
-\includegraphics[width = \linewidth]{random_prob_graph.png}
-\caption{\textit{bla bla bla}}
+\includegraphics[width=0.7\linewidth]{random_prob_graph.png}
+\caption{\textit{Rappresentazione grafica dei dati e dei fit relativi alle probabilità di osservazione degli stati stazionari ("Tutti +1" e "Tutti -1"). }}
 \label{Fig:11}
 \end{figure}
 
@@ -492,8 +527,9 @@ f(c_{-}^{in}) = A \cdot \tanh(k(x+\mu))+\varphi
 \end{equation}
 
 con \textit{A, k, $\mu$ e $\varphi$}, rispettivamente, coefficienti di ampiezza, modulazione, dislocamento orizzontale e verticale.
-\\ L'operazione di \textit{fitting} ai dati secondo la forma funzionale appena presentata ha condotto alla stima dei suoi parametri, i quali sono stati riportati in Tabella (sticazzi), ma anche ad un valore del coefficiente di determinazione $R^2 = 0.999927$, molto prossimo a quello ottimale (ossia 1).
+\\ L'operazione di \textit{fitting} ai dati secondo la forma funzionale appena presentata ha condotto alla stima dei suoi parametri, i quali sono stati riportati nella tabella a fine paragrafo, ma anche ad un valore del coefficiente di determinazione $R^2 = 0.999927$, molto prossimo a quello ottimale (ossia 1).
 
+\medskip
 \begin{center}
 \begin{tabular}{ |c|c|c|c| } 
 \hline
@@ -506,23 +542,25 @@ con \textit{A, k, $\mu$ e $\varphi$}, rispettivamente, coefficienti di ampiezza,
 \hline
 \end{tabular}
 \end{center}
+\medskip
 
 Inoltre, è stato interessante scoprire quanto anche le modalità di inizializzazione della popolazione sull'automa cellulare siano influenti sulle probabilità di osservazione dei due stati stazionari noti.
 \\ Infatti, al posto dell'inizializzazione puramente randomica utilizzata per i risultati precedenti ne è stata introdotta una nuova affinchè all'istante iniziale soltanto i primi $(c_{-}^{in} \cdot N)$ individui avessero opinione -1. Per chiarezza se ne è esposto un esempio in Figura \ref{Fig:12}.
 
-\medskip
 \begin{figure}[h]
 {\centering\par
 \makebox[0 pt]{
-\includegraphics[width=0.5\linewidth]{Random_Inizialization.png}
-\includegraphics[width=0.5\linewidth]{Fixed_Inizialization.png}}
+\includegraphics[width=0.45\linewidth]{Random_Inizialization.png}
+\includegraphics[width=0.45\linewidth]{Fixed_Inizialization.png}}
 \par}
 \caption{\textit{Esempio di due simulazioni con differenti modalità di inizializzazione: randomica a sinistra, ed ordinata a destra. }}
 \label{Fig:12}
 \end{figure}
+\medskip
 
-Ripetendo fedelmente l'analisi descritta all'inizio, si è potuto constatare che tutte le stime dei parametri del fit a tangente iperbolica (nella tabella a seguire) sono risultate compatibili a quelle del caso precedente, ad eccezione di \textit{k} che ha riscontrato una diminuizione di un'ordine di grandezza.
+Ripetendo fedelmente l'analisi descritta all'inizio, si è potuto constatare che tutte le stime dei parametri del \textit{fit} a tangente iperbolica (nella tabella a seguire) sono risultate compatibili a quelle del caso precedente, ad eccezione di \textit{k} che ha riscontrato una diminuizione di un'ordine di grandezza.
 
+\medskip
 \begin{center}
 \begin{tabular}{ |c|c|c|c| } 
 \hline
@@ -535,35 +573,140 @@ Ripetendo fedelmente l'analisi descritta all'inizio, si è potuto constatare che
 \hline
 \end{tabular}
 \end{center}
+\medskip
+
+Ciò ha reso gli andamenti delle probabilità d'osservazione delle distribuzioni stazionarie al variare della concentrazione iniziale $c_{-}^{in}$ di agenti con opinione -1 (in Figura \ref{Fig:13}) meno ripide in prossimità del punto di flesso rispetto a quelli in Figura \ref{Fig:11}. Grazie alla valutazione del coefficiente di determinazione $R^2 = 0.9967$, anch'essi sono risultati molto compatibili ai dati, per cui sono state eseguite 500 simulazioni ciascuno.
+
+\medskip
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\linewidth]{fixed_prob_graph.png}
+\caption{\textit{Rappresentazione grafica dei dati e dei fit relativi alle probabilità di osservazione degli stati stazionari ("Tutti +1" e "Tutti -1") nel caso particolare di inizializzazione ordinata della popolazione sull'automa cellulare. }}
+\label{Fig:13}
+\end{figure}
+\medskip \bigskip \bigskip \bigskip
+
+\subsection{Visione Parziale}
+\label{Sec:4.3}
+
+Per il modello di visione parziale, le cui basi teoriche sono trattate in Sezione \ref{Sec:3.2}, è stata svolta un'analisi del tutto analoga a quella presentata in Sezione \ref{Sec:4.1} riguardo la risposta del sistema a diversi valori della distanza d'influenza $\delta$.
+\\ Innanzitutto sono stati valutati, a fine puramente qualitativo, gli andamenti caratteristici dell'osservabile di magnetizzazione al variare del parametro $\eta$ (in Figura \ref{Fig:14}). Similarmente a $\delta$, si è ottenuto che il suo progressivo aumento comporta un raggiungimento dello stato stazionario a tempi mediamente minori.
 
 \begin{figure}[h]
 \centering
-\includegraphics[width = \linewidth]{fixed_prob_graph.png}
-\caption{\textit{bla bla bla}}
-\label{Fig:9}
+\begin{subfigure}{0.95\textwidth}
+\includegraphics[width=\linewidth]{partial_magn_graph_v1.png}
+\end{subfigure}
+\begin{subfigure}{0.95\textwidth}
+\includegraphics[width=\linewidth]{partial_magn_graph_v2.png}
+\end{subfigure}
+\end{figure}
+\begin{figure}
+\ContinuedFloat
+\centering
+\begin{subfigure}{0.95\textwidth}
+\includegraphics[width=\linewidth]{partial_magn_graph_v4.png}
+\end{subfigure}
+\begin{subfigure}{0.95\textwidth}
+\includegraphics[width=\linewidth]{partial_magn_graph_v8.png}
+\end{subfigure}
+\caption{\textit{Grafici riguardanti l'evoluzione temporale della magnetizzazione per quattro valori di distanza d'influenza (in ordine dall'alto verso il basso e da sinistra a destra: $\eta$ = 1, 2, 4, 8) in simulazioni da 300 steps temporali ciascuna.}}
+\label{Fig:14}
 \end{figure}
 
+\bigskip  \bigskip  \bigskip  
+Questo risultato è stato confermato da un punto di vista più quantitativo tramite l'acquisizione dei dati relativi ai tempi di decisione $\tau$ del sistema. In particolare, la loro distribuzione $\phi(\tau)$ si è rivelata seguire l'andamento tipico delle leggi a potenza, tranne che per il caso specifico di $\eta = 1$, per cui invece è risultato essere senza dubbio di forma esponenziale.
+\\ Proprio per questo motivo, la funzione di \textit{fit} scelta è stata la seguente
 
-\subsection{Visione Parziale}
-\label{Sec:4.2}
+\begin{equation}
+f(\tau)=\begin{cases}
+          c \ \tau ^{a} \quad &\text{per } \, \eta \neq 1 \\
+          c \ e^{a \tau} \quad &\text{per } \, \eta = 1 \\
+     \end{cases} .
+\label{Eq:13}
+\end{equation}
+
+\begin{figure}[h]
+\centering
+\begin{subfigure}{0.8\textwidth}
+\includegraphics[width=\linewidth]{partial_time_graph_v1.png}
+\end{subfigure}
+\begin{subfigure}{0.8\textwidth}
+\includegraphics[width=\linewidth]{partial_time_graph_v2.png}
+\end{subfigure}
+\end{figure}
+\begin{figure}
+\ContinuedFloat
+\centering
+\begin{subfigure}{0.8\textwidth}
+\includegraphics[width=\linewidth]{partial_time_graph_v4.png}
+\end{subfigure}
+\begin{subfigure}{0.8\textwidth}
+\includegraphics[width=\linewidth]{partial_time_graph_v8.png}
+\end{subfigure}
+\caption{\textit{Illustrazioni delle distribuzioni $\phi(\tau)$ dei tempi di decisione $\tau$, ottenute dalle medesime simulazioni, la cui magnetizzazione è riportata in Figura \ref{Fig:14}, assieme al relativo fit non-lineare in rosso, in scala logaritmica.  }}
+\label{Fig:15}
+\end{figure}
+
+Le stime dei parametri \textit{c} ed \textit{a} risultanti dai \textit{fit} in Figura \ref{Fig:15} sono state raccolte nella seguente tabella assieme alle proprie incertezze.
+
+\begin{center}
+\begin{tabular}{ |c|c|c|c| } 
+\hline
+ Simulazioni & \textit{c} & \textit{a} \\
+\hline
+\multirow{4}{4em}{$\eta$ = 1 \\$\eta$ = 2 \\$\eta$ = 4 \\$\eta$ = 8 } & 0.0212 $\pm$ 0.0004 & -0.0194 $\pm$ 0.0005 \\ 
+& 0.064 $\pm$ 0.003 & -0.58 $\pm$ 0.02 \\ 
+& 0.197 $\pm$ 0.005 & -0.95 $\pm$ 0.02 \\ 
+& 0.286 $\pm$ 0.009 &  -1.17 $\pm$ 0.04 \\
+\hline
+\end{tabular}
+\end{center}
+
+In particolare, la loro variazione dimostra che al decrescere di $\eta$ gli agenti abbiano una probabilità sempre meno trascurabile di compiere cambi di opinione in tempi maggiori.
+
 
 \subsection{Flocking Gravitazionale}
 \label{Sec:4.3}
 
-Le regole di evoluzione della dinamica spaziale presentate nella Sezione \ref{Sec:3.3} hanno effetti notevoli sulla dinamica delle opinioni in quanto le due fazioni corrispondenti ai due stati $\pm1$ intraprendono una specie di ''guerra di logoramento'' in cui gli individui si dispongono in ''trincee'' e cercano di far prevalere la propria opinione (Vedi Fig.\ref{Fig:9}). 
+Le regole di evoluzione della dinamica spaziale presentate nella Sezione \ref{Sec:3.3} hanno effetti notevoli sulla dinamica delle opinioni in quanto le due fazioni corrispondenti ai due stati $\pm1$ intraprendono una specie di ''guerra di logoramento'' in cui gli individui si dispongono in ''trincee'' e cercano di far prevalere la propria opinione (Vedi Fig.\ref{Fig:16}). 
+
 \begin{figure}[h]
 \centering
-\includegraphics{trincea.jpg}
+\includegraphics[width=0.65\linewidth]{trincea.jpg}
 \caption{\textit{Configurazione caratteristica degli individui in una dinamica di flocking gravitazionale.}}
-\label{Fig:9}
-
+\label{Fig:16}
 \end{figure}
 
-Gli individui nei nuclei di queste trincee, che sono protetti dai vicini della stessa opinione, sono chiaramente difficili da conquistare mentre le parti più esterne, corrispondenti agli individui che si devono ancora aggregare al gruppo, sono più vulnerabili al cambio di opinione. La fine della guerra corrisponde a quando una delle due fazioni ha influenzato tutti gli individui dell'altra fazione, con il conseguente risultato di una distribuzione di opinioni omogenea corrispondente ad una condizione di equilibrio stabile. \\
-Il raggiungimento di una delle due possibili condizioni stazionarie è fortemente dipendente dal parametro distanza di influenza $\delta$,  in particolare la dinamica è tanto più rapida quanto è maggiore il valore di $\delta$. Gli esempi riportati in figura \ref{Fig:10} portano una dimostrazione di quanto affermato attraverso l'analisi delle magnetizzazioni M(t).\\\\
+Gli individui nei nuclei di queste trincee, che sono protetti dai vicini della stessa opinione, sono chiaramente difficili da conquistare mentre le parti più esterne, corrispondenti agli individui che si devono ancora aggregare al gruppo, sono più vulnerabili al cambio di opinione. La fine della guerra corrisponde a quando una delle due fazioni ha influenzato tutti gli individui dell'altra fazione, con il conseguente risultato di una distribuzione di opinioni omogenea corrispondente ad una condizione di equilibrio stabile. 
+\\ Il raggiungimento di una delle due possibili condizioni stazionarie è fortemente dipendente dal parametro distanza di influenza $\delta$,  in particolare la dinamica è tanto più rapida quanto è maggiore il valore di $\delta$. Gli esempi riportati in figura \ref{Fig:10} portano una dimostrazione di quanto affermato attraverso l'analisi delle magnetizzazioni M(t).
 
-L'analisi dei tempi di decisione $\tau$ ha manifestato un andamento a potenza come mostrato dai \textit{fit} in Figura \ref{Fig:11} eseguiti tramite la funzione introdotta nella Eq.\ref{Eq:11}. Le stime dei coefficienti \textit{c} e \textit{a} sono presentate nella seguente Tabella.
+\begin{figure}[h]
+\centering
+\begin{subfigure}{0.95\textwidth}
+\includegraphics[width=\linewidth]{mag_d1.pdf}
+\end{subfigure}
+\begin{subfigure}{0.95\textwidth}
+\includegraphics[width=\linewidth]{mag_d2.pdf}
+\end{subfigure}
+\end{figure}
+\begin{figure}
+\ContinuedFloat
+\centering
+\begin{subfigure}{0.95\textwidth}
+\includegraphics[width=\linewidth]{mag_d4.pdf}
+\end{subfigure}
+\begin{subfigure}{0.95\textwidth}
+\includegraphics[width=\linewidth]{mag_d8.pdf}
+\end{subfigure}
+\label{Fig:10}
+\caption{SUUUU }
+\end{figure}
 
+\[\] \[\]
+L'analisi dei tempi di decisione $\tau$ ha manifestato un andamento a potenza come mostrato dai \textit{fit} in Figura \ref{Fig:11} eseguiti tramite la funzione introdotta nella Eq.\ref{Eq:11}. Le stime dei coefficienti \textit{c} e \textit{a} sono presentate nella seguente tabella.
+
+\medskip
 \begin{center}
 \begin{tabular}{ |c|c|c|c| } 
 \hline
@@ -577,36 +720,43 @@ L'analisi dei tempi di decisione $\tau$ ha manifestato un andamento a potenza co
 \hline
 \end{tabular}
 \end{center}
+\medskip
 
-\begin{figure}
+\begin{figure}[h]
 \centering
-\includegraphics{tau1.pdf}
+\begin{subfigure}{0.9\textwidth}
+\includegraphics[width=\linewidth]{tau1.pdf}
+\end{subfigure}
+\begin{subfigure}{0.9\textwidth}
+\includegraphics[width=\linewidth]{tau2.pdf}
+\end{subfigure}
 \end{figure}
 \begin{figure}
+\ContinuedFloat
 \centering
-\includegraphics{tau2.pdf}
-\end{figure}
-\begin{figure}
-\centering
-\includegraphics{tau4.pdf}
-\end{figure}
-\begin{figure}
-\centering
-\includegraphics{tau8.pdf}
+\begin{subfigure}{0.9\textwidth}
+\includegraphics[width=\linewidth]{tau4.pdf}
+\end{subfigure}
+\begin{subfigure}{0.9\textwidth}
+\includegraphics[width=\linewidth]{tau8.pdf}
+\end{subfigure}
+\label{Fig:17}
 \end{figure}
 
+\[\]
 È interessante notare che in questo tipo di modello, per come è costruita la dinamica degli individui, il raggiungimento di una condizione di equilibrio stabile può richiedere un numero di step temporali di simulazione molto elevato. Qui di seguito è stato riportato un esempio in cui si sono studiati la magnetizzazione
 e i tempi di decisione degli individui in una simulazione durata \textit{10078 steps}.
 
-\begin{figure}
+\begin{figure}[h]
 \centering
-\begin{subfigure}[h]{1.2\linewidth}
+\begin{subfigure}[h]{0.9\linewidth}
 \includegraphics[width=\linewidth]{mag.pdf}
 \end{subfigure}
-\begin{subfigure}[h]{1.2\linewidth}
+\qquad
+\begin{subfigure}[h]{0.9\linewidth}
 \includegraphics[width=\linewidth]{tau_10078.pdf}
 \end{subfigure}
-\label{Fig:13}
+\label{Fig:18}
 \end{figure}
 
 La stima dei parametri di \textit{fit} del grafico in Figura \ref{Fig:13} sono i seguenti:
@@ -622,12 +772,12 @@ La stima dei parametri di \textit{fit} del grafico in Figura \ref{Fig:13} sono i
 \end{tabular}
 \end{center}.
 
-Lo studio della influenza delle condizioni iniziali nella distribuzione di equilibrio del sistema è stato fatto su un campione di 500 simulazioni, eseguite variando la concentrazione $c^{in}_{ \_ }$ di agenti con opinione -1 ogni 100 esecuzioni della simulazione. Il risultato di questa analisi è graficato in Figura\ref{Fig:12}.
+Lo studio della influenza delle condizioni iniziali nella distribuzione di equilibrio del sistema è stato fatto su un campione di 500 simulazioni, eseguite variando la concentrazione $c^{in}_{-}$ di agenti con opinione -1 ogni 100 esecuzioni della simulazione. Il risultato di questa analisi è graficato in Figura\ref{Fig:19}.
 
-\begin{figure}
+\begin{figure}[h]
 \centering
-\includegraphics{fit_grav.pdf}
-\label{Fig:12}
+\includegraphics[width=0.9\linewidth]{fit_grav.pdf}
+\label{Fig:19}
 \end{figure}
 
 I \textit{fit} dei dati sono stati eseguiti attraverso la tangente iperbolica in Eq.\ref{Eq:12} e hanno portato alla stima dei parametri di \textit{fit} riportati in Tabella.
@@ -645,58 +795,46 @@ I \textit{fit} dei dati sono stati eseguiti attraverso la tangente iperbolica in
 \hline
 \end{tabular}
 \end{center}
-Il coefficiente di determinazione $R^2$ = 0.999587 è molto vicino al valore ottimale 1, ciò è un indice di bontà del \textit{fit}.
 
-\begin{figure}
-\centering
-\begin{subfigure}[h]{1.2\linewidth}
-\includegraphics[width=\linewidth]{mag_d1.pdf}
-\end{subfigure}
-\begin{subfigure}[h]{1.2\linewidth}
-\includegraphics[width=\linewidth]{mag_d2.pdf}
-\end{subfigure}
-\end{figure}
-
-\begin{figure}[h]
-\centering
-\begin{subfigure}[h]{1.2\linewidth}
-\includegraphics[width=\linewidth]{mag_d4.pdf}
-\end{subfigure}
-\begin{subfigure}[h]{1.2\linewidth}
-\includegraphics[width=\linewidth]{mag_d8.pdf}
-\end{subfigure}
-
-\label{Fig:10}
-\caption{SUUUU }
-\end{figure}
-
-
+Il coefficiente di determinazione associato $R^2$ = 0.999587 è molto vicino al valore ottimale 1; ciò è indice di un'eccellente compatibilità del \textit{fit} ai dati.
 
 \subsection{Confronto ai Dati}
 \label{Sec:4.5}
 
+In questa sottosezione, si intende mostrare l'attendibilità del modello fin qui introdotto ed analizzato, confrontandone il comportamento con dati riguardanti il supporto o l'opposizione all'adesione della Polonia alla NATO nel lasso temporale compreso tra il 02/1999 e il 03/2022.
+\\ Tuttavia, questi dati raccolti dal centro di ricerca CBOS \cite{cbos} nella serie \textit{"Polish Public Opinion"} presentano quattro possibili esiti dall'interrogazione delle persone nel campione popolativo, ossia \textit{"Support", "Oppose", "Indifferent"} e \textit{"Don't know/Refusal to answer".}
+\\ Quindi il calcolo della magnetizzazione, poi rappresentata in  Figura \ref{Fig:20}, è stato possibile assumendo una corrispondenza delle prime due opzioni rispettivamente alle opinioni $\pm1$, e delle ultime due ad un ipotetico valore 0, in modo tale da minimizzarne il loro contributo additivo. 
+
 \begin{figure}[h]
 \centering
 \includegraphics[width = 1.1\linewidth]{poland_magnetization_graph.png}
-\caption{\textit{bla bla bla}}
-\label{Fig:9}
+\caption{\textit{Andamento temporale della magnetizzazione relativa ai dati empirici sul supporto dell'adesione della Polonia alla NATO. La scala di tempi è scelta intenzionalmente fuori scala a causa di una discontinuità dalla raccolta dati tra il 09/2004 e il 02/2014. }}
+\label{Fig:20}
 \end{figure}
+
+\[\]
+Affinchè si ottenga una simulazione che rappresenti qualitativamente l'andamento empirico di magnetizzazione in Figura \ref{Fig:20}, è stato necessario porre la concentrazione iniziale di agenti con opinione -1 a $c_{-}^{in}=0.25$ e il parametro di distanza d'influenza $\delta=2$.
+\\ Il primo accorgimento inizializza il sistema in condizioni il più prossime possibili a quelle dei dati; mentre il secondo modula la rapidità di raggiungimento dello stato stazionario, infatti dall'analisi in Sezione \ref{Sec:4.1} si può dedurre che maggiore è il valore di $\delta$, minore sarà il tempo necessario al rilassamento ad uno degli equilibri possibili.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width = 1.1\linewidth]{poland_sim_magnetization_graph.png}
-\caption{\textit{bla bla bla}}
-\label{Fig:9}
+\caption{\textit{Andamento temporale della magnetizzazione ottenuta da una simulazione di dinamica delle opinioni secondo il modello su automa cellulare introdotto. }}
+\label{Fig:21}
 \end{figure}
 
 \section{Implementazione}
 \label{Sec:5}
-Qui di seguito è riportato il codice python utilizzato per l'implementazione del modello. Per l'esecuzione si rammenta di scaricare l'\textit{interpreter} di \textit{python (v ${>=}$3.10)} compatibile con il proprio sistema operativo. Inoltre è necessario avere installato le librerie richieste, in caso contrario sono facilmente reperibili utilizzando dei \textit{package manager} come ad esempio \textit{pip}.
+Qui di seguito è riportato il codice python utilizzato per l'implementazione del modello. Per l'esecuzione si rammenta di scaricare l'\textit{interpreter} di \textit{python (v ${>=}$ 3.10)} compatibile con il proprio sistema operativo. Inoltre è necessario avere installato le librerie richieste, in caso contrario sono facilmente reperibili utilizzando dei \textit{package manager} come ad esempio \textit{pip}.
 
 \section{Conclusioni}
 \label{Sec:6}
 
-\section{Bibliografia}
-\label{Sec:7}
+%\section{Bibliografia}
+%\label{Sec:7}
+
+\medskip
+
+\printbibliography[title={Bibliografia}]
 
 \end{document}
