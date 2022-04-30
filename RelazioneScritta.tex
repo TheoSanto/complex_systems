@@ -678,33 +678,36 @@ Le regole di evoluzione della dinamica spaziale presentate nella Sezione \ref{Se
 \label{Fig:16}
 \end{figure}
 
-Gli individui nei nuclei di queste trincee, che sono protetti dai vicini della stessa opinione, sono chiaramente difficili da conquistare mentre le parti più esterne, corrispondenti agli individui che si devono ancora aggregare al gruppo, sono più vulnerabili al cambio di opinione. La fine della guerra corrisponde a quando una delle due fazioni ha influenzato tutti gli individui dell'altra fazione, con il conseguente risultato di una distribuzione di opinioni omogenea corrispondente ad una condizione di equilibrio stabile. 
-\\ Il raggiungimento di una delle due possibili condizioni stazionarie è fortemente dipendente dal parametro distanza di influenza $\delta$,  in particolare la dinamica è tanto più rapida quanto è maggiore il valore di $\delta$. Gli esempi riportati in figura \ref{Fig:10} portano una dimostrazione di quanto affermato attraverso l'analisi delle magnetizzazioni M(t).
-
+Gli individui nei nuclei di queste trincee, che sono protetti dai vicini della stessa opinione, sono chiaramente difficili da conquistare mentre le parti più esterne, corrispondenti agli individui che si devono ancora aggregare al gruppo, sono più vulnerabili al cambio di opinione. La fine della guerra corrisponde a quando una delle due fazioni ha influenzato tutti gli individui dell'altra fazione, con il conseguente risultato di una distribuzione di opinioni omogenea corrispondente ad una condizione di equilibrio stabile. Il raggiungimento di una delle due possibili condizioni stazionarie è dipendente dal parametro distanza di influenza $\delta$,  in particolare la dinamica è mediamente tanto più rapida quanto è maggiore il valore di $\delta$.\medskip
+\\Va tuttavia osservato che la correlazione tra la rapidità del sistema a ragiungere l'equilibrio e i valori della distanza di influenza non è forte come per i due precedenti modelli. Infatti, in una porzione significante di casi, capita che il sistema riesca a raggiungere l'equilibrio solo in tempi molto alti mentre, in un'altra porzione di casi altrettanto significante, il sistema rilassa all'equilibrio in tempi comparabili con quelli degli altri modelli. La distanza $\delta$ è la responsabile della gestione delle proporzioni di queste due classi di casi: per $\delta$ elevati (rispetto a \textit{$\sqrt k$}), il sistema riesce generalmente a raggiungere una condizione di equilibrio prima che il \textit{flocking} di individui con la stessa opinione sia consistente.
 \begin{figure}[h]
 \centering
 \begin{subfigure}{0.95\textwidth}
-\includegraphics[width=\linewidth]{mag_d1.pdf}
+\centering
+\includegraphics[width=0.9\linewidth]{mag_d1.pdf}
 \end{subfigure}
 \begin{subfigure}{0.95\textwidth}
-\includegraphics[width=\linewidth]{mag_d2.pdf}
+\centering
+\includegraphics[width=0.9\linewidth]{mag_d2.pdf}
 \end{subfigure}
 \end{figure}
-\begin{figure}
+\begin{figure}[t]
 \ContinuedFloat
 \centering
 \begin{subfigure}{0.95\textwidth}
-\includegraphics[width=\linewidth]{mag_d4.pdf}
+\centering
+\includegraphics[width=0.9\linewidth]{mag_d4.pdf}
 \end{subfigure}
 \begin{subfigure}{0.95\textwidth}
-\includegraphics[width=\linewidth]{mag_d8.pdf}
+\centering
+\includegraphics[width=0.9\linewidth]{mag_d8.pdf}
 \end{subfigure}
 \label{Fig:10}
 \caption{SUUUU }
 \end{figure}
-
-\[\] \[\]
-L'analisi dei tempi di decisione $\tau$ ha manifestato un andamento a potenza come mostrato dai \textit{fit} in Figura \ref{Fig:11} eseguiti tramite la funzione introdotta nella Eq.\ref{Eq:11}. Le stime dei coefficienti \textit{c} e \textit{a} sono presentate nella seguente tabella.
+\\
+Quando questo accade, il modello di \textit{flocking} gravitazionale si comporta similmente agli altri modelli, come mostrato negli esempi riportati in figura \ref{Fig:10} attraverso l'analisi delle magnetizzazioni M(t). \\
+Se invece le distanze $\delta$ in gioco sono piccole, allora questa evenienza è piuttosto rara e il sistema generalmente si pone in ''condizioni di stallo'' (per via della struttura della dinamica) da cui se ne esce solo dopo tempi lughissimi. Le condizioni di stallo, che hanno probabilità di verificarsi proporzionale al valore di $\delta$, sono quindi le dirette responsabili della rottura della legge a potenza nei grafici dei tempi di decisione.  L'analisi dei tempi di decisione $\tau$ mostrata dai \textit{fit} in Figura \ref{Fig:11} eseguiti tramite la funzione introdotta nella Eq.\ref{Eq:11} mette in luce questa rottura. Le stime dei coefficienti \textit{c} e \textit{a} sono presentate nella seguente tabella.
 
 \medskip
 \begin{center}
@@ -716,12 +719,12 @@ L'analisi dei tempi di decisione $\tau$ ha manifestato un andamento a potenza co
 & 0.182 $\pm$ 0.007 & -1.09 $\pm$ 0.05 \\ 
 & 0.394 $\pm$ 0.011 & -1.68 $\pm$ 0.08 \\ 
 & 0.265 $\pm$ 0.005 & -1.54 $\pm$ 0.05 \\ 
-& 0.182 $\pm$ 0.007 &  -1.09 $\pm$ 0.05 \\
+& 0.40 $\pm$ 0.02 &  -1.24 $\pm$ 0.08 \\
 \hline
 \end{tabular}
 \end{center}
 \medskip
-
+Fatta eccezione per il grafico avente $\delta$ = 8, dove il \textit{fit} ricopre l'intero intervallo di dati, rimane evidente il fatto che per tempi bassi (fino a circa 20 step temporali di simulazione), il fenomeno di \textit{flocking} non è sufficientemente pesante da creare questa rottura e quindi il sistema segue comunque una legge a potenza.\\
 \begin{figure}[h]
 \centering
 \begin{subfigure}{0.9\textwidth}
@@ -730,7 +733,7 @@ L'analisi dei tempi di decisione $\tau$ ha manifestato un andamento a potenza co
 \begin{subfigure}{0.9\textwidth}
 \includegraphics[width=\linewidth]{tau2.pdf}
 \end{subfigure}
-\end{figure}
+\end{figure}\\
 \begin{figure}
 \ContinuedFloat
 \centering
@@ -742,9 +745,16 @@ L'analisi dei tempi di decisione $\tau$ ha manifestato un andamento a potenza co
 \end{subfigure}
 \label{Fig:17}
 \end{figure}
-
-\[\]
-È interessante notare che in questo tipo di modello, per come è costruita la dinamica degli individui, il raggiungimento di una condizione di equilibrio stabile può richiedere un numero di step temporali di simulazione molto elevato. Qui di seguito è stato riportato un esempio in cui si sono studiati la magnetizzazione
+\\In Figura\ref{Fig:123} sono state messe in evidenza le correlazioni della distanza con la velocità del sistema a rilassare all'equilbrio. Per ognuno dei 4 valori di $\delta$ rappresentati, sono state eseguite 25 simulazioni e il tempo soglia è stato scelto pari a 500 step in quanto è un valore ragionevole dopo il quale i tempi possono essere considerati elevati (e quindi il fenomeno di \textit{flocking} sufficientemente consolidato nella dinamica).
+\\
+\begin{figure}[h!!]
+\centering
+\includegraphics[width=0.8\linewidth]{Time_distribution_correlation.pdf}
+\caption{\textit{Distribuzione delle occorenze di tempi di rilassamento che superano la soglia di 500 step al variare di $\delta$ su un campione di 100 simulazioni. In azzurro le occorrenze per $\delta=1$, in verde per $\delta=2$, in giallo per $\delta=4$ e in rosso per $\delta=8$}.}
+\label{Fig:123}
+\end{figure}
+\\
+È interessante analizzare anche un caso in cui il raggiungimento di una condizione di equilibrio stabile può richiedere un numero di step temporali di simulazione molto elevato. Qui di seguito è stato riportato un esempio in cui si sono studiati la magnetizzazione
 e i tempi di decisione degli individui in una simulazione durata \textit{10078 steps}.
 
 \begin{figure}[h]
@@ -758,9 +768,8 @@ e i tempi di decisione degli individui in una simulazione durata \textit{10078 s
 \end{subfigure}
 \label{Fig:18}
 \end{figure}
-
-La stima dei parametri di \textit{fit} del grafico in Figura \ref{Fig:13} sono i seguenti:
-
+\bigskip
+La stima dei parametri di \textit{fit} del grafico in Figura \ref{Fig:13} sono i seguenti:\\
 \begin{center}
 \begin{tabular}{ |c|c|c|c| } 
 \hline
@@ -771,8 +780,8 @@ La stima dei parametri di \textit{fit} del grafico in Figura \ref{Fig:13} sono i
 \hline
 \end{tabular}
 \end{center}.
-
-Lo studio della influenza delle condizioni iniziali nella distribuzione di equilibrio del sistema è stato fatto su un campione di 500 simulazioni, eseguite variando la concentrazione $c^{in}_{-}$ di agenti con opinione -1 ogni 100 esecuzioni della simulazione. Il risultato di questa analisi è graficato in Figura\ref{Fig:19}.
+\bigskip
+\\\\Lo studio della influenza delle condizioni iniziali nella distribuzione di equilibrio del sistema è stato fatto su un campione di 500 simulazioni, eseguite variando la concentrazione $c^{in}_{-}$ di agenti con opinione -1 ogni 100 esecuzioni della simulazione. Il risultato di questa analisi è graficato in Figura\ref{Fig:19}.
 
 \begin{figure}[h]
 \centering
