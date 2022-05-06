@@ -1,5 +1,4 @@
 #include "TH1.h"
-#include "TRandom.h"
 #include "TMath.h"
 #include "TCanvas.h"
 #include "TFile.h"
@@ -7,150 +6,136 @@
 #include "TTree.h"
 #include <array>
 
-void opinions_histos() {
 
-  gStyle->SetOptStat(2210);
-  //gStyle->SetOptFit(111);
-
-// Window for Visualization of Initial Opinions' Distribution
-  TCanvas* c1 = new TCanvas("c1","Initial Opinions' Distribution",200,10,1100,900);
-  c1->SetGridx();
-  c1->SetGridy();
-
-// TTree filled with Data on Initial Opinions' Distribution
-  TTree* t_in = new TTree("t_in", "tree from data_in.csv");
-  t_in->ReadFile("data_in.csv", "Class/C:ID/D:Opinion:Position:Time_Step", ',');
-
-// Histogram filled with Opinion Data of  TTree 't_in'
-  TH1F* h_in=new TH1F("h_in","Initial Opinions' Distribution",16, -1.1, 1.1);  
-  t_in->Draw("Opinion>>h_in");
-  h_in->SetBinContent(0,0);
-  h_in->ResetStats();
-
-// Histogram 'h_in' Cosmetics
-  h_in->SetTitleSize(1.5);
-  h_in->SetFillColor(kBlue);
-  h_in->SetLineColor(kBlue+2);
-  h_in->SetLineWidth(2);
-  h_in->GetXaxis()->SetTitle("Opinion Parameter");
-  h_in->GetXaxis()->SetTitleSize(0.04);
-  h_in->GetYaxis()->SetTitle("Counts");
-  h_in->GetYaxis()->SetTitleSize(0.04);
-
-// Window for Visualization of Final Opinions' Distribution
-  TCanvas* c2 = new TCanvas("c2","Final Opinions' Distribution",200,10,1100,900);
-  c2->SetGridx();
-  c2->SetGridy();
-
-// TTree filled with Data on Final Opinions' Distribution
-  TTree* t_fin = new TTree("t_fin", "tree from /home/theo/bazzani/data_fin.csv");
-  t_fin->ReadFile("/home/theo/bazzani/data_fin.csv", "Class/C:ID/D:Opinion:Position:Time_Step", ',');
-
-// Histogram filled with Opinion Data of TTree 't_fin'
-  TH1F* h_fin=new TH1F("h_fin","Final Opinions' Distribution",16, -1.1, 1.1);  
-  t_fin->Draw("Opinion>>h_fin");
-  h_fin->SetBinContent(0,0);
-  h_fin->ResetStats();
-
-// Histogram 'h_fin' Cosmetics
-  h_fin->SetTitleSize(1.5);
-  h_fin->SetFillColor(kBlue);
-  h_fin->SetLineColor(kBlue+2);
-  h_fin->SetLineWidth(2);
-  h_fin->GetXaxis()->SetTitle("Opinion Parameter");
-  h_fin->GetXaxis()->SetTitleSize(0.04);
-  h_fin->GetYaxis()->SetTitle("Counts");
-  h_fin->GetYaxis()->SetTitleSize(0.04);
-
-}
-
-void degree_histo() {
+void histo() {
 
   gStyle->SetOptStat(2210);
 
 // Window for Visualization 
-  TCanvas* c3 = new TCanvas("c3","Degree of nodes' Occourences",200,10,1100,900);
+  TCanvas* c3 = new TCanvas("c3","Time's Occourences",200,10,1100,900);
   c3->SetGridx();
   c3->SetGridy();
 
 
 
 // TTree filled with Data on Degrees Distribution
-  TTree* t_deg1 = new TTree("t_deg", "tree from /home/theo/bazzani/deg.csv");
-  t_deg1->ReadFile("/home/theo/bazzani/deg.csv", "Degree:Number_of_nodes", ';');
-  TTree* t_deg2 = new TTree("t_deg", "tree from /home/theo/bazzani/deg.csv");
-  t_deg2->ReadFile("/home/theo/bazzani/deg.csv", "Number_of_nodes:Degree", ';');
+  TTree* t8 = new TTree("t8", "tree");
+  t8->ReadFile("/home/matteo/sistemi_complessi/step8.txt", "Time",' ');
+  TTree* t4 = new TTree("t4", "tree");
+  t4->ReadFile("/home/matteo/sistemi_complessi/step4.txt", "Time",' ');
+  TTree* t2 = new TTree("t2", "tree");
+  t2->ReadFile("/home/matteo/sistemi_complessi/step2.txt", "Time",' ');
+  TTree* t1 = new TTree("t1", "tree");
+  t1->ReadFile("/home/matteo/sistemi_complessi/step1.txt", "Time",' ');
+
+  TH1I* h1=new TH1I("h1","Tempi maggiori di t=500",10, -0.5, 9.5);  
+  TH1I* h2=new TH1I("h2","Tempi maggiori di t=500",10, -0.5, 9.5);
+  TH1I* h4=new TH1I("h4","Tempi maggiori di t=500",10, -0.5, 9.5);
+  TH1I* h8=new TH1I("h8","Tempi maggiori di t=500",10, -0.5, 9.5);
  
-  TH1I* h_deg=new TH1I("h_deg","Degree of nodes' Occourences",11, -0.5, 10.5);  
-
-  int sz1 = t_deg1->Draw("Degree", "Number_of_nodes");
-  Double_t *v1 = t_deg1->GetV1();
-  for ( int i = 0; i < sz1; ++i ) {
-    std::cout << v1[i] << endl;
-  }
-  int sz2 = t_deg2->Draw("Degree", "Number_of_nodes");
-  Double_t *v2 = t_deg2->GetV1();
-  for ( int i = 0; i < sz2; ++i ) {
-    std::cout << v2[i] << endl;
-  }
-
-
+  std::vector<int> step8 = {};
+  std::vector<int> step4 = {};
+  std::vector<int> step2 = {};
+  std::vector<int> step1 = {};
 
   
-  //TFile *file = new TFile("deg.root", "READ"); 
-  //TTree * Tout= (TTree*)file->Get(0);
-  //Tout->Print();
+  int sz8 = t8->Draw("Time", "Time");
+  int sz1 = t1->Draw("Time", "Time");
+  int sz2 = t2->Draw("Time", "Time");
+  int sz4 = t4->Draw("Time", "Time");
+  Double_t *v8 = t8->GetV1();
+  Double_t *v4 = t4->GetV1();
+  Double_t *v2 = t2->GetV1();
+  Double_t *v1 = t1->GetV1();
 
-  //TFile *f = TFile::Open("deg.root");
-  //TTree *t4 = (TTree *) f->GetObject("t0");
-  //t4->Print();
-
-
-//  std::array<int, 8> col1 = {0,3,4,5,6,5,3,1};
-//  std::array<int, 8> col2 = {1,2,3,4,5,6,7,8};
-  for(int i = 0; i <= sz1; i++) {
-    for(int j = 0; j < v2[i]; j++) {
-      //std::cout<<"valore "<<col1[i]<<'\n';
-      //std::cout<<"indice"<<i<<'\n';
-      h_deg->Fill(v1[i]);
+  for ( int i = 0; i < sz8; ++i ) {
+    std::cout << v8[i] << endl; 
+    if (v8[i] > 500) {
+    	step8.push_back(v8[i]);
     }
   }
+    for ( int i = 0; i < sz4; ++i ) {
+    std::cout << v4[i] << endl; 
+    if (v4[i] > 500) {
+    	step4.push_back(v4[i]);
+    }
+  }
+    for ( int i = 0; i < sz2; ++i ) {
+    std::cout << v2[i] << endl; 
+    if (v2[i] > 500) {
+    	step2.push_back(v2[i]);
+    }
+  }
+    for ( int i = 0; i < sz1; ++i ) {
+    std::cout << v1[i] << endl; 
+    if (v1[i] > 500) {
+    	step1.push_back(v1[i]);
+    }
+  }
+  std::cout << "Actual elements in d8: " << step8.size() << endl;
+  std::cout << "Actual elements in d4: " << step4.size() << endl;
+  std::cout << "Actual elements in d2: " << step2.size() << endl;
+  std::cout << "Actual elements in d1: " << step1.size() << endl;
 
 
-
-
-
-
-
-
-  //t->ReadFile("ytt_yt.csv", "yt0_X/D:yt0_Y:yt3_X:yt3_Y:yt1_X:yt1_Y:yt2_X:yt2_Y");
-  //t->Draw("yt3_Y : yt3_X");
-
-// Histogram filled with Degree Data of TTree 't_in'
-
-  //t_deg->Draw("Degree>>h_deg");
-  //h_deg->SetBinContent(0,0);
-  //h_deg->ResetStats();
+   for(int j = 0; j < step8.size(); j++) {
+   	h8->Fill(8);
+   }
+   for(int j = 0; j < step4.size(); j++) {
+   	h4->Fill(4);
+   }
+   for(int j = 0; j < step2.size(); j++) {
+   	h2->Fill(2);
+   }
+   for(int j = 0; j < step1.size(); j++) {
+   	h1->Fill(1);
+   }
 
 // Cosmetics
-  h_deg->SetTitleSize(1.5);
-  h_deg->SetFillColor(kBlue);
-  h_deg->SetLineColor(kBlue+2);
-  h_deg->SetLineWidth(2);
-  h_deg->GetXaxis()->SetTitle("Degree");
-  h_deg->GetXaxis()->SetTitleSize(0.04);
-  h_deg->GetYaxis()->SetTitle("Occourences");
-  h_deg->GetYaxis()->SetTitleSize(0.04);
-  h_deg->Draw();
-  c3->SaveAs("canvas.pdf");
+  h1->SetTitleSize(1.5);
+  h1->SetFillColor(38);
+  h1->SetLineColor(kBlue+2);
+  h1->SetLineWidth(2);
+  h1->GetXaxis()->SetTitle("Distanza di influenza");
+  h1->GetXaxis()->SetTitleSize(0.04);
+  h1->GetYaxis()->SetTitle("Occorrenze");
+  h1->GetYaxis()->SetTitleSize(0.04);
+  h1->Draw();
+  
+  h8->SetTitleSize(1.5);
+  h8->SetFillColor(46);
+  h8->SetLineColor(kBlue+2);
+  h8->SetLineWidth(2);
+  h8->GetXaxis()->SetTitle("Distance");
+  h8->GetXaxis()->SetTitleSize(0.04);
+  h8->GetYaxis()->SetTitle("Occourences");
+  h8->GetYaxis()->SetTitleSize(0.04);
+  h8->Draw("SAME");
+  
+  h4->SetTitleSize(1.5);
+  h4->SetFillColor(kOrange);
+  h4->SetLineColor(kBlue+2);
+  h4->SetLineWidth(2);
+  h4->GetXaxis()->SetTitle("Distance");
+  h4->GetXaxis()->SetTitleSize(0.04);
+  h4->GetYaxis()->SetTitle("Occourences");
+  h4->GetYaxis()->SetTitleSize(0.04);
+  h4->Draw("SAME");
+  
+  h2->SetTitleSize(1.5);
+  h2->SetFillColor(8);
+  h2->SetLineColor(kBlack);
+  h2->SetLineWidth(2);
+  h2->GetXaxis()->SetTitle("Distance");
+  h2->GetXaxis()->SetTitleSize(0.04);
+  h2->GetYaxis()->SetTitle("Occourences");
+  h2->GetYaxis()->SetTitleSize(0.04);
+  h2->Draw("SAME");
+  
+  gStyle->SetOptStat(0);
+  
+  c3->SaveAs("Time_distribution_correlation.pdf");
 
 
 }
 
-/*
-col1 = [,,,,]
-col2 = [,,,,,]
-for j (0, i < , ++j)
-    for i in range (col2[j])
-        h_deg->Fill(col1[j])
-        */
