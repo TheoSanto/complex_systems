@@ -2,15 +2,13 @@ import functions as f
 import global_variables as glob
 
 start_all = glob.time.time()
-#glob.np.random.seed(196808819)
+glob.np.random.seed(196808818) 
 
 # Random Positioning & Opinion Defining of the Individuals
 if glob.fixed_init==False :
     glob.ambient_evolution[0] = f.init_random()
 if glob.fixed_init==True :
     glob.ambient_evolution[0] = f.init_fixed()
-
-# CSV Files for Magnetization & Decision Time Data Storage
 
 # Implementation and Storage of Time Evolution of 1° Scenario
 if glob.setup==0 :
@@ -19,9 +17,8 @@ if glob.setup==0 :
         print("Step", t, ', Mode',glob.setup)
         if t>0 :
             glob.ambient_evolution[t] = f.evolve_norm(glob.ambient_evolution[t-1])
-            print(f.count_all(glob.ambient_evolution[t]))
             if glob.balancing==True :
-                balance = f.stop_if_eq(glob.ambient_evolution[t], t) #sono in equilibrio?
+                balance = f.stop_if_eq(glob.ambient_evolution[t], t)
                 if balance!=False : 
                     print("Equilibrio raggiunto: ", balance)
                     glob.nsteps = t
@@ -40,7 +37,7 @@ if glob.setup==0 :
         glob.plt.xlabel('Time Step')
         glob.plt.show()
         
-        magnetization_data_file = 'magn_data_n100_d1.csv'
+        magnetization_data_file = 'magn_data_n100_d8.csv'
         with open(magnetization_data_file, 'w') as magn_fout :
             f.magnetization_data_storage(magnetization_data, magn_fout)
     
@@ -58,13 +55,13 @@ if glob.setup==0 :
         glob.plt.xscale('log')
         glob.plt.show()
 
-        decision_time_data_file = 'time_data_n100_d1.csv'
+        decision_time_data_file = 'time_data_n100_d8.csv'
         with open(decision_time_data_file, 'w') as time_fout :
             f.decision_time_data_storage(times_counts, time_fout)
 
     # Initial Conditions Influence Analysis
     if glob.init_analysis==True :
-        norm_file = 'init_data_sim500_d4_random.txt'
+        norm_file = 'init_data_sim500_d4_blues50_fixed.txt'
         with open(norm_file, 'a') as n_fout :
             n_fout.write(f'{balance}\n')
 
@@ -72,19 +69,13 @@ if glob.setup==0 :
 # Implementation and Storage of Time Evolution of 2° Scenario
 if glob.setup==1 :
 
-    #third_stationary_duration = 0
     for t in range(glob.nsteps) : 
         print("Step", t, ', Mode',glob.setup)
         if t>0 :
             glob.ambient_evolution[t] = f.evolve_grav(glob.ambient_evolution[t-1])
-            print(f.count_all(glob.ambient_evolution[t]))
             if glob.balancing==True :
-                #if f.count_all(glob.ambient_evolution[t])==f.count_all(glob.ambient_evolution[t-1]) :
-                #    third_stationary_duration += 1
-                #else : 
-                #    third_stationary_duration = 0
-                balance = f.stop_if_eq(glob.ambient_evolution[t], t) #sono in equilibrio?
-                if balance!=False : #or third_stationary_duration==100 : 
+                balance = f.stop_if_eq(glob.ambient_evolution[t], t)
+                if balance!=False :  
                     print("Equilibrio raggiunto: ", balance)
                     glob.nsteps = t
                     break
@@ -93,8 +84,8 @@ if glob.setup==1 :
     if glob.magnetization_analysis==True :
         magnetization_data = [] 
         for t in range(glob.nsteps) :
-            spin_data_t = f.count_all(glob.ambient_evolution[t]) #proportion of opinions
-            m = (1/glob.npeople)*(spin_data_t[1]-spin_data_t[0]) #magnetizzazione al tempo t generico
+            spin_data_t = f.count_all(glob.ambient_evolution[t])
+            m = (1/glob.npeople)*(spin_data_t[1]-spin_data_t[0])
             magnetization_data.append(m)
 
         times = glob.np.linspace(0,glob.nsteps,glob.nsteps)
@@ -122,8 +113,6 @@ if glob.setup==1 :
         glob.plt.xscale('log')
         glob.plt.show()
 
-        #csv file tau
-        '''problema'''
         decision_time_data_file = 'grav_time_data.csv'
         with open(decision_time_data_file, 'w') as gtime_fout :
             f.decision_time_data_storage(times_counts, gtime_fout)
@@ -134,13 +123,6 @@ if glob.setup==1 :
         with open(grav_file, 'a') as g_fout :
             g_fout.write(f'{balance}\n')
         
-        
-
-''''''''''''''''''''''''''''''''''''''''''''''''
-
-
-
-
 # Implementation and Storage of Time Evolution of 3° Scenario
 if glob.setup==2 :
 
@@ -149,7 +131,7 @@ if glob.setup==2 :
         if t>0 :
             glob.ambient_evolution[t] = f.evolve_vis(glob.ambient_evolution[t-1])
             if glob.balancing==True :
-                balance = f.stop_if_eq(glob.ambient_evolution[t], t) #sono in equilibrio?
+                balance = f.stop_if_eq(glob.ambient_evolution[t], t)
                 if balance!=False : 
                     print("Equilibrio raggiunto: ", balance)
                     glob.nsteps = t
@@ -159,8 +141,8 @@ if glob.setup==2 :
     if glob.magnetization_analysis==True :
         magnetization_data = [] 
         for t in range(glob.nsteps) :
-            spin_data_t = f.count_all(glob.ambient_evolution[t]) #proportion of opinions
-            m = (1/glob.npeople)*(spin_data_t[1]-spin_data_t[0]) #magnetizzazione al tempo t generico
+            spin_data_t = f.count_all(glob.ambient_evolution[t]) 
+            m = (1/glob.npeople)*(spin_data_t[1]-spin_data_t[0]) 
             magnetization_data.append(m)
 
         times = glob.np.linspace(0,glob.nsteps,glob.nsteps)
@@ -170,9 +152,8 @@ if glob.setup==2 :
         glob.plt.xlabel('Time Step')
         glob.plt.show()
 
-        #csv file magnetization
-        partial_v= 'partial_vision_magnetization.csv'
-        with open(partial_v, 'w') as partial_fout :
+        partial_magn_file = 'partial_magn_data_n100_d4_v8.csv'
+        with open(partial_magn_file, 'w') as partial_fout :
             f.magnetization_data_storage(magnetization_data, partial_fout)
 
     # Decision Time Distribution Analysis
@@ -189,9 +170,8 @@ if glob.setup==2 :
         glob.plt.xscale('log')
         glob.plt.show()
 
-        #csv file tau
-        decision_time_data_file = 'partial_time_data.csv'
-        with open(decision_time_data_file, 'w') as ptime_fout :
+        partial_time_data_file = 'partial_time_data_n100_d4_v8.csv'
+        with open(partial_time_data_file, 'w') as ptime_fout :
             f.decision_time_data_storage(times_counts, ptime_fout)
 
     # Initial Conditions Influence Analysis
@@ -200,29 +180,15 @@ if glob.setup==2 :
         with open(vis_file, 'a') as v_fout :
             v_fout.write(f'{balance}\n')
 
-
-#bench
 end_all = glob.time.time()
 print('all time:',end_all-start_all)
-
-## Fulfilling of the CSV File for Initial State of the System 
-#data_in = 'data_in.csv'
-#with open(data_in, 'w') as fout1 :
-#    fout1.write('Class, Opinion, Position, Time_Step\n')
-#    for i in range(glob.dimension) :
-#        f.data_extr(glob.ambient_evolution[0], i, fout1, 0)
-#
-## Fulfilling of the CSV File for Final State of the System 
-#data_fin = 'data_fin.csv'
-#with open(data_fin, 'w') as fout2 :
-#    fout2.write('Class, ID, Opinion, Position, Time_Step\n')
-#    for i in range(glob.dimension) :
-#        f.data_extr(glob.ambient_evolution[glob.nsteps-1], i, fout2, glob.nsteps-1)
 
 # Implementaion of Cellular Automata Visualization and Animation
 fig = glob.plt.figure()
 glob.ax = fig.add_axes([0.1, 0.1, 0.5, 0.75])
 glob.ax_histo = fig.add_axes([0.7, 0.1, 0.23, 0.4])
 anim = glob.animation.FuncAnimation(fig, f.update_scatter, frames=glob.nsteps, interval=glob.interval)
-anim.save('simulation_try.gif')
-#glob.plt.show() 
+#anim.save('simulation_try.gif')
+glob.plt.show() 
+
+#it is recommended to create a comment for all .show() methods in order to allow start.bat for multiple executions  
